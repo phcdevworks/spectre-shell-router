@@ -1,0 +1,32 @@
+# Development files
+.devcontainer/
+.github/
+.vscode/
+.git/
+.gitattributes
+.editorconfig
+
+# Documentation
+CHANGELOG.md
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+SECURITY.md
+
+# Build artifacts
+node_modules/
+spectre-theme/dist/
+
+# Config files
+.eslintrc*
+.prettierrc*
+*.code-workspace
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Misc
+.DS_Store
+*.local
