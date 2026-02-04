@@ -7,18 +7,16 @@
     "spectre",
     "spectre-shell",
     "router",
-    "client-router",
-    "spa-router",
-    "vanilla-js",
     "framework-agnostic",
     "typescript",
     "history-api",
-    "navigation",
     "page-lifecycle"
   ],
   "author": "PHCDevworks",
   "license": "MIT",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.js",
