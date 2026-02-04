@@ -1,20 +1,55 @@
 {
-  "name": "spectre-shell-router",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "name": "@phcdevworks/spectre-shell-router",
+  "version": "0.1.0",
+  "description": "Minimal, framework-agnostic client-side router for vanilla TypeScript apps.",
+  "keywords": [
+    "phcdevworks",
+    "spectre",
+    "spectre-shell",
+    "router",
+    "client-router",
+    "spa-router",
+    "vanilla-js",
+    "framework-agnostic",
+    "typescript",
+    "history-api",
+    "navigation",
+    "page-lifecycle"
+  ],
+  "author": "PHCDevworks",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
   },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/phcdevworks"
+    },
+    {
+      "type": "buymeacoffee",
+      "url": "https://buymeacoffee.com/phcdevworks"
+    }
+  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/phcdevworks/spectre-shell-router.git"
+    "url": "https://github.com/phcdevworks/spectre-shell-router.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "bugs": {
     "url": "https://github.com/phcdevworks/spectre-shell-router/issues"
   },
-  "homepage": "https://github.com/phcdevworks/spectre-shell-router#readme"
+  "homepage": "https://github.com/phcdevworks/spectre-shell-router#readme",
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
 }
