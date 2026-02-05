@@ -1,35 +1,72 @@
 # Contributing to Spectre Shell Router
 
-Thanks for helping improve Spectre Shell Router!
+Thanks for helping improve Spectre Shell Router! This package is a minimal, framework-agnostic client-side router for vanilla TypeScript apps.
 
-## About This Project
+## Development Philosophy
 
-**Spectre Shell Router** is a minimal, framework-agnostic client-side router designed to support the Spectre platform's vanilla TypeScript app shell.
+This router follows a **minimal by design** approach:
 
-It is **not a full routing framework**. It intentionally solves only one problem: **mapping URLs to page modules and managing page lifecycle in a vanilla web app.**
+### 1. Core Routing
 
-### What it does
+**Purpose**: Single source of truth for URL mapping and page lifecycle
 
-- Maps URL paths to async page module loaders
-- Supports path parameters (e.g. `/users/:id`)
-- Uses the browser History API (`pushState`, `popstate`)
-- Loads pages dynamically via `import()`
-- Calls a page's `render(ctx)` function on navigation
-- Calls an optional `destroy()` function when leaving a page
+**Exports**: Type-safe routing functions and interfaces
 
-### What it does NOT do
+**Rules**:
 
-- No nested routing
-- No layouts or middleware
-- No data fetching or side effects
-- No global state or SSR
-- No transitions, animations, or framework integration
+- Keep the API surface minimal and predictable
+- No framework dependencies or assumptions
+- Router only maps paths and manages lifecycle
+- All source files must be TypeScript with strict types
 
-### Philosophy
+**Status**: v0.0.1 initial release with path matching and lifecycle hooks
 
-**Routing should be boring, small, explicit, and replaceable.**
+### 2. Page Contract
 
-This router exists to define a navigation and page lifecycle contract, not to compete with full-featured routers.
+**Purpose**: Simple interface for pages to integrate with the router
+
+**Ships**:
+
+- `render(ctx)` (required page entry point)
+- `destroy()` (optional cleanup handler)
+- `RouteContext` interface with path, params, query, root
+
+**Rules**:
+
+- Keep page contract minimal and well-documented
+- No magic or hidden behavior
+- Use TypeScript for type safety
+- Pages handle their own rendering
+
+**Status**: Basic structure ready for customization
+
+### 3. Build Configuration
+
+**Purpose**: Compile TypeScript to JavaScript with proper types
+
+**Key mechanism**:
+
+- TypeScript compiler generates declarations
+- Vitest for testing with jsdom
+- ES modules only (no CommonJS)
+
+**Rules**:
+
+- All source code must compile cleanly
+- Follow TypeScript strict mode
+- Export types alongside runtime code
+
+**Status**: Basic build pipeline ready
+
+### Golden Rule (Non-Negotiable)
+
+**TypeScript compiles. Tests pass. Types ship.**
+
+The router ships compiled JavaScript + type declarations from `dist/`.
+
+- If it's configuration → belongs in `tsconfig.json` or `vitest.config.ts`
+- If it's source code → belongs in `src/`
+- If it's tests → belongs in `tests/`
 
 ## Development Setup
 
@@ -46,58 +83,111 @@ cd spectre-shell-router
 npm install
 ```
 
-3. Build and develop:
+3. Build the package (compiles TypeScript):
 
 ```bash
 npm run build
-# or for development:
-npm run dev
+# or for testing with watch mode:
+npm run test
 ```
+
+## Project Structure
+
+```
+spectre-shell-router/
+├── src/
+│   └── index.ts          # Router implementation
+├── tests/
+│   └── router.test.ts    # Vitest test suite
+├── dist/                 # Built assets (generated)
+├── tsconfig.json         # TypeScript configuration
+├── vitest.config.ts      # Vitest configuration
+└── package.json
+```
+
+**Responsibilities**:
+
+- **Router developers**: Edit `src/` source files
+- **Test writers**: Update `tests/` test suite
+- **Config maintainers**: Update TypeScript and Vitest configs
+- **Build engineers**: Update build pipeline when structure changes
 
 ## Contribution Guidelines
 
-### Code Standards
+### Router Development
 
-- **Keep it minimal** - This router intentionally has a small surface area
+1. **Keep it minimal** – This router intentionally has a small surface area
+2. **Type everything** – Use TypeScript strict mode, avoid `any`
+3. **Document constraints** – Router does NOT do nested routing, layouts, or data loading
+4. **Test your changes** – Run `npm test` before committing
+
+### Source File Development
+
 - Use TypeScript for type safety
 - Follow modern ES module patterns
 - Add comments for complex logic
-- Use proper types, avoid `any` when possible
-- Follow the existing code style
+- Export types alongside runtime code
+- Test in Vitest with jsdom
 
-### Page Contract
+### Configuration Changes
 
-Pages must export:
-
-```typescript
-export function render(ctx: RouteContext): void
-export function destroy?(): void  // optional
-```
-
-Where `RouteContext` contains:
-
-- `path` – the matched URL path
-- `params` – route parameters
-- `query` – URLSearchParams
-- `root` – the DOM element where the page should render
-
-### Design Constraints
-
-This router is intentionally limited:
-
-- No reactivity model or templating
-- No nested routing or layouts
-- No guards, middleware, or data loading
-- Easy to delete or replace if a framework is adopted later
+- Follow TypeScript best practices
+- Keep configuration minimal
+- Document changes in commit messages
+- Test that build still works
 
 ### Code Quality
 
 - Use modern TypeScript + ES modules
-- Run linting with `npm run lint` (if available)
-- Add comments for complex logic
 - Run `npm run build` before committing
-- Test your changes thoroughly
+- Run `npm test` to ensure all tests pass
 - Keep the API surface minimal
+- Add comments for complex logic
+
+### Documentation
+
+- Update README.md when adding features
+- Include code examples for new features
+- Document breaking changes in commit messages
+- Keep inline comments clear and concise
+
+## Pull Request Process
+
+1. **Branch from `main`**
+2. **Make your changes** and test locally (`npm run build` and `npm test`)
+3. **Run build** to ensure compilation works (`npm run build`)
+4. **Update documentation** (README.md, comments) to reflect changes
+5. **Open a PR** describing:
+   - The motivation for the change
+   - What was changed
+   - Testing notes (test coverage, edge cases)
+6. **Respond to feedback** and make requested changes
+
+## Known Gaps (Not Done Yet)
+
+- Hash-based routing (`#/path`)
+- Nested routing support
+- Route guards/middleware
+- Named routes
+- Programmatic navigation helpers
+- Scroll position restoration
+- Meta tag management
+
+## Questions or Issues?
+
+Please open an issue or discussion on GitHub if you're unsure about the best approach for a change. Coordinating early avoids conflicts with:
+
+- Router design philosophy (minimal by design)
+- API surface area
+- TypeScript type safety
+
+## Code of Conduct
+
+This project adheres to the [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to the project maintainers.
+
+## License
+
+By contributing, you agree that your contributions will be licensed under the MIT License.
 
 ### Documentation
 

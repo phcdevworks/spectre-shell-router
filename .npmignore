@@ -14,7 +14,6 @@ SECURITY.md
 
 # Build artifacts
 node_modules/
-spectre-theme/dist/
 
 # Config files
 .eslintrc*

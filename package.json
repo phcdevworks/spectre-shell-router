@@ -28,7 +28,10 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "vitest"
+    "test": "vitest",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\""
   },
   "funding": [
     {
@@ -47,7 +50,7 @@
   "bugs": {
     "url": "https://github.com/phcdevworks/spectre-shell-router/issues"
   },
-  "homepage": "https://github.com/phcdevworks/spectre-shell-router#readme",
+  "homepage": "https://phcdevworks.com",
   "devDependencies": {
     "jsdom": "^24.1.0",
     "typescript": "^5.9.3",

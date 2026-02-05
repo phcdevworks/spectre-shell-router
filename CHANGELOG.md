@@ -23,7 +23,6 @@ All notable changes to this project will be documented here. The format follows 
 
 [unreleased]: https://github.com/phcdevworks/spectre-shell-router/compare/v0.0.1...HEAD
 [0.0.1]: https://github.com/phcdevworks/spectre-shell-router/tree/v0.0.1
-
 [a05924d]: https://github.com/phcdevworks/spectre-shell-router/commit/a05924d
 [d971c57]: https://github.com/phcdevworks/spectre-shell-router/commit/d971c57
 [a3bdfb0]: https://github.com/phcdevworks/spectre-shell-router/commit/a3bdfb0
