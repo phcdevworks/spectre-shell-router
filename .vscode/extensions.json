@@ -25,6 +25,7 @@
     // Utilities
     "christian-kohler.path-intellisense",
     "zignd.html-css-class-completion",
-    "formulahendry.auto-rename-tag"
+    "formulahendry.auto-rename-tag",
+    "bradlc.vscode-tailwindcss"
   ]
 }

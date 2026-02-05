@@ -33,7 +33,8 @@
 .env*       text eol=lf
 Dockerfile  text eol=lf
 devcontainer.json text eol=lf
-*.config.*  text eol=lf
+vite.config.* text eol=lf
+vitest.config.* text eol=lf
 *.gradle    text eol=lf
 
 # Windows-only scripts that expect CRLF
