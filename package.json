@@ -1,6 +1,6 @@
 {
   "name": "@phcdevworks/spectre-shell-router",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Minimal, framework-agnostic client-side router for vanilla TypeScript apps.",
   "keywords": [
     "phcdevworks",
@@ -27,7 +27,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "vitest"
   },
   "funding": [
     {
@@ -48,6 +49,8 @@
   },
   "homepage": "https://github.com/phcdevworks/spectre-shell-router#readme",
   "devDependencies": {
-    "typescript": "^5.9.3"
+    "jsdom": "^24.1.0",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.9"
   }
 }
