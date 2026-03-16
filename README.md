@@ -1,12 +1,23 @@
 # @phcdevworks/spectre-shell-router
 
-A minimal, framework-agnostic client-side router for vanilla TypeScript apps. Designed to support the Spectre platform's app shell with simple URL-to-page mapping and lifecycle management.
+### **The Sensory Layer (Layer 5 of the Spectre 8-Layer Arsenal)**
 
-🤝 **[Contributing Guide](CONTRIBUTING.md)** | 📝 **[Changelog](CHANGELOG.md)**
+`@phcdevworks/spectre-shell-router` is a minimal, framework-agnostic client-side router. It acts as a "Sensory" plugin for the Spectre platform, handling URL mapping and page lifecycle management.
 
-## Overview
+🤝 **[Contributing Guide](CONTRIBUTING.md)** | 📝 **[Changelog](CHANGELOG.md)** | 🏛️ **[Spectre Arsenal](https://github.com/phcdevworks)**
 
-`@phcdevworks/spectre-shell-router` is **not a full routing framework**. It intentionally solves one problem: mapping URLs to page modules and managing page lifecycle in a vanilla web app.
+---
+
+## 🏗️ Core Architecture
+
+This package is a **Specialized Utility Layer**. It intentionally avoids being a "full routing framework" to maintain a minimal surface area and high performance.
+
+- 🗺️ **Async Mapping**: Strategic URL-to-page module mapping via dynamic `import()`.
+- 🔄 **Lifecycle Management**: Strict enforcement of `render()` and `destroy()` hooks.
+- 🕒 **History API**: Native integration with `pushState` and `popstate` for smooth navigation.
+- 📦 **Zero Dependencies**: Pure TypeScript implementation with no external runtime overhead.
+
+---
 
 - ✅ Maps URL paths to async page module loaders
 - ✅ Supports path parameters (e.g., `/users/:id`)
@@ -151,16 +162,20 @@ Full TypeScript definitions are included:
 import type { Router, RouteContext, Route } from '@phcdevworks/spectre-shell-router'
 ```
 
-## Part of the Spectre Suite
+---
 
-- **Spectre Tokens** - Design token foundation
-- **Spectre UI** - Core styling layer
-- **Spectre Shell Router** - Client-side routing (this package)
-- **Spectre Shell** - Application shell framework
-- **Spectre Blocks** - WordPress block library
-- **Spectre Astro** - Astro integration
+## 🏛️ The Spectre Suite Hierarchy
 
-## Contributing
+Spectre is built on a non-negotiable hierarchy to prevent style leakage and duplication:
+
+1.  **Layer 1: DNA** ([@phcdevworks/spectre-tokens](https://github.com/phcdevworks/spectre-tokens)) – Design values.
+2.  **Layer 2: Blueprint** ([@phcdevworks/spectre-ui](https://github.com/phcdevworks/spectre-ui)) – Structure & Recipes.
+3.  **Layer 4: Nervous System** ([@phcdevworks/spectre-shell](https://github.com/phcdevworks/spectre-shell)) – Orchestration.
+4.  **Layer 5: Sensory (This Package)** – Specialized plugins & routing.
+
+> **The Golden Rule**: Tokens define *meaning*. UI defines *structure*. Shell defines *orchestration*. Plugins define *capability*.
+
+---
 
 Issues and pull requests are welcome. For detailed contribution guidelines, see **[CONTRIBUTING.md](CONTRIBUTING.md)**.
 
