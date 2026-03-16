@@ -185,9 +185,4 @@ MIT © PHCDevworks — See **[LICENSE](LICENSE)** for details.
 
 ---
 
-## ❤️ Support Spectre
 
-If Spectre Shell Router helps your workflow, consider sponsoring:
-
-- [GitHub Sponsors](https://github.com/sponsors/phcdevworks)
-- [Buy Me a Coffee](https://buymeacoffee.com/phcdevworks)
