@@ -1,6 +1,6 @@
 {
   "name": "@phcdevworks/spectre-shell-router",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Minimal, framework-agnostic client-side router for vanilla TypeScript apps.",
   "keywords": [
     "phcdevworks",
@@ -29,8 +29,8 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest",
-    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
-    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\""
   },
   "funding": [
@@ -52,8 +52,12 @@
   },
   "homepage": "https://phcdevworks.com",
   "devDependencies": {
+    "eslint": "^9.27.0",
+    "globals": "^15.15.0",
+    "jiti": "^2.4.2",
     "jsdom": "^24.1.0",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.26.0",
     "vitest": "^2.1.9"
   }
 }

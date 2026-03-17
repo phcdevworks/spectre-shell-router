@@ -8,7 +8,7 @@ All notable changes to this project will be documented here. The format follows 
 - **Architecture**: Refactored procedural routing logic into a `Router` class for Layer 5 (Sensory Layer) compliance.
 - **API Consistency**: Synchronized `Router` initialization with the standard `README.md` constructor pattern.
 - **Lifecycle**: Standardized page hooks to `render` and `destroy` for strict resource orchestration.
-- **Robustness**: Implemented navigation tracking to prevent race conditions during rapid path transitions.
+- **Robustness**: Implemented navigation tracking to prevent race conditions and added global link interception for same-domain anchors.
 
 ## [0.0.1] - 2026-02-05
 

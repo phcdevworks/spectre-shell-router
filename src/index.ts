@@ -20,13 +20,18 @@ export class Router {
   private rootEl: HTMLElement | null
   private currentPage: PageModule | null = null
   private handleNavigationBound: () => void
+  private handleLinkClickBound: (e: MouseEvent) => void
   private currentNavId = 0
 
   constructor(routes: Route[], root: HTMLElement) {
     this.routes = routes
     this.rootEl = root
     this.handleNavigationBound = this.handleNavigation.bind(this)
+    this.handleLinkClickBound = this.handleLinkClick.bind(this)
+
     window.addEventListener("popstate", this.handleNavigationBound)
+    document.addEventListener("click", this.handleLinkClickBound)
+    
     this.handleNavigation()
   }
 
@@ -44,7 +49,27 @@ export class Router {
       this.currentPage = null
     }
     window.removeEventListener("popstate", this.handleNavigationBound)
+    document.removeEventListener("click", this.handleLinkClickBound)
     this.rootEl = null
+  }
+
+  private handleLinkClick(e: MouseEvent) {
+    const link = (e.target as HTMLElement).closest("a")
+    if (
+      !link ||
+      link.target ||
+      link.hasAttribute("download") ||
+      link.getAttribute("rel") === "external" ||
+      !link.href
+    ) {
+      return
+    }
+
+    const url = new URL(link.href)
+    if (url.origin !== window.location.origin) return
+
+    e.preventDefault()
+    this.navigate(url.pathname + url.search + url.hash)
   }
 
   private async handleNavigation() {
@@ -56,12 +81,8 @@ export class Router {
       const params = this.matchRoute(route.path, url.pathname)
       if (!params) continue
 
-      // Load page module before destroying previous if we want to be smooth,
-      // but the rule says destroy() must be called before render().
-      // Sequential is safer for memory.
       const page = await route.loader()
 
-      // If a newer navigation started while we were loading, abort this one.
       if (navId !== this.currentNavId) return
 
       if (this.currentPage?.destroy) {
@@ -80,6 +101,13 @@ export class Router {
 
       return
     }
+
+    // No route matched - clear the root
+    if (this.currentPage?.destroy) {
+      this.currentPage.destroy()
+      this.currentPage = null
+    }
+    this.rootEl.innerHTML = ""
   }
 
   private matchRoute(

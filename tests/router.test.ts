@@ -93,4 +93,66 @@ describe("spectre-shell-router", () => {
     expect(render1).not.toHaveBeenCalled()
     router.destroy()
   })
+
+  it("intercepts same-domain link clicks", async () => {
+    const { Router } = await import("../src/index")
+    const render = vi.fn()
+    const routes = [{ path: "/about", loader: async () => ({ render }) }]
+    const root = document.createElement("div")
+    window.history.replaceState({}, "", "/")
+
+    const router = new Router(routes, root)
+    
+    // Create a link and click it
+    const link = document.createElement("a")
+    link.href = "/about"
+    document.body.appendChild(link)
+    
+    link.click()
+    await tick()
+
+    expect(window.location.pathname).toBe("/about")
+    expect(render).toHaveBeenCalled()
+    
+    router.destroy()
+    document.body.removeChild(link)
+  })
+
+  it("handles 404 by clearing the root element", async () => {
+    const { Router } = await import("../src/index")
+    const render = vi.fn((ctx) => {
+      ctx.root.innerHTML = "Loaded"
+    })
+    const routes = [{ path: "/", loader: async () => ({ render }) }]
+    const root = document.createElement("div")
+    window.history.replaceState({}, "", "/")
+
+    const router = new Router(routes, root)
+    await tick()
+    expect(root.innerHTML).toBe("Loaded")
+
+    router.navigate("/non-existent")
+    await tick()
+
+    expect(root.innerHTML).toBe("")
+    router.destroy()
+  })
+
+  it("removes event listeners on destroy", async () => {
+    const { Router } = await import("../src/index")
+    const render = vi.fn()
+    const routes = [{ path: "/foo", loader: async () => ({ render }) }]
+    const root = document.createElement("div")
+    window.history.replaceState({}, "", "/")
+
+    const router = new Router(routes, root)
+    router.destroy()
+
+    // Navigate after destroy
+    window.history.pushState({}, "", "/foo")
+    window.dispatchEvent(new PopStateEvent("popstate"))
+    await tick()
+
+    expect(render).not.toHaveBeenCalled()
+  })
 })
