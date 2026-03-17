@@ -3,44 +3,31 @@ import { describe, expect, it, vi } from "vitest"
 const tick = () => new Promise((resolve) => setTimeout(resolve, 0))
 
 describe("spectre-shell-router", () => {
-  it("throws if navigate is called before startRouter", async () => {
-    vi.resetModules()
-    const { navigate } = await import("../src/index")
-
-    expect(() => navigate("/")).toThrow(
-      "Router has not been started. Call startRouter() first."
-    )
-  })
-
   it("renders the matching route on start", async () => {
-    vi.resetModules()
-    const { registerRoute, startRouter } = await import("../src/index")
-
+    const { Router } = await import("../src/index")
     const render = vi.fn()
-    registerRoute("/", async () => ({ render }))
-
+    const routes = [{ path: "/", loader: async () => ({ render }) }]
     const root = document.createElement("div")
     window.history.replaceState({}, "", "/")
 
-    startRouter({ root })
+    const router = new Router(routes, root)
     await tick()
 
     expect(render).toHaveBeenCalledOnce()
+    router.destroy()
   })
 
   it("passes params and query to the page module", async () => {
-    vi.resetModules()
-    const { registerRoute, startRouter, navigate } = await import("../src/index")
-
+    const { Router } = await import("../src/index")
     const render = vi.fn()
-    registerRoute("/users/:id", async () => ({ render }))
-
+    const routes = [{ path: "/users/:id", loader: async () => ({ render }) }]
     const root = document.createElement("div")
     window.history.replaceState({}, "", "/")
-    startRouter({ root })
+
+    const router = new Router(routes, root)
     await tick()
 
-    navigate("/users/42?tab=info")
+    router.navigate("/users/42?tab=info")
     await tick()
 
     expect(render).toHaveBeenCalled()
@@ -49,24 +36,61 @@ describe("spectre-shell-router", () => {
     expect(ctx?.query.get("tab")).toBe("info")
     expect(ctx?.path).toBe("/users/42")
     expect(ctx?.root).toBe(root)
+    router.destroy()
   })
 
   it("calls destroy on the previous page when navigating", async () => {
-    vi.resetModules()
-    const { registerRoute, startRouter, navigate } = await import("../src/index")
-
+    const { Router } = await import("../src/index")
     const destroy = vi.fn()
-    registerRoute("/", async () => ({ render: vi.fn(), destroy }))
-    registerRoute("/next", async () => ({ render: vi.fn() }))
-
+    const routes = [
+      { path: "/", loader: async () => ({ render: vi.fn(), destroy }) },
+      { path: "/next", loader: async () => ({ render: vi.fn() }) }
+    ]
     const root = document.createElement("div")
     window.history.replaceState({}, "", "/")
-    startRouter({ root })
+
+    const router = new Router(routes, root)
     await tick()
 
-    navigate("/next")
+    router.navigate("/next")
     await tick()
 
     expect(destroy).toHaveBeenCalledOnce()
+    router.destroy()
+  })
+
+  it("prevents race conditions", async () => {
+    const { Router } = await import("../src/index")
+    const render1 = vi.fn()
+    const render2 = vi.fn()
+    
+    const routes = [
+      { 
+        path: "/1", 
+        loader: async () => {
+          await new Promise(r => setTimeout(r, 50))
+          return { render: render1 }
+        } 
+      },
+      { 
+        path: "/2", 
+        loader: async () => {
+          return { render: render2 }
+        } 
+      }
+    ]
+    const root = document.createElement("div")
+    window.history.replaceState({}, "", "/")
+
+    const router = new Router(routes, root)
+
+    router.navigate("/1")
+    router.navigate("/2")
+    
+    await new Promise(r => setTimeout(r, 150))
+
+    expect(render2).toHaveBeenCalledOnce()
+    expect(render1).not.toHaveBeenCalled()
+    router.destroy()
   })
 })
