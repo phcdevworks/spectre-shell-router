@@ -1,30 +1,30 @@
 # @phcdevworks/spectre-shell-router
 
-### **The Sensory Layer (Layer 5 of the Spectre 8-Layer Arsenal)**
+[![GitHub issues](https://img.shields.io/github/issues/phcdevworks/spectre-shell-router)](https://github.com/phcdevworks/spectre-shell-router/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/phcdevworks/spectre-shell-router)](https://github.com/phcdevworks/spectre-shell-router/pulls)
+[![License](https://img.shields.io/github/license/phcdevworks/spectre-shell-router)](LICENSE)
 
-`@phcdevworks/spectre-shell-router` is a minimal, framework-agnostic client-side router. It acts as a "Sensory" plugin for the Spectre platform, handling URL mapping and page lifecycle management.
+`@phcdevworks/spectre-shell-router` is a minimal, framework-agnostic
+client-side router for Spectre-based applications.
 
-🤝 **[Contributing Guide](CONTRIBUTING.md)** | 📝 **[Changelog](CHANGELOG.md)** | 🏛️ **[Spectre Arsenal](https://github.com/phcdevworks)**
+Maintained by PHCDevworks as part of the Spectre platform, it handles URL
+matching, navigation, route params, query parsing, and browser history
+integration. It provides resolved route state to consuming shell logic while
+remaining responsible only for routing. It does not own sensory behavior,
+signals, rendering, or application orchestration.
 
----
+[Contributing](CONTRIBUTING.md) | [Changelog](CHANGELOG.md) |
+[Security Policy](SECURITY.md)
 
-## 🏗️ Core Architecture
+## Key capabilities
 
-This package is a **Specialized Utility Layer**. It intentionally avoids being a "full routing framework" to maintain a minimal surface area and high performance.
-
-- 🗺️ **Async Mapping**: Strategic URL-to-page module mapping via dynamic `import()`.
-- 🔄 **Lifecycle Management**: Strict enforcement of `render()` and `destroy()` hooks.
-- 🕒 **History API**: Native integration with `pushState` and `popstate` for smooth navigation.
-- 📦 **Zero Dependencies**: Pure TypeScript implementation with no external runtime overhead.
-
----
-
-- ✅ Maps URL paths to async page module loaders
-- ✅ Supports path parameters (e.g., `/users/:id`)
-- ✅ Uses the browser History API (`pushState`, `popstate`)
-- ✅ Loads pages dynamically via `import()`
-- ✅ Calls page `render(ctx)` and optional `destroy()` lifecycle hooks
-- ✅ Minimal surface area—easy to delete or replace
+- URL and path matching for client-side routes
+- Route parameter extraction from path patterns
+- Query string parsing via standard browser APIs
+- Programmatic navigation through router helpers
+- Browser history integration using the native History API
+- Resolved route state for consuming shell logic
+- Lightweight, framework-agnostic routing contract
 
 ## Installation
 
@@ -32,157 +32,126 @@ This package is a **Specialized Utility Layer**. It intentionally avoids being a
 npm install @phcdevworks/spectre-shell-router
 ```
 
-## Usage
+## Quick start
 
-### 1. Define Your Routes
+Define a route table, create the router, and let page modules receive resolved
+route state through the routing contract.
 
-```typescript
-import { Router } from '@phcdevworks/spectre-shell-router'
+```ts
+import { Router, type Route, type RouteContext } from '@phcdevworks/spectre-shell-router'
 
-const routes = [
-  { path: '/', loader: () => import('./pages/home') },
-  { path: '/users/:id', loader: () => import('./pages/user') },
-  { path: '/about', loader: () => import('./pages/about') },
+const routes: Route[] = [
+  {
+    path: '/',
+    loader: async () => import('./pages/home')
+  },
+  {
+    path: '/users/:id',
+    loader: async () => import('./pages/user-detail')
+  }
 ]
 
-const router = new Router(routes, document.getElementById('app'))
-```
+const root = document.getElementById('app')
 
-### 2. Create Page Modules
+if (!root) {
+  throw new Error('Missing application root element')
+}
 
-Each page module must export a `render` function:
+const router = new Router(routes, root)
 
-```typescript
-// pages/user.ts
+router.navigate('/users/42?tab=profile')
+
+// pages/user-detail.ts
 export function render(ctx: RouteContext) {
   const userId = ctx.params.id
-  ctx.root.innerHTML = `<h1>User ${userId}</h1>`
+  const tab = ctx.query.get('tab')
+
+  ctx.root.textContent = `User ${userId} (${tab ?? 'overview'})`
 }
 
 export function destroy() {
-  // Optional cleanup
-  console.log('Leaving user page')
+  // Optional cleanup before the next route renders.
 }
 ```
 
-### 3. Navigate
+Depending on how your shell is structured, consuming logic can use the resolved
+route context passed to `render(ctx)` as the current route state.
 
-```typescript
-// Programmatic navigation
-router.navigate('/users/123')
+## What this package owns
 
-// Or use standard links with History API interception
-<a href="/about">About</a>
+- Client-side routing behavior
+- Route matching and resolution
+- Path params and query extraction
+- Navigation and history coordination
+- Stable routing contract for shell consumers
+
+## What this package does not own
+
+- Rendering or view components
+- Framework adapters for UI delivery
+- Signals or application state systems
+- Data fetching
+- Application business logic
+- Shell orchestration outside routing concerns
+
+## Package exports / API surface
+
+The root package exposes a small routing surface intended to stay easy to
+understand and easy to replace.
+
+- Route definition utilities
+- Router creation and lifecycle primitives
+- Navigation helpers
+- Route match and resolved route types
+- Browser history integration utilities
+
+In the current package shape, that surface includes the router class and core
+TypeScript types used to describe routes, page modules, and route context.
+
+## Relationship to the rest of Spectre
+
+Spectre keeps responsibilities separate:
+
+- [`@phcdevworks/spectre-tokens`](https://github.com/phcdevworks/spectre-tokens)
+  defines visual language and semantic meaning
+- [`@phcdevworks/spectre-ui`](https://github.com/phcdevworks/spectre-ui) defines
+  reusable styling implementation
+- Shell packages coordinate application behavior
+- `@phcdevworks/spectre-shell-router` handles routing only
+- Signals belong separately to
+  [`@phcdevworks/spectre-shell-signals`](https://github.com/phcdevworks/spectre-shell-signals),
+  not this package
+
+That separation keeps routing focused on URL resolution and navigation contracts
+instead of expanding into rendering or state concerns.
+
+## Development
+
+Install dependencies, then run the package checks:
+
+```bash
+npm run build
+npm test
 ```
 
-## Page Contract
+Key source areas:
 
-Each page module must export:
+- `src/` for router implementation and package exports
+- `tests/` for routing and lifecycle coverage
 
-```typescript
-export function render(ctx: RouteContext): void
-export function destroy?(): void  // optional
-```
+## Contributing
 
-Where `RouteContext` contains:
+PHCDevworks maintains this package as part of the Spectre suite.
 
-- `path` – the matched URL path
-- `params` – route parameters (e.g., `{ id: '123' }`)
-- `query` – URLSearchParams object
-- `root` – the DOM element where the page should render
+When contributing:
 
-## What It Does
+- keep the routing surface minimal
+- preserve framework-agnostic behavior
+- keep responsibility boundaries explicit
+- run `npm run build` and `npm test` before opening a pull request
 
-✅ Maps URL paths to page loaders  
-✅ Path parameter extraction (`/users/:id`)  
-✅ History API integration  
-✅ Dynamic page imports  
-✅ Lifecycle hooks (`render`, `destroy`)
-
-## What It Does NOT Do
-
-❌ No nested routing  
-❌ No layouts or middleware  
-❌ No guards or data fetching  
-❌ No global state management  
-❌ No SSR or hydration  
-❌ No transitions or animations  
-❌ No framework lifecycle integration
-
-## Development Philosophy
-
-This router follows a **minimal by design** approach:
-
-### 1. Core Routing
-
-**Purpose**: Map URLs to pages and manage lifecycle
-
-**Rules**:
-
-- Keep the API surface minimal and predictable
-- No framework dependencies or assumptions
-- Router only maps paths and manages lifecycle
-- TypeScript strict mode with proper type exports
-
-### 2. Page Contract
-
-**Purpose**: Simple interface for pages to integrate
-
-**Contains**:
-
-- `render(ctx)` - Required page entry point
-- `destroy()` - Optional cleanup handler
-- `RouteContext` - Type-safe context object
-
-**Rules**:
-
-- Pages handle their own rendering
-- No magic or hidden behavior
-- Clear separation of concerns
-
-### Golden Rule (Non-Negotiable)
-
-**Routing should be boring, small, explicit, and replaceable.**
-
-This router exists to define a navigation and page lifecycle contract, not to compete with full-featured frameworks.
-
-## Design Principles
-
-1. **Minimal surface area** - Only essential routing features
-2. **Framework-agnostic** - Works with any rendering approach
-3. **Type-safe** - Full TypeScript support with proper exports
-4. **Disposable by design** - Easy to replace if a framework is adopted later
-5. **Production-ready** - Simple, tested, and reliable
-
-## TypeScript Support
-
-Full TypeScript definitions are included:
-
-```typescript
-import type { Router, RouteContext, Route } from '@phcdevworks/spectre-shell-router'
-```
-
----
-
-## 🏛️ The Spectre Suite Hierarchy
-
-Spectre is built on a non-negotiable hierarchy to prevent style leakage and duplication:
-
-1.  **Layer 1: DNA** ([@phcdevworks/spectre-tokens](https://github.com/phcdevworks/spectre-tokens)) – Design values.
-2.  **Layer 2: Blueprint** ([@phcdevworks/spectre-ui](https://github.com/phcdevworks/spectre-ui)) – Structure & Recipes.
-3.  **Layer 4: Nervous System** ([@phcdevworks/spectre-shell](https://github.com/phcdevworks/spectre-shell)) – Orchestration.
-4.  **Layer 5: Sensory (This Package)** – Specialized plugins & routing.
-
-> **The Golden Rule**: Tokens define *meaning*. UI defines *structure*. Shell defines *orchestration*. Plugins define *capability*.
-
----
-
-Issues and pull requests are welcome. For detailed contribution guidelines, see **[CONTRIBUTING.md](CONTRIBUTING.md)**.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow.
 
 ## License
 
-MIT © PHCDevworks — See **[LICENSE](LICENSE)** for details.
-
----
-
-
+MIT © PHCDevworks. See [LICENSE](LICENSE).
