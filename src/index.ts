@@ -1,5 +1,3 @@
-import { tokens } from "@phcdevworks/spectre-tokens"
-
 export type PageModule = {
   render: (ctx: RouteContext) => void
   destroy?: () => void
@@ -92,7 +90,6 @@ export class Router {
       }
 
       this.rootEl.innerHTML = ""
-
       this.currentPage = page
 
       page.render({
@@ -101,18 +98,6 @@ export class Router {
         query: url.searchParams,
         root: this.rootEl
       })
-
-      // Use Spectre tokens for page entry animation if animate API is available
-      if (typeof this.rootEl.animate === "function") {
-        this.rootEl.animate(
-          [{ opacity: 0 }, { opacity: 1 }],
-          {
-            duration: parseInt(tokens.animations.fadeIn.duration),
-            easing: tokens.animations.fadeIn.easing,
-            fill: "forwards"
-          }
-        )
-      }
 
       return
     }
