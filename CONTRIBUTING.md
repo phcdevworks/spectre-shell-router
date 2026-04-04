@@ -1,49 +1,31 @@
 # Contributing to Spectre Shell Router
 
-Thanks for helping improve Spectre Shell Router! This package is a minimal, framework-agnostic client-side router for vanilla TypeScript apps.
-
-## 🏛️ Spectre Design Philosophy
-
-Spectre is a **specification-driven design system** built on a strict hierarchy:
-
-### 1. @phcdevworks/spectre-tokens (Layer 1 - DNA)
-- **Purpose**: Single source of truth for design values (colors, spacing, typography, semantic roles).
-- **Rules**: Defines semantic meaning, not UI behavior. Designers own JSON; engineers maintain transforms.
-
-### 2. @phcdevworks/spectre-ui (Layer 2 - The Blueprint)
-- **Purpose**: Converts tokens into real CSS and class recipes.
-- **Rules**: MUST consume tokens, MUST NOT redefine values. Every CSS selector has a matching recipe.
-
-### 3. Framework Adapters (Layer 3 - Delivery)
-- **Purpose**: Map Layer 2 to specific frameworks (WordPress, Astro, etc.).
-- **Rules**: Adapters never define styles or duplicate CSS.
-
-> **The Golden Rule**: Tokens define *meaning*. UI defines *structure*. Adapters define *delivery*.
-
----
+Thanks for helping improve Spectre Shell Router. This package is a minimal,
+framework-agnostic client-side router for Spectre-based applications.
 
 ## Development Philosophy
 
-This router follows a **minimal by design** approach:
+This router follows a minimal-by-design approach.
 
 ### 1. Core Routing
 
-**Purpose**: Single source of truth for URL mapping and page lifecycle
+**Purpose**: Single source of truth for URL mapping and route resolution
 
-**Exports**: Type-safe routing functions and interfaces
+**Exports**: A lean router class plus the types needed to describe routes and
+route context
 
 **Rules**:
 
 - Keep the API surface minimal and predictable
 - No framework dependencies or assumptions
-- Router only maps paths and manages lifecycle
+- Router only handles matching, params, query parsing, navigation, and history
 - All source files must be TypeScript with strict types
 
-**Status**: v0.0.1 initial release with path matching and lifecycle hooks
+**Status**: Minimal route matching and navigation behavior
 
-### 2. Page Contract
+### 2. Route Module Contract
 
-**Purpose**: Simple interface for pages to integrate with the router
+**Purpose**: Simple interface for matched route modules to receive routing state
 
 **Ships**:
 
@@ -56,9 +38,9 @@ This router follows a **minimal by design** approach:
 - Keep page contract minimal and well-documented
 - No magic or hidden behavior
 - Use TypeScript for type safety
-- Pages handle their own rendering
+- Route modules manage their own DOM work outside the router
 
-**Status**: Basic structure ready for customization
+**Status**: Stable routing contract
 
 ### 3. Build Configuration
 
@@ -138,7 +120,7 @@ spectre-shell-router/
 
 1. **Keep it minimal** – This router intentionally has a small surface area
 2. **Type everything** – Use TypeScript strict mode, avoid `any`
-3. **Document constraints** – Router does NOT do nested routing, layouts, or data loading
+3. **Document constraints** – Router does NOT do styling, signals, shell orchestration, or app-state management
 4. **Test your changes** – Run `npm test` before committing
 
 ### Source File Development
@@ -189,9 +171,9 @@ spectre-shell-router/
 - Nested routing support
 - Route guards/middleware
 - Named routes
-- Programmatic navigation helpers
+- Additional navigation helpers beyond the current router surface
 - Scroll position restoration
-- Meta tag management
+- Meta tag management or document-level side effects
 
 ## Questions or Issues?
 
@@ -200,37 +182,6 @@ Please open an issue or discussion on GitHub if you're unsure about the best app
 - Router design philosophy (minimal by design)
 - API surface area
 - TypeScript type safety
-
-## Code of Conduct
-
-This project adheres to the [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to the project maintainers.
-
-## License
-
-By contributing, you agree that your contributions will be licensed under the MIT License.
-
-### Documentation
-
-- Update README.md when adding features
-- Include code examples for new features
-- Document breaking changes in commit messages
-- Keep inline comments clear and concise
-
-## Pull Request Process
-
-1. **Branch from `main`**
-2. **Make your changes** and test locally
-3. **Run build** to ensure compilation works (`npm run build`)
-4. **Update documentation** (README.md, comments) to reflect changes
-5. **Open a PR** describing:
-   - The motivation for the change
-   - What was changed
-   - Testing notes
-6. **Respond to feedback** and make requested changes
-
-## Questions or Issues?
-
-Please open an issue or discussion on GitHub if you're unsure about the best approach for a change.
 
 ## Code of Conduct
 

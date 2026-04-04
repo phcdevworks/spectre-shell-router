@@ -1,16 +1,18 @@
 {
   "name": "@phcdevworks/spectre-shell-router",
   "version": "1.0.0",
-  "description": "Minimal, framework-agnostic client-side router for vanilla TypeScript apps.",
+  "description": "Minimal, framework-agnostic client-side router for Spectre-based applications.",
   "keywords": [
     "phcdevworks",
     "spectre",
-    "spectre-shell",
+    "spectre-shell-router",
     "router",
+    "client-side-routing",
+    "url-routing",
     "framework-agnostic",
     "typescript",
     "history-api",
-    "page-lifecycle"
+    "browser"
   ],
   "author": "PHCDevworks",
   "license": "MIT",
