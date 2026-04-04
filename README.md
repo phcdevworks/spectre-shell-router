@@ -34,8 +34,10 @@ npm install @phcdevworks/spectre-shell-router
 
 ## Quick start
 
-Define a route table, create the router, and let page modules receive resolved
-route state through the routing contract.
+Define a route table, create the router, and let route modules receive resolved
+route state through the routing contract. The router resolves the URL and hands
+the matched context to your module; how that module updates the DOM stays
+outside the router's responsibility.
 
 ```ts
 import { Router, type Route, type RouteContext } from '@phcdevworks/spectre-shell-router'
@@ -75,7 +77,7 @@ export function destroy() {
 ```
 
 Depending on how your shell is structured, consuming logic can use the resolved
-route context passed to `render(ctx)` as the current route state.
+route context passed to `render(ctx)` as current routing state.
 
 ## What this package owns
 
@@ -99,31 +101,25 @@ route context passed to `render(ctx)` as the current route state.
 The root package exposes a small routing surface intended to stay easy to
 understand and easy to replace.
 
-- Route definition utilities
-- Router creation and lifecycle primitives
-- Navigation helpers
-- Route match and resolved route types
-- Browser history integration utilities
+- Route definitions
+- Router instance for navigation and history coordination
+- Route context and page module types
+- URL matching, params extraction, and query access
 
 In the current package shape, that surface includes the router class and core
 TypeScript types used to describe routes, page modules, and route context.
 
-## Relationship to the rest of Spectre
+## Package boundary
 
-Spectre keeps responsibilities separate:
+`@phcdevworks/spectre-shell-router` stays intentionally narrow:
 
-- [`@phcdevworks/spectre-tokens`](https://github.com/phcdevworks/spectre-tokens)
-  defines visual language and semantic meaning
-- [`@phcdevworks/spectre-ui`](https://github.com/phcdevworks/spectre-ui) defines
-  reusable styling implementation
-- Shell packages coordinate application behavior
-- `@phcdevworks/spectre-shell-router` handles routing only
-- Signals belong separately to
-  [`@phcdevworks/spectre-shell-signals`](https://github.com/phcdevworks/spectre-shell-signals),
-  not this package
+- it resolves URLs into route modules
+- it extracts params and query values
+- it coordinates navigation through the browser History API
+- it passes resolved routing context into the matched module
 
-That separation keeps routing focused on URL resolution and navigation contracts
-instead of expanding into rendering or state concerns.
+Rendering, state management, data loading, styling, animation, and shell
+orchestration stay outside this package.
 
 ## Development
 
@@ -137,7 +133,7 @@ npm test
 Key source areas:
 
 - `src/` for router implementation and package exports
-- `tests/` for routing and lifecycle coverage
+- `tests/` for routing and navigation coverage
 
 ## Contributing
 

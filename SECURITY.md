@@ -4,7 +4,8 @@
 
 We aim to support the latest published version of the project. Security updates are applied to the current major version only.
 
-**Please ensure you are using the most recent versions** of the Spectre Arsenal packages. Older releases may not receive security fixes.
+**Please ensure you are using the most recent published version** of this
+package. Older releases may not receive security fixes.
 
 ## Reporting a Vulnerability
 
@@ -50,13 +51,13 @@ We appreciate responsible disclosure and will work with you to:
 
 ## Security Best Practices
 
-When using the Spectre Arsenal:
+When using this router package:
 
 1. **Keep dependencies updated** to the latest versions.
 2. **Monitor dependencies** for known vulnerabilities (`npm audit`).
 3. **Use HTTPS** for all production sites.
-4. **Sanitize user input** when using classes or components dynamically.
-5. **Follow framework security best practices** (WordPress, Astro, React, etc.).
+4. **Treat route params and query values as untrusted input** before using them in your application.
+5. **Follow your framework or platform security best practices** where this router is consumed.
 
 ## Contact
 
