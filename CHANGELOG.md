@@ -5,6 +5,7 @@ All notable changes to this project will be documented here. The format follows 
 ## [Unreleased]
 
 ### Changed
+
 - **Architecture**: Refactored procedural routing logic into a `Router` class with a smaller, routing-focused surface.
 - **API Consistency**: Synchronized `Router` initialization with the standard `README.md` constructor pattern.
 - **Lifecycle**: Standardized page hooks to `render` and `destroy` so route-module cleanup stays ordered during navigation.
@@ -13,6 +14,7 @@ All notable changes to this project will be documented here. The format follows 
 ## [0.0.1] - 2026-02-05
 
 ### Added
+
 - **Initial Release**: Minimal, framework-agnostic client-side router for Spectre-based applications.
 - **Features**: Includes string-based path matching, dynamic parameter extraction, and native History API integration.
 

@@ -31,7 +31,7 @@ export class Router {
 
     window.addEventListener("popstate", this.handleNavigationBound)
     document.addEventListener("click", this.handleLinkClickBound)
-    
+
     this.handleNavigation()
   }
 

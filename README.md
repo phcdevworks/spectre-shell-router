@@ -45,12 +45,12 @@ import { Router, type Route, type RouteContext } from '@phcdevworks/spectre-shel
 const routes: Route[] = [
   {
     path: '/',
-    loader: async () => import('./pages/home')
+    loader: async () => import('./pages/home'),
   },
   {
     path: '/users/:id',
-    loader: async () => import('./pages/user-detail')
-  }
+    loader: async () => import('./pages/user-detail'),
+  },
 ]
 
 const root = document.getElementById('app')
