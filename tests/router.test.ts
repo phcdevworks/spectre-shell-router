@@ -39,6 +39,25 @@ describe("spectre-shell-router", () => {
     router.destroy()
   })
 
+  it("decodes encoded route params before exposing them in context", async () => {
+    const { Router } = await import("../src/index")
+    const render = vi.fn()
+    const routes = [{ path: "/users/:id", loader: async () => ({ render }) }]
+    const root = document.createElement("div")
+    window.history.replaceState({}, "", "/")
+
+    const router = new Router(routes, root)
+    await tick()
+
+    router.navigate("/users/Brad%20Potts")
+    await tick()
+
+    const ctx = render.mock.calls.at(-1)?.[0]
+    expect(ctx?.params.id).toBe("Brad Potts")
+    expect(ctx?.path).toBe("/users/Brad%20Potts")
+    router.destroy()
+  })
+
   it("calls destroy on the previous page when navigating", async () => {
     const { Router } = await import("../src/index")
     const destroy = vi.fn()

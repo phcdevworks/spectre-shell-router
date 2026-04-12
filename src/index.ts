@@ -126,7 +126,7 @@ export class Router {
       const urlPart = urlParts[i]
 
       if (routePart.startsWith(":")) {
-        params[routePart.slice(1)] = urlPart
+        params[routePart.slice(1)] = decodeURIComponent(urlPart)
       } else if (routePart !== urlPart) {
         return null
       }
