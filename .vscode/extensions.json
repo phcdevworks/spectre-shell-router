@@ -1,31 +1,10 @@
 {
   "recommendations": [
-    // AI Assistants
-    "github.copilot",
-    "github.copilot-chat",
-    "openai.chatgpt",
-    // Code Quality & Linting
     "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode",
     "editorconfig.editorconfig",
-    "streetsidesoftware.code-spell-checker",
-    // TypeScript & JavaScript
-    "usernamehw.errorlens",
-    "yoavbls.pretty-ts-errors",
-    // Import Management
-    "wix.vscode-import-cost",
-    // Theming & Icons
-    "zhuangtongfa.material-theme",
+    "esbenp.prettier-vscode",
+    "ms-vscode-remote.remote-wsl",
     "pkief.material-icon-theme",
-    // Git & Version Control
-    "eamodio.gitlens",
-    "mhutchie.git-graph",
-    // Testing
-    "vitest.explorer",
-    // Utilities
-    "christian-kohler.path-intellisense",
-    "zignd.html-css-class-completion",
-    "formulahendry.auto-rename-tag",
-    "bradlc.vscode-tailwindcss"
+    "yzhang.markdown-all-in-one"
   ]
 }

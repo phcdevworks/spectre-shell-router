@@ -63,20 +63,20 @@ describe("spectre-shell-router", () => {
     const { Router } = await import("../src/index")
     const render1 = vi.fn()
     const render2 = vi.fn()
-    
+
     const routes = [
-      { 
-        path: "/1", 
+      {
+        path: "/1",
         loader: async () => {
           await new Promise(r => setTimeout(r, 50))
           return { render: render1 }
-        } 
+        }
       },
-      { 
-        path: "/2", 
+      {
+        path: "/2",
         loader: async () => {
           return { render: render2 }
-        } 
+        }
       }
     ]
     const root = document.createElement("div")
@@ -86,7 +86,7 @@ describe("spectre-shell-router", () => {
 
     router.navigate("/1")
     router.navigate("/2")
-    
+
     await new Promise(r => setTimeout(r, 150))
 
     expect(render2).toHaveBeenCalledOnce()
@@ -102,18 +102,18 @@ describe("spectre-shell-router", () => {
     window.history.replaceState({}, "", "/")
 
     const router = new Router(routes, root)
-    
+
     // Create a link and click it
     const link = document.createElement("a")
     link.href = "/about"
     document.body.appendChild(link)
-    
+
     link.click()
     await tick()
 
     expect(window.location.pathname).toBe("/about")
     expect(render).toHaveBeenCalled()
-    
+
     router.destroy()
     document.body.removeChild(link)
   })
