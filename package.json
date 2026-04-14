@@ -59,7 +59,7 @@
     "jiti": "^2.6.1",
     "jsdom": "^29.0.2",
     "typescript": "^6.0.2",
-    "typescript-eslint": "^8.58.1",
+    "typescript-eslint": "^8.58.2",
     "vitest": "^4.1.4"
   }
 }

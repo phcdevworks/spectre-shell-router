@@ -54,6 +54,17 @@ export class Router {
   }
 
   private handleLinkClick(e: MouseEvent) {
+    if (
+      e.defaultPrevented ||
+      e.button !== 0 ||
+      e.metaKey ||
+      e.ctrlKey ||
+      e.shiftKey ||
+      e.altKey
+    ) {
+      return
+    }
+
     const link = (e.target as HTMLElement).closest("a")
     if (
       !link ||
