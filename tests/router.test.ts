@@ -137,6 +137,35 @@ describe("spectre-shell-router", () => {
     document.body.removeChild(link)
   })
 
+  it("does not intercept modifier-key link clicks", async () => {
+    const { Router } = await import("../src/index")
+    const render = vi.fn()
+    const routes = [{ path: "/about", loader: async () => ({ render }) }]
+    const root = document.createElement("div")
+    window.history.replaceState({}, "", "/")
+
+    const router = new Router(routes, root)
+    const link = document.createElement("a")
+    link.href = "/about"
+    document.body.appendChild(link)
+
+    const event = new MouseEvent("click", {
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: true
+    })
+
+    link.dispatchEvent(event)
+    await tick()
+
+    expect(event.defaultPrevented).toBe(false)
+    expect(window.location.pathname).toBe("/")
+    expect(render).not.toHaveBeenCalled()
+
+    router.destroy()
+    document.body.removeChild(link)
+  })
+
   it("handles 404 by clearing the root element", async () => {
     const { Router } = await import("../src/index")
     const render = vi.fn((ctx) => {
