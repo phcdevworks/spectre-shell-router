@@ -32,7 +32,7 @@ export class Router {
     window.addEventListener("popstate", this.handleNavigationBound)
     document.addEventListener("click", this.handleLinkClickBound)
 
-    this.handleNavigation()
+    void this.handleNavigation()
   }
 
   public navigate(path: string) {
