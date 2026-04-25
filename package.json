@@ -1,6 +1,6 @@
 {
   "name": "@phcdevworks/spectre-shell-router",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "Minimal, framework-agnostic client-side router for Spectre-based applications.",
   "keywords": [
     "phcdevworks",

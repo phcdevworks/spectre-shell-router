@@ -4,6 +4,23 @@ All notable changes to this project will be documented here. The format follows 
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-04-25
+
+Release Title: Stable Router Release and Navigation Polish
+
+### Added
+
+- **Publish Validation**: Added a `prepublishOnly` check that builds and runs the test suite before publishing.
+- **Tooling**: Added a dedicated `typecheck` script and included Prettier in development dependencies.
+
+### Changed
+
+- **Package Version**: Promoted the package to the stable `1.0.0` release line.
+- **Navigation**: Preserved native browser behavior for modified or non-primary link clicks so actions like opening links in a new tab are not intercepted.
+- **Initialization**: Marked the initial asynchronous navigation call as intentionally fire-and-forget during router construction.
+- **Build Output**: Pinned TypeScript `rootDir` to `src` so emitted files stay scoped to the package source tree.
+- **Dependencies**: Refreshed development dependencies and lockfile entries.
+
 ## [0.0.2] - 2026-04-13
 
 Release Title: Router Class Refactor and Navigation Hardening
@@ -31,6 +48,7 @@ Release Title: Initial Router Foundation
 - **Initial Release**: Minimal, framework-agnostic client-side router for Spectre-based applications.
 - **Features**: Includes string-based path matching, dynamic parameter extraction, and native History API integration.
 
-[unreleased]: https://github.com/phcdevworks/spectre-shell-router/compare/0.0.2...HEAD
+[unreleased]: https://github.com/phcdevworks/spectre-shell-router/compare/1.0.0...HEAD
+[1.0.0]: https://github.com/phcdevworks/spectre-shell-router/compare/0.0.2...1.0.0
 [0.0.2]: https://github.com/phcdevworks/spectre-shell-router/compare/0.0.1...0.0.2
 [0.0.1]: https://github.com/phcdevworks/spectre-shell-router/tree/0.0.1
