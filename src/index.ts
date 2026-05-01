@@ -45,7 +45,11 @@ export class Router {
 
   public destroy() {
     if (this.currentPage?.destroy) {
-      this.currentPage.destroy()
+      try {
+        this.currentPage.destroy()
+      } catch (e) {
+        console.error("Error destroying page during router destruction:", e)
+      }
       this.currentPage = null
     }
     window.removeEventListener("popstate", this.handleNavigationBound)
@@ -92,30 +96,46 @@ export class Router {
       const params = this.matchRoute(route.path, url.pathname)
       if (!params) continue
 
-      const page = await route.loader()
+      try {
+        const page = await route.loader()
 
-      if (navId !== this.currentNavId) return
+        if (navId !== this.currentNavId) return
 
-      if (this.currentPage?.destroy) {
-        this.currentPage.destroy()
+        if (this.currentPage?.destroy) {
+          try {
+            this.currentPage.destroy()
+          } catch (e) {
+            console.error("Error destroying page:", e)
+          }
+        }
+
+        this.rootEl.innerHTML = ""
+        this.currentPage = page
+
+        page.render({
+          path: url.pathname,
+          params,
+          query: url.searchParams,
+          root: this.rootEl
+        })
+
+        return
+      } catch (e) {
+        console.error("Error loading route:", e)
+        if (navId === this.currentNavId) {
+          this.rootEl.innerHTML = ""
+        }
+        return
       }
-
-      this.rootEl.innerHTML = ""
-      this.currentPage = page
-
-      page.render({
-        path: url.pathname,
-        params,
-        query: url.searchParams,
-        root: this.rootEl
-      })
-
-      return
     }
 
     // No route matched - clear the root
     if (this.currentPage?.destroy) {
-      this.currentPage.destroy()
+      try {
+        this.currentPage.destroy()
+      } catch (e) {
+        console.error("Error destroying page on 404:", e)
+      }
       this.currentPage = null
     }
     this.rootEl.innerHTML = ""
@@ -125,6 +145,7 @@ export class Router {
     routePath: string,
     urlPath: string
   ): Record<string, string> | null {
+    // Normalize paths by removing trailing slashes and filtering out empty segments
     const routeParts = routePath.split("/").filter(Boolean)
     const urlParts = urlPath.split("/").filter(Boolean)
 
