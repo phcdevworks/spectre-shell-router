@@ -36,7 +36,7 @@ You are an autonomous agent responsible for the Spectre routing package. This pa
 
 ## Workflow
 
-1. READ: `skills/ai-implementation/SKILL.md` -> PENDING ROUTER UPDATES.
+1. Review `src/index.ts` for pending routing updates.
 2. Update `src/index.ts` or related routing utilities and docs.
-3. Run `npm run build` and `npm test` to verify logic and artifacts.
-4. SUCCESS: Clear the "PENDING" block in `SKILL.md` when done.
+3. Run `npm run check` to verify build, lint, and tests.
+4. SUCCESS: Confirm all checks pass before marking work done.

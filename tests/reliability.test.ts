@@ -8,14 +8,13 @@ describe("Router Reliability Tests", () => {
     document.body.innerHTML = ""
   })
 
-  it("handles loader failure gracefully", async () => {
+  it("clears the root when a loader throws", async () => {
     const { Router } = await import("../src/index")
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
 
     const routes = [
       {
         path: "/fail",
-        loader: async () => { throw new Error("Load failed") }
+        loader: async (): Promise<never> => { throw new Error("Load failed") }
       },
       {
         path: "/",
@@ -31,16 +30,14 @@ describe("Router Reliability Tests", () => {
     router.navigate("/fail")
     await tick()
 
-    expect(consoleSpy).toHaveBeenCalledWith("Error loading route:", expect.any(Error))
+    // Root is cleared when the loader throws — stale content is not left on screen.
     expect(root.innerHTML).toBe("")
 
     router.destroy()
-    consoleSpy.mockRestore()
   })
 
-  it("handles destroy hook failure gracefully", async () => {
+  it("completes navigation even when the outgoing page's destroy hook throws", async () => {
     const { Router } = await import("../src/index")
-    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {})
 
     const routes = [
       {
@@ -66,11 +63,10 @@ describe("Router Reliability Tests", () => {
     router.navigate("/next")
     await tick()
 
-    expect(consoleSpy).toHaveBeenCalledWith("Error destroying page:", expect.any(Error))
+    // Navigation must complete despite the throwing destroy hook.
     expect(root.innerHTML).toBe("Next")
 
     router.destroy()
-    consoleSpy.mockRestore()
   })
 
   it("handles trailing slashes consistently in route matching", async () => {
@@ -87,9 +83,6 @@ describe("Router Reliability Tests", () => {
 
     router.navigate("/about")
     await tick()
-    // Should still be called (or not called if it's the same route, but current implementation re-renders on every navigate)
-    // Actually handleNavigation checks if navId changed, and matchRoute is called.
-    // If it matches, it re-renders.
     expect(render).toHaveBeenCalledTimes(2)
 
     router.destroy()

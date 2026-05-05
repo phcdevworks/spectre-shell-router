@@ -100,7 +100,8 @@ spectre-shell-router/
 ├── src/
 │   └── index.ts          # Router implementation
 ├── tests/
-│   └── router.test.ts    # Vitest test suite
+│   ├── router.test.ts    # Core routing test suite
+│   └── stress.test.ts    # Stress and edge case tests
 ├── dist/                 # Built assets (generated)
 ├── tsconfig.json         # TypeScript configuration
 ├── vitest.config.ts      # Vitest configuration

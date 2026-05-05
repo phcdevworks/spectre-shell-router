@@ -1,5 +1,6 @@
 # @phcdevworks/spectre-shell-router
 
+[![CI](https://github.com/phcdevworks/spectre-shell-router/actions/workflows/ci.yml/badge.svg)](https://github.com/phcdevworks/spectre-shell-router/actions/workflows/ci.yml)
 [![GitHub issues](https://img.shields.io/github/issues/phcdevworks/spectre-shell-router)](https://github.com/phcdevworks/spectre-shell-router/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/phcdevworks/spectre-shell-router)](https://github.com/phcdevworks/spectre-shell-router/pulls)
 [![License](https://img.shields.io/github/license/phcdevworks/spectre-shell-router)](LICENSE)
