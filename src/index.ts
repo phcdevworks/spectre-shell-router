@@ -40,16 +40,12 @@ export class Router {
       throw new Error("Router has been destroyed or not initialized.")
     }
     history.pushState({}, "", path)
-    this.handleNavigation()
+    void this.handleNavigation()
   }
 
   public destroy() {
     if (this.currentPage?.destroy) {
-      try {
-        this.currentPage.destroy()
-      } catch (e) {
-        console.error("Error destroying page during router destruction:", e)
-      }
+      this.currentPage.destroy()
       this.currentPage = null
     }
     window.removeEventListener("popstate", this.handleNavigationBound)
@@ -87,6 +83,17 @@ export class Router {
     this.navigate(url.pathname + url.search + url.hash)
   }
 
+  private destroyCurrentPage() {
+    if (this.currentPage?.destroy) {
+      try {
+        this.currentPage.destroy()
+      } catch {
+        // a broken destroy hook must not block the next route from rendering
+      }
+    }
+    this.currentPage = null
+  }
+
   private async handleNavigation() {
     if (!this.rootEl) return
     const navId = ++this.currentNavId
@@ -96,48 +103,36 @@ export class Router {
       const params = this.matchRoute(route.path, url.pathname)
       if (!params) continue
 
+      let page: PageModule
       try {
-        const page = await route.loader()
-
-        if (navId !== this.currentNavId) return
-
-        if (this.currentPage?.destroy) {
-          try {
-            this.currentPage.destroy()
-          } catch (e) {
-            console.error("Error destroying page:", e)
-          }
-        }
-
-        this.rootEl.innerHTML = ""
-        this.currentPage = page
-
-        page.render({
-          path: url.pathname,
-          params,
-          query: url.searchParams,
-          root: this.rootEl
-        })
-
-        return
-      } catch (e) {
-        console.error("Error loading route:", e)
-        if (navId === this.currentNavId) {
+        page = await route.loader()
+      } catch {
+        // loader failure — abandon this navigation and clear stale content
+        if (navId === this.currentNavId && this.rootEl) {
+          this.destroyCurrentPage()
           this.rootEl.innerHTML = ""
         }
         return
       }
+
+      if (navId !== this.currentNavId) return
+
+      this.destroyCurrentPage()
+      this.rootEl.innerHTML = ""
+      this.currentPage = page
+
+      page.render({
+        path: url.pathname,
+        params,
+        query: url.searchParams,
+        root: this.rootEl
+      })
+
+      return
     }
 
-    // No route matched - clear the root
-    if (this.currentPage?.destroy) {
-      try {
-        this.currentPage.destroy()
-      } catch (e) {
-        console.error("Error destroying page on 404:", e)
-      }
-      this.currentPage = null
-    }
+    // No route matched — clear the root
+    this.destroyCurrentPage()
     this.rootEl.innerHTML = ""
   }
 
@@ -145,7 +140,6 @@ export class Router {
     routePath: string,
     urlPath: string
   ): Record<string, string> | null {
-    // Normalize paths by removing trailing slashes and filtering out empty segments
     const routeParts = routePath.split("/").filter(Boolean)
     const urlParts = urlPath.split("/").filter(Boolean)
 
