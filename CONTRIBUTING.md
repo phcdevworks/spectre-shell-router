@@ -173,7 +173,6 @@ spectre-shell-router/
 - Named routes
 - Additional navigation helpers beyond the current router surface
 - Scroll position restoration
-- Meta tag management or document-level side effects
 
 ## Questions or Issues?
 

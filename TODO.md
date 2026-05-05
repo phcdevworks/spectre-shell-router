@@ -48,14 +48,6 @@ ergonomics.
   - Tests confirm named route resolution and param interpolation
   - Documented in README
 
-- Add opt-in signals integration for reactive route state File targets:
-  - `src/index.ts` or new `src/signals.ts`
-  - `tests/`
-  - `README.md` Acceptance criteria:
-  - `currentRoute` exposed as a readable signal (opt-in)
-  - Signal updates on every navigation
-  - Documented as optional in README
-
 ## P2: Later / Controlled Improvement
 
 - Write nested routing proposal File targets:
@@ -64,17 +56,14 @@ ergonomics.
     lifecycle behavior
   - Implement only when a concrete application need is proven
 
-- Evaluate meta tag management File targets:
-  - planning docs Acceptance criteria:
-  - Document whether page title and meta updates should live in the router or
-    in the consuming application
-
 ## Explicitly Out of Scope
 
 - Do not add application state management
 - Do not add rendering or DOM helpers beyond route outlet management
 - Do not add framework-specific adapters
 - Do not add styling or token definitions
+- Do not add signals integration
+- Do not add meta tag management
 
 ## Recommended Execution Order
 
@@ -83,5 +72,4 @@ ergonomics.
 3. CI pipeline
 4. Scroll position restoration
 5. Named routes
-6. Signals integration
-7. Nested routing proposal (only when proven necessary)
+6. Nested routing proposal (only when proven necessary)

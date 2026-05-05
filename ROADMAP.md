@@ -34,9 +34,6 @@ hardening the package toward a stable v1.0 before expanding scope.
 - Scroll position is not restored on navigation — browser-expected behavior is
   missing.
 - No CI pipeline for automated build and test validation.
-- Integration with `@phcdevworks/spectre-shell-signals` for reactive route state
-  is not wired.
-
 ## 2. Roadmap
 
 ## P0: Core Routing Completeness / Must-Do
@@ -158,28 +155,6 @@ Risk if skipped
 
 - Path strings are duplicated across route modules and templates
 
-### P1.3 Signals Integration for Reactive Route State
-
-Objective Expose current route state as a signal from
-`@phcdevworks/spectre-shell-signals`.
-
-Why it matters Reactive UI components need to respond to route changes without
-polling or manual event wiring. A signal-backed route state makes this clean.
-
-Suggested deliverables
-
-- Optional integration that exposes `currentRoute` as a readable signal
-- Document in `README.md` as opt-in behavior
-- Tests for reactive route state updates
-
-Dependency notes
-
-- Depends on `@phcdevworks/spectre-shell-signals` being stable
-
-Risk if skipped
-
-- Route-reactive UI must use manual event listeners
-
 ## P2: Later / Controlled Improvement
 
 ### P2.1 Nested Routing
@@ -199,15 +174,6 @@ Dependency notes
 - Only after P0 and P1 are stable
 - Evaluate with WordPress theme and Astro adapter use cases
 
-### P2.2 Meta Tag Management
-
-Objective Allow route modules to declare page title and meta updates.
-
-Suggested deliverables
-
-- Optional `meta` field on route context or module contract
-- Implement only if the WordPress theme or Astro integration proves the need
-
 ## 3. Explicitly Out of Scope
 
 - Do not add application state management here
@@ -215,6 +181,8 @@ Suggested deliverables
 - Do not add framework-specific adapters (React, Vue, etc.)
 - Do not add styling or token definitions
 - Do not add server-side routing or SSR rendering
+- Do not add signals integration
+- Do not add meta tag management
 
 ## 4. Recommended Execution Order
 
@@ -223,5 +191,4 @@ Suggested deliverables
 3. CI pipeline
 4. Scroll position restoration
 5. Named routes
-6. Signals integration for reactive route state
-7. Evaluate nested routing only when proven necessary
+6. Evaluate nested routing only when proven necessary
