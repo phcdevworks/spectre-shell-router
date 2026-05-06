@@ -1,7 +1,7 @@
-import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
-import globals from 'globals';
-import { type Linter } from 'eslint';
+import eslint from '@eslint/js'
+import tseslint from 'typescript-eslint'
+import globals from 'globals'
+import { type Linter } from 'eslint'
 
 export default tseslint.config(
   eslint.configs.recommended,
@@ -29,4 +29,4 @@ export default tseslint.config(
   {
     ignores: ['dist/', 'node_modules/'],
   }
-);
+)

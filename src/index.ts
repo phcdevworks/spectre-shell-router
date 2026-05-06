@@ -29,17 +29,17 @@ export class Router {
     this.handleNavigationBound = this.handleNavigation.bind(this)
     this.handleLinkClickBound = this.handleLinkClick.bind(this)
 
-    window.addEventListener("popstate", this.handleNavigationBound)
-    document.addEventListener("click", this.handleLinkClickBound)
+    window.addEventListener('popstate', this.handleNavigationBound)
+    document.addEventListener('click', this.handleLinkClickBound)
 
     void this.handleNavigation()
   }
 
   public navigate(path: string) {
     if (!this.rootEl) {
-      throw new Error("Router has been destroyed or not initialized.")
+      throw new Error('Router has been destroyed or not initialized.')
     }
-    history.pushState({}, "", path)
+    history.pushState({}, '', path)
     void this.handleNavigation()
   }
 
@@ -48,29 +48,22 @@ export class Router {
       this.currentPage.destroy()
       this.currentPage = null
     }
-    window.removeEventListener("popstate", this.handleNavigationBound)
-    document.removeEventListener("click", this.handleLinkClickBound)
+    window.removeEventListener('popstate', this.handleNavigationBound)
+    document.removeEventListener('click', this.handleLinkClickBound)
     this.rootEl = null
   }
 
   private handleLinkClick(e: MouseEvent) {
-    if (
-      e.defaultPrevented ||
-      e.button !== 0 ||
-      e.metaKey ||
-      e.ctrlKey ||
-      e.shiftKey ||
-      e.altKey
-    ) {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
       return
     }
 
-    const link = (e.target as HTMLElement).closest("a")
+    const link = (e.target as HTMLElement).closest('a')
     if (
       !link ||
       link.target ||
-      link.hasAttribute("download") ||
-      link.getAttribute("rel") === "external" ||
+      link.hasAttribute('download') ||
+      link.getAttribute('rel') === 'external' ||
       !link.href
     ) {
       return
@@ -107,10 +100,10 @@ export class Router {
       try {
         page = await route.loader()
       } catch {
-        // loader failure — abandon this navigation and clear stale content
+        // Loader failure: abandon this navigation and clear stale content.
         if (navId === this.currentNavId && this.rootEl) {
           this.destroyCurrentPage()
-          this.rootEl.innerHTML = ""
+          this.rootEl.innerHTML = ''
         }
         return
       }
@@ -118,30 +111,27 @@ export class Router {
       if (navId !== this.currentNavId) return
 
       this.destroyCurrentPage()
-      this.rootEl.innerHTML = ""
+      this.rootEl.innerHTML = ''
       this.currentPage = page
 
       page.render({
         path: url.pathname,
         params,
         query: url.searchParams,
-        root: this.rootEl
+        root: this.rootEl,
       })
 
       return
     }
 
-    // No route matched — clear the root
+    // No route matched: clear the root.
     this.destroyCurrentPage()
-    this.rootEl.innerHTML = ""
+    this.rootEl.innerHTML = ''
   }
 
-  private matchRoute(
-    routePath: string,
-    urlPath: string
-  ): Record<string, string> | null {
-    const routeParts = routePath.split("/").filter(Boolean)
-    const urlParts = urlPath.split("/").filter(Boolean)
+  private matchRoute(routePath: string, urlPath: string): Record<string, string> | null {
+    const routeParts = routePath.split('/').filter(Boolean)
+    const urlParts = urlPath.split('/').filter(Boolean)
 
     if (routeParts.length !== urlParts.length) return null
 
@@ -151,7 +141,7 @@ export class Router {
       const routePart = routeParts[i]
       const urlPart = urlParts[i]
 
-      if (routePart.startsWith(":")) {
+      if (routePart.startsWith(':')) {
         params[routePart.slice(1)] = decodeURIComponent(urlPart)
       } else if (routePart !== urlPart) {
         return null
