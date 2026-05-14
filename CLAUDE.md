@@ -1,6 +1,13 @@
 # CLAUDE.md — spectre-shell-router
 
-Claude Code is the primary developer for this package. This file is the single source of truth for working on the project.
+Primary AI maintainer: **Claude Code** (claude-sonnet-4-6, Anthropic)
+Human owner: PHCDevworks / brad.potts@coastdigitalgroup.com
+
+## Commit Policy
+
+Claude Code does **not** create git commits, push branches, or create tags in this repository. Changes are prepared and validated but left for human review and commit.
+
+---
 
 ## What This Package Is
 
