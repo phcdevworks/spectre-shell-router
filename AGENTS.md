@@ -1,42 +1,42 @@
-# 📡 The Router Specialist
+# AGENTS.md — spectre-shell-router
 
-### **The Routing Package**
+**Primary developer: Claude Code (Anthropic)**
+**Owner: PHCDevworks**
 
-You are an autonomous agent responsible for the Spectre routing package. This package is the **Routing Package**. Your mission is to provide minimal, framework-agnostic client-side routing for Spectre-based applications and vanilla TypeScript environments.
+Claude Code is the primary AI developer for this package. All automated and AI-assisted work on this repository flows through Claude Code using the guidance in `CLAUDE.md`.
 
-## The Golden Rule of Routing
+## Package Mission
 
-**Routing is a utility, not a framework.** You are strictly legacy-forbidden from defining UI styles, managing global application state (other than URL state), or inventing design tokens in this package. Your responsibility is to map URLs to page loaders and ensure the `render`/`destroy` contract is strictly followed.
+`@phcdevworks/spectre-shell-router` provides minimal, framework-agnostic client-side routing for Spectre applications. It maps URL paths to lazy page modules and enforces the `render` / `destroy` lifecycle contract.
 
 ## Responsibility Boundary
 
-- **Own Routing Only**: This package owns URL matching, navigation, params extraction, query parsing, history integration, and resolved route state for consuming shell logic.
-- **Do Not Drift**: This package does not own sensory behavior, rendering, signals, data fetching, or shell orchestration outside routing concerns.
-- **Stay Framework-Agnostic**: Keep the contract neutral so downstream consumers can decide how they render, compose state, and structure application behavior.
+- **Own routing only**: URL matching, navigation, params extraction, query parsing, History API, race-condition protection, page lifecycle
+- **Do not own**: application state, rendering logic beyond clearing the root element, styling, signals, SSR, framework adapters
 
-## Core Directives (Antigravity/Google Best Practices)
+## Core Directives
 
-1. **Minimal Surface Area**: The `Router` class should remain lean. Avoid adding features like middleware, nested routes, or complex guards unless requested.
-2. **Lifecycle Enforcement**: You must guarantee that every page module's `destroy()` hook is called before a new `render()` hook is executed.
-3. **Async Loaders**: Favor dynamic `import()` for page loading. This ensures optimal bundle splitting and performance.
-4. **Native History**: Use the native History API (`pushState`, `popstate`) for navigation. Do not use hash-based routing unless explicitly required.
-5. **Zero Dependencies**: This package must remain dependency-free. It uses standard browser APIs and TypeScript.
+1. **Minimal surface area** — keep `src/index.ts` lean; resist feature creep
+2. **Lifecycle enforcement** — `destroy()` must always run before the next `render()`
+3. **Zero dependencies** — standard browser APIs only
+4. **Async loaders** — dynamic `import()` pattern for page loading
+5. **Native History API** — `pushState` / `popstate`; no hash routing by default (hash mode is a planned opt-in)
+6. **Race-condition safe** — `currentNavId` monotonic counter guards stale renders
 
-## Implementation Guardrails
+## Verification Gate
 
-- **Separation of Concerns**: The router manages navigation. It does not manage how pages render themselves; it simply calls the `render` hook.
-- **Resolved Route Contract**: Prefer exposing stable route context to consumers instead of embedding app-specific logic into the router itself.
-- **Fail Fast**: If a new UI style or token is needed, output a 🛑 CONSTRAINT TRIGGERED block for the tokens or UI packages.
+Before marking any change done:
 
-## Testing & Validation Strategy
+```bash
+npm run check
+```
 
-1. **URL Mapping**: Verify that specific URL patterns correctly map to the corresponding module loaders.
-2. **Parameter Extraction**: Test that path parameters (e.g., `:id`) are correctly extracted and passed.
-3. **Lifecycle Sequentiality**: Assert that `destroy` always precedes `render` during navigation transitions.
+All of typecheck, lint, build, and tests must pass.
 
-## Workflow
+## AI Workflow
 
-1. Review `src/index.ts` for pending routing updates.
-2. Update `src/index.ts` or related routing utilities and docs.
-3. Run `npm run check` to verify build, lint, and tests.
-4. SUCCESS: Confirm all checks pass before marking work done.
+1. Read `CLAUDE.md` for project context and coding standards
+2. Make the smallest focused change that solves the stated problem
+3. Add or update tests in the appropriate test file
+4. Update `CHANGELOG.md` and `README.md` when public behavior changes
+5. Run `npm run check` — all green before committing

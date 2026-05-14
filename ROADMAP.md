@@ -33,7 +33,7 @@ hardening the package toward a stable v1.0 before expanding scope.
 - Named routes are not supported — links must hardcode path strings.
 - Scroll position is not restored on navigation — browser-expected behavior is
   missing.
-- No CI pipeline for automated build and test validation.
+- ~~No CI pipeline for automated build and test validation.~~ **Done** — GitHub Actions CI runs `npm run check` on push and PR across Node 22 and 24.
 ## 2. Roadmap
 
 ## P0: Core Routing Completeness / Must-Do
@@ -88,25 +88,10 @@ Risk if skipped
 
 - Auth and permission patterns require consumers to bypass the router
 
-### P0.3 CI Pipeline
+### ~~P0.3 CI Pipeline~~ — **Complete**
 
-Objective Add a CI pipeline that runs build, lint, and tests on every push.
-
-Why it matters Without CI, regressions can ship unnoticed. The router is a
-shared dependency across all Spectre applications.
-
-Suggested deliverables
-
-- GitHub Actions workflow running `npm run check` on push and PR
-- Badge in `README.md`
-
-Dependency notes
-
-- No blocking dependencies
-
-Risk if skipped
-
-- Regressions ship without automated catch
+GitHub Actions CI runs `npm run check` on every push and PR across Node 22 and
+24 with concurrency cancellation. CI badge added to `README.md`.
 
 ## P1: Routing Ergonomics
 
