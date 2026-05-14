@@ -1,75 +1,47 @@
-# Spectre Shell Router Execution Todo
+# Spectre Shell Router — Execution Todo
 
-This todo list is aligned to the current repository and the roadmap in
-`ROADMAP.md`. It is scoped to routing completeness, guard middleware, CI, and
-ergonomics.
+Scoped to routing completeness, ergonomics, and CI. Aligned with `ROADMAP.md`.
 
-## P0: Core Routing Completeness / Must-Do
+## P0: Core Routing Completeness
 
-- Add hash-based routing mode (`mode: 'hash'`) File targets:
-  - `src/index.ts`
-  - `tests/router.test.ts`
-  - `README.md` Acceptance criteria:
-  - `mode: 'hash'` reads/writes `location.hash` instead of `location.pathname`
-  - Params, query, and navigation all work in hash mode
-  - Test coverage matches history mode parity
-  - Documented in README
+- [ ] **Hash-based routing mode** (`mode: 'hash'`)
+  - Files: `src/index.ts`, `tests/router.test.ts`, `README.md`
+  - Acceptance: `mode: 'hash'` reads/writes `location.hash`; params, query, and navigation work in hash mode; test parity with history mode; documented
 
-- Add route guard / `beforeNavigate` hook File targets:
-  - `src/index.ts`
-  - `tests/router.test.ts`
-  - `README.md` Acceptance criteria:
-  - Optional `beforeNavigate(context, next)` hook on router constructor
-  - Guard can allow, redirect, or cancel navigation
-  - Tests cover guard invocation, redirect, and cancellation
-  - Documented in README
+- [ ] **Route guard / `beforeNavigate` hook**
+  - Files: `src/index.ts`, `tests/router.test.ts`, `README.md`
+  - Acceptance: optional `beforeNavigate(context, next)` on constructor; guard can allow, redirect, or cancel; tests cover all three; documented
 
-- Add GitHub Actions CI pipeline File targets:
-  - `.github/workflows/ci.yml`
-  - `README.md` (badge) Acceptance criteria:
-  - CI runs `npm run check` on push and PR
-  - Badge visible in README
+- [x] **CI pipeline** — done; GitHub Actions runs `npm run check` on Node 22 + 24; badge in README
 
 ## P1: Routing Ergonomics
 
-- Add scroll position restoration on navigation File targets:
-  - `src/index.ts`
-  - `tests/router.test.ts` Acceptance criteria:
-  - Scroll to top on forward navigation by default
-  - Scroll position restored on back/forward history traversal
-  - Opt-out available for custom scroll handling
+- [ ] **Scroll position restoration**
+  - Files: `src/index.ts`, `tests/router.test.ts`
+  - Acceptance: scroll to top on forward navigation; restore on back/forward; opt-out available
 
-- Add named routes and `router.href()` helper File targets:
-  - `src/index.ts`
-  - `tests/router.test.ts`
-  - `README.md` Acceptance criteria:
-  - Optional `name` field on route definitions
-  - `router.href('routeName', params)` generates correct path
-  - Tests confirm named route resolution and param interpolation
-  - Documented in README
+- [ ] **Named routes + `router.href()` helper**
+  - Files: `src/index.ts`, `tests/router.test.ts`, `README.md`
+  - Acceptance: optional `name` on route definitions; `router.href('name', params)` generates correct path; tests confirm resolution; documented
 
 ## P2: Later / Controlled Improvement
 
-- Write nested routing proposal File targets:
-  - planning docs Acceptance criteria:
-  - Proposal covers outlet API, child route matching, and parent/child
-    lifecycle behavior
-  - Implement only when a concrete application need is proven
+- [ ] **Nested routing proposal** (planning doc only; implement only when a concrete need is proven)
 
 ## Explicitly Out of Scope
 
-- Do not add application state management
-- Do not add rendering or DOM helpers beyond route outlet management
-- Do not add framework-specific adapters
-- Do not add styling or token definitions
-- Do not add signals integration
-- Do not add meta tag management
+- Application state management
+- Rendering or DOM helpers beyond route outlet management
+- Framework-specific adapters
+- Styling or token definitions
+- Signals integration
+- Meta tag management
+- SSR / server routing
 
 ## Recommended Execution Order
 
-1. Hash routing (priority: WordPress compatibility)
+1. Hash routing (WordPress deployment priority)
 2. Route guards
-3. CI pipeline
-4. Scroll position restoration
-5. Named routes
-6. Nested routing proposal (only when proven necessary)
+3. Scroll position restoration
+4. Named routes
+5. Nested routing proposal (only when proven necessary)

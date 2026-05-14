@@ -1,5 +1,7 @@
 # @phcdevworks/spectre-shell-router
 
+[![CI](https://github.com/phcdevworks/spectre-shell-router/actions/workflows/ci.yml/badge.svg)](https://github.com/phcdevworks/spectre-shell-router/actions/workflows/ci.yml)
+
 Minimal browser router for Spectre applications. It maps URL paths to lazy page modules, renders into a root element, and keeps navigation behavior framework-agnostic.
 
 [Issues](https://github.com/phcdevworks/spectre-shell-router/issues) | [Pull requests](https://github.com/phcdevworks/spectre-shell-router/pulls) | [Security](./SECURITY.md) | [Contributing](./CONTRIBUTING.md)
