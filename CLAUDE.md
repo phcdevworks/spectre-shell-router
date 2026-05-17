@@ -1,11 +1,34 @@
 # CLAUDE.md — spectre-shell-router
 
-Primary AI maintainer: **Claude Code** (claude-sonnet-4-6, Anthropic)
+Lead AI developer: **Claude Code** (claude-sonnet-4-6, Anthropic)
 Human owner: PHCDevworks / brad.potts@coastdigitalgroup.com
 
 ## Commit Policy
 
-Claude Code does **not** create git commits, push branches, or create tags in this repository. Changes are prepared and validated but left for human review and commit.
+Claude Code does **not** create git commits, push branches, create tags, merge pull requests,
+publish packages, or create releases in this repository. Changes are prepared and validated but
+left for human review and approval.
+
+For multi-agent coordination, follow `AGENTS.md`. Claude Code owns implementation,
+architecture, tests, and final validation; Codex owns documentation, release preparation,
+production stabilization, and repo hygiene.
+
+---
+
+## Claude Code Owns
+
+As the lead development agent, Claude Code is responsible for:
+
+- Feature implementation and bug fixes in `src/index.ts`
+- Refactors and architecture improvements within the router boundary
+- Test coverage and test quality across `tests/`
+- Code quality, TypeScript type safety, and coding standards enforcement
+- Build reliability and CI troubleshooting
+- Developer workflow improvements
+- Final pre-handoff validation — `npm run check` must pass clean
+
+When a task falls outside this list (docs, changelog, release version, config hygiene),
+check `AGENTS.md` for the owning agent before acting.
 
 ---
 
@@ -18,7 +41,7 @@ Single source file: `src/index.ts` (153 lines). Keep it lean.
 ## Commands
 
 ```bash
-npm run check          # Full verification: typecheck + lint + build + test (run before every commit)
+npm run check          # Full verification: typecheck + lint + build + test (run before handoff)
 npm run typecheck      # tsc --noEmit only
 npm run lint           # ESLint
 npm run lint:fix       # ESLint with auto-fix
@@ -27,7 +50,7 @@ npm test -- --run      # Vitest once (no watch)
 npm run format         # Prettier across all source files
 ```
 
-`npm run check` is the gate. All must pass before committing.
+`npm run check` is the gate. All must pass before handoff.
 
 ## Architecture
 
@@ -65,6 +88,7 @@ Do not add to this package:
 - Zero runtime dependencies — browser APIs only
 - No comments unless the WHY is non-obvious; never comment the WHAT
 - Follow the existing Prettier config (`.prettierrc`): single quotes, no semi, 100-char width
+- Keep tool config files in TypeScript where the tool supports it (e.g. `vitest.config.ts`)
 - All new behavior needs a test in the appropriate test file
 
 ## Test Strategy
@@ -75,9 +99,24 @@ Do not add to this package:
 
 Tests run against jsdom (see `vitest.config.ts`). Use `vi.fn()` mocks for render/destroy hooks.
 
+## Handoff Protocol
+
+When implementation is complete, communicate clearly before stepping back:
+
+1. State that `npm run check` passes — never assume it's implied.
+2. List which files changed and whether any public API types (`Route`, `Router`, `RouteContext`,
+   `PageModule`) were added, changed, or removed.
+3. Flag any `README.md` or `CHANGELOG.md` updates needed — Codex owns those.
+4. Note remaining risk or deferred items.
+
+This gives Codex and Bradley a clean, reviewable summary to work from.
+
 ## Publishing
 
-`prepublishOnly` runs `npm run check`. Never manually publish without passing the full check. Version follows semver; update `CHANGELOG.md` with every release.
+Codex prepares releases and changelog updates. Before handoff, Codex runs the
+release-readiness checklist in `CODEX.md` — verify CI, README/API sync, CHANGELOG format,
+semver, and no unexpected runtime dependencies. `prepublishOnly` runs `npm run check`; never
+publish or tag without human approval and a passing full check. Versioning follows semver.
 
 ## Boundaries Reference
 

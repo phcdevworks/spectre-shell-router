@@ -4,12 +4,23 @@
 - [ ] Summary of changes
 - [ ] Rationale/context
 
-## Testing
+## Type of Change
 
-- [ ] `npm test`
-- [ ] `npm run build`
-- [ ] Other (describe):
+- [ ] Bug fix / patch
+- [ ] New feature / additive
+- [ ] Breaking change
+- [ ] Documentation / config only
+- [ ] Refactor (no behavior change)
 
-## Screenshots (if UI)
+## Checklist
 
-## Notes for reviewers
+- [ ] `npm run check` passes (typecheck + lint + build + test)
+- [ ] No scope drift beyond routing (no tokens, styling, rendering, or signals)
+- [ ] `CHANGELOG.md` updated (if public behavior changes)
+- [ ] Role boundary respected (`AGENTS.md` / `CLAUDE.md` / `CODEX.md`)
+
+## Screenshots (if applicable)
+
+## Notes for Reviewers
+
+## Agent / Automation Notes

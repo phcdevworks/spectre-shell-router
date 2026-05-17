@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: 'en-US'
+early_access: false
+reviews:
+  profile: 'assertive'
+  request_changes_workflow: false
+  high_level_summary: true
+  high_level_summary_placeholder: '@coderabbitai summary'
+  auto_title_placeholder: '@coderabbitai'
+  review_status: true
+  commit_status: true
+  collapse_walkthrough: false
+  changed_files_summary: true
+  sequence_diagrams: false
+  assess_linked_issues: true
+  related_issues: true
+  related_prs: true
+  suggested_labels: true
+  auto_apply_labels: false
+  suggested_reviewers: false
+  poem: false
+  abort_on_close: true
+  auto_review:
+    enabled: true
+    auto_incremental_review: true
+    drafts: false
+  finishing_touches:
+    docstrings:
+      enabled: false
+  tools:
+    eslint:
+      enabled: true
+    markdownlint:
+      enabled: true
+    gitleaks:
+      enabled: true
+    github-checks:
+      enabled: true
+      timeout_ms: 90000
+    yamllint:
+      enabled: true
+    languagetool:
+      enabled: true
+      level: default
+    actionlint:
+      enabled: true
+  path_instructions:
+    - path: '**/*.ts'
+      instructions: 'Enforce strict TypeScript: flag missing type annotations, any usage, non-null assertions without justification, and unhandled promise rejections.'
+    - path: 'src/**'
+      instructions: 'Router logic is foundational to all Spectre apps. Flag any modifications to public TypeScript contracts, route matching, navigation, lifecycle, history management, or race-condition protection that lack focused tests or would require a semver major bump.'
+    - path: 'package.json'
+      instructions: 'This package has zero runtime dependencies. Flag any dependencies entry, broad script churn, publish metadata drift, or release-version change that is not reflected in CHANGELOG.md.'
+    - path: 'CHANGELOG.md'
+      instructions: 'Verify entries follow Keep a Changelog format with Added/Changed/Fixed/Removed categories, accurate release dates, and bottom comparison links.'
+    - path: 'AGENTS.md'
+      instructions: 'Verify the four-agent operating model stays intact: Claude Code leads implementation, Codex owns docs/releases/stabilization/hygiene/config, Copilot is advisory, and Jules handles small automated maintenance.'
+    - path: 'CODEX.md'
+      instructions: 'Verify Codex stays focused on documentation, releases, production stabilization, repo hygiene, changelog/release-note support, and config standardization without taking Claude Code implementation ownership.'
+    - path: '.github/copilot-instructions.md'
+      instructions: 'Ensure Copilot remains advisory only and does not claim ownership of architecture, releases, dependency maintenance, or commit authority.'
+chat:
+  auto_reply: true
+knowledge_base:
+  opt_out: false
+  learnings:
+    scope: auto
+  issues:
+    scope: auto
+  pull_requests:
+    scope: auto
