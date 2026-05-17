@@ -19,11 +19,11 @@ Thanks for helping improve `@phcdevworks/spectre-shell-router`. This package own
 ## Checks
 
 ```bash
-npm run typecheck
-npm run lint
-npm run build
-npm test -- --run
-npm run check
+npm run check         # Full gate — run this before opening a PR
+npm run typecheck     # TypeScript only
+npm run lint          # ESLint only
+npm run build         # Build only
+npm test -- --run     # Tests only
 ```
 
 ## Pull Requests
