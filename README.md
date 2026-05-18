@@ -1,13 +1,16 @@
 # @phcdevworks/spectre-shell-router
 
-[![CI](https://github.com/phcdevworks/spectre-shell-router/actions/workflows/ci.yml/badge.svg)](https://github.com/phcdevworks/spectre-shell-router/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/@phcdevworks/spectre-shell-router.svg)](https://www.npmjs.com/package/@phcdevworks/spectre-shell-router)
+[![CI](https://img.shields.io/github/actions/workflow/status/phcdevworks/spectre-shell-router/ci.yml?branch=main&label=CI)](https://github.com/phcdevworks/spectre-shell-router/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/phcdevworks/spectre-shell-router)](LICENSE)
+[![Node](https://img.shields.io/node/v/@phcdevworks/spectre-shell-router)](https://nodejs.org)
 
 Minimal browser router for Spectre applications. It maps URL paths to lazy page modules, renders into a root element, and keeps navigation behavior framework-agnostic.
 
 Part of the [PHCDevworks Spectre shell ecosystem](https://github.com/phcdevworks) — composable, zero-dependency packages for client-side shell applications.
 
-[Issues](https://github.com/phcdevworks/spectre-shell-router/issues) | [Pull requests](https://github.com/phcdevworks/spectre-shell-router/pulls) | [Security](./SECURITY.md) | [Contributing](./CONTRIBUTING.md)
+[Contributing](CONTRIBUTING.md) | [Changelog](CHANGELOG.md) |
+[Roadmap](ROADMAP.md) | [Security Policy](SECURITY.md)
 
 ## When to use this package
 
@@ -138,14 +141,19 @@ Useful scripts:
 - `npm run build` emits declarations and JavaScript to `dist`.
 - `npm run check` runs the full verification gate (typecheck + lint + build + test).
 
+AI-agent coordination starts in [AGENTS.md](./AGENTS.md), with companion
+guidance in [CLAUDE.md](./CLAUDE.md), [CODEX.md](./CODEX.md),
+[COPILOT.md](./COPILOT.md), [JULES.md](./JULES.md), and
+[.github/copilot-instructions.md](./.github/copilot-instructions.md).
+
 ### Troubleshooting
 
-| Problem | Likely cause | Fix |
-|---|---|---|
-| `npm run check` fails on typecheck | Type error in source or tests | Run `npm run typecheck` to isolate the error |
-| Tests fail in CI but pass locally | Node version mismatch | CI runs Node 22 and 24; match your local version |
-| `dist/` is missing after clone | Build output is gitignored | Run `npm run build` |
-| Link clicks are not intercepted | Link is cross-origin, has `target`, `download`, or `rel="external"` | Expected behavior — only same-domain plain links are intercepted |
+| Problem                            | Likely cause                                                        | Fix                                                              |
+| ---------------------------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `npm run check` fails on typecheck | Type error in source or tests                                       | Run `npm run typecheck` to isolate the error                     |
+| Tests fail in CI but pass locally  | Node version mismatch                                               | CI runs Node 22 and 24; match your local version                 |
+| `dist/` is missing after clone     | Build output is gitignored                                          | Run `npm run build`                                              |
+| Link clicks are not intercepted    | Link is cross-origin, has `target`, `download`, or `rel="external"` | Expected behavior — only same-domain plain links are intercepted |
 
 ## Contributing
 

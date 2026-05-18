@@ -42,6 +42,5 @@ Read `CLAUDE.md` for package boundaries, architecture, and implementation standa
 
 - Route behavior, architecture, public API contract, and test strategy direction are Claude Code-owned
 - Documentation, releases, stabilization, repo hygiene, and config standardization are Codex-owned
-- Strategy, coordination, prompt design, and external review are ChatGPT-provided
-- Mechanical dependency/config micro-updates are Jules/Dependabot-owned
+- Mechanical dependency/config micro-updates are Jules/Dependabot-owned and scoped by `JULES.md`
 - Copilot output is advisory and should align with the owning agent decisions

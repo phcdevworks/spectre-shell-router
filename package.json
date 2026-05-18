@@ -17,6 +17,7 @@
   "author": "PHCDevworks",
   "license": "MIT",
   "type": "module",
+  "packageManager": "npm@11.14.1",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -42,22 +43,18 @@
     {
       "type": "github",
       "url": "https://github.com/sponsors/phcdevworks"
-    },
-    {
-      "type": "buymeacoffee",
-      "url": "https://buymeacoffee.com/phcdevworks"
     }
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/phcdevworks/spectre-shell-router.git"
+    "url": "git+https://github.com/phcdevworks/spectre-shell-router.git"
   },
   "bugs": {
     "url": "https://github.com/phcdevworks/spectre-shell-router/issues"
   },
-  "homepage": "https://phcdevworks.com",
+  "homepage": "https://github.com/phcdevworks/spectre-shell-router#readme",
   "engines": {
-    "node": ">=22"
+    "node": "^22.12.0 || >=24.0.0"
   },
   "publishConfig": {
     "access": "public"
