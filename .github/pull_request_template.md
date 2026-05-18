@@ -1,26 +1,53 @@
 ## Summary
 
-- [ ] Linked issue (or `N/A`)
-- [ ] Summary of changes
-- [ ] Rationale/context
+- [ ] Linked issue (or N/A)
+- [ ] What changed
+- [ ] Why this change is needed
 
 ## Type of Change
 
-- [ ] Bug fix / patch
-- [ ] New feature / additive
+- [ ] Bug fix (non-breaking)
+- [ ] Feature (non-breaking)
 - [ ] Breaking change
-- [ ] Documentation / config only
 - [ ] Refactor (no behavior change)
+- [ ] Documentation or config only
 
-## Checklist
+## Package Boundary Check
 
-- [ ] `npm run check` passes (typecheck + lint + build + test)
-- [ ] No scope drift beyond routing (no tokens, styling, rendering, or signals)
-- [ ] `CHANGELOG.md` updated (if public behavior changes)
-- [ ] Role boundary respected (`AGENTS.md` / `CLAUDE.md` / `CODEX.md`)
+- [ ] Change stays within this package scope (routing only)
+- [ ] No scope drift into tokens, UI, signals, shell orchestration, or app logic
 
-## Screenshots (if applicable)
+## Public API Impact
 
-## Notes for Reviewers
+- [ ] No public API contract change
+- [ ] Public API changed (describe impact and migration notes below)
 
-## Agent / Automation Notes
+## Validation
+
+- [ ] Command run: npm run check
+- [ ] Result: pass
+
+## Documentation Updated
+
+- [ ] README updated (if needed)
+- [ ] CHANGELOG updated (if needed)
+- [ ] No documentation updates required
+
+## Release Impact
+
+- [ ] No release impact
+- [ ] Patch
+- [ ] Minor
+- [ ] Major
+
+## Codex Review Needed
+
+- [ ] Yes
+- [ ] No
+
+## Claude Code Implementation Notes
+
+- [ ] N/A
+- [ ] Included below
+
+## Additional Notes
