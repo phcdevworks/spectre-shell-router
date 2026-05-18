@@ -1,6 +1,6 @@
 # CLAUDE.md — spectre-shell-router
 
-Lead AI developer: **Claude Code** (claude-sonnet-4-6, Anthropic)
+Primary AI maintainer: **Claude Code** (claude-sonnet-4-6, Anthropic)
 Human owner: PHCDevworks / brad.potts@coastdigitalgroup.com
 
 ## Commit Policy
@@ -12,6 +12,18 @@ left for human review and approval.
 For multi-agent coordination, follow `AGENTS.md`. Claude Code owns implementation,
 architecture, tests, and final validation; Codex owns documentation, release preparation,
 production stabilization, and repo hygiene.
+
+## AI Team
+
+| Role                   | Agent          | Authority                                                     |
+| ---------------------- | -------------- | ------------------------------------------------------------- |
+| Human owner            | Bradley Potts  | Final authority — commits, tags, releases                     |
+| Lead developer         | Claude Code    | Implementation, architecture, tests, CI                       |
+| Release/docs oversight | OpenAI Codex   | Release readiness, changelog, production safety               |
+| Development support    | GitHub Copilot | Inline suggestions, IDE support                               |
+| Maintenance            | Google Jules   | Bounded micro-maintenance and dependency updates (`JULES.md`) |
+
+See [AGENTS.md](./AGENTS.md) for full role boundaries and per-agent handoff rules.
 
 ---
 
