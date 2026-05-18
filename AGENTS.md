@@ -25,6 +25,7 @@ Claude Code, Codex, and Copilot do not commit by default. Jules may commit and p
 | `CLAUDE.md`                       | Claude Code                  | Lead-development guide for implementation, architecture, and tests |
 | `CODEX.md`                        | OpenAI Codex                 | Release-readiness, production stabilization, and config posture    |
 | `JULES.md`                        | Google Jules                 | Bounded automated maintenance guidance                             |
+| `COPILOT.md`                      | GitHub Copilot               | Role summary and development boundaries for GitHub Copilot         |
 | `.github/copilot-instructions.md` | GitHub Copilot               | In-editor suggestion boundaries                                    |
 | `.claude/settings.json`           | Claude Code runtime          | Local command denies for commit, push, tag, and publish actions    |
 | `.coderabbit.yaml`                | CodeRabbit                   | Automated review checks aligned with package boundaries            |
