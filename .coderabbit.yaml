@@ -57,6 +57,8 @@ reviews:
       instructions: 'Verify the four-agent operating model stays intact: Claude Code leads implementation, Codex owns docs/releases/stabilization/hygiene/config, Copilot is advisory, and Jules handles small automated maintenance.'
     - path: 'CODEX.md'
       instructions: 'Verify Codex stays focused on documentation, releases, production stabilization, repo hygiene, changelog/release-note support, and config standardization without taking Claude Code implementation ownership.'
+    - path: 'JULES.md'
+      instructions: 'Verify Jules remains limited to bounded automated maintenance and never changes route matching, navigation, lifecycle behavior, race protection, exported types, public API, or the zero-runtime-dependency boundary.'
     - path: '.github/copilot-instructions.md'
       instructions: 'Ensure Copilot remains advisory only and does not claim ownership of architecture, releases, dependency maintenance, or commit authority.'
 chat:
