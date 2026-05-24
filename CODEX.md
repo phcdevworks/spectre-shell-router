@@ -29,6 +29,34 @@ safety before handoff.
 - Tracking changes across docs, release metadata, package config, and validation results.
 - Small, bounded config or documentation refactors when they reduce drift.
 
+## Primary Responsibilities
+
+### Documentation Updates
+
+- Run `npm run check` after any change to verify nothing breaks.
+- Follow [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format: Added/Changed/Fixed/Removed
+  sections, version links at the bottom.
+- `README.md` must stay in sync with the public API (`Route`, `Router`, `RouteContext`, `PageModule`).
+
+### Release Preparation
+
+- Version follows semver; bump the `version` field in `package.json`.
+- Move `## [Unreleased]` entries into a new `## [X.Y.Z] - YYYY-MM-DD` section in `CHANGELOG.md`.
+- `prepublishOnly` runs `npm run check` automatically — never skip it.
+- Do not prepare a release without a passing CI run on the release commit.
+
+### Production Stabilization
+
+- Confirm `npm run check` passes clean on the release branch.
+- Review open issues and PRs for regressions before marking stable.
+- Flag any `[Unreleased]` CHANGELOG entries that have not been attributed to a version.
+
+### Repo Hygiene
+
+- Formatting: Prettier config (`.prettierrc`) governs all source; `npm run format` applies it.
+- Keep `ROADMAP.md` current: mark completed items, do not add scope that contradicts `CLAUDE.md`.
+- Do not introduce new root-level files without a clear, documented purpose.
+
 ## Codex Does Not Own
 
 - Primary implementation in `src/index.ts`.
@@ -53,19 +81,6 @@ Before marking a release-ready handoff:
 6. Verify `prepublishOnly` still runs `npm run check`.
 7. Confirm there are no unexpected runtime dependencies.
 8. Summarize changed files, validation status, public behavior impact, and remaining risk.
-
-## Standard Commands
-
-```bash
-npm run check
-npm run typecheck
-npm run lint
-npm run build
-npm test -- --run
-npm run format
-```
-
-`npm run check` is the required gate before handoff.
 
 ## Handoff Format
 

@@ -24,6 +24,25 @@ Jules must not change route matching, navigation, lifecycle behavior, race
 protection, exported types, or public API. This package must remain routing-only
 and must not gain runtime dependencies.
 
+## Pull Request Creation
+
+Follow the shared PR requirements in `AGENTS.md`. Jules PRs must also state which maintenance
+category was executed: dependency update, config fix, or documentation fix.
+
+## Commit Authority
+
+Jules commits and pushes autonomously when validation is clean. Jules must not:
+- reset or discard changes it did not make
+- force-push or rewrite history
+- commit any state where a validation gate fails
+- absorb unrelated working-tree changes into its commit
+
+### Commit message format
+
+- Dependency update: `chore(spectre-shell-router): bump <package> to <version>`
+- Config fix: `chore(spectre-shell-router): <description of fix>`
+- Doc fix: `docs(spectre-shell-router): <description of fix>`
+
 ## Validation
 
 Before committing or pushing an allowed maintenance change, run:
