@@ -12,6 +12,7 @@ export type RouteContext = {
 
 export type Route = {
   path: string
+  name?: string
   loader: () => Promise<PageModule>
 }
 
@@ -22,10 +23,15 @@ export class Router {
   private handleNavigationBound: () => void
   private handleLinkClickBound: (e: MouseEvent) => void
   private currentNavId = 0
+  private nameIndex: Map<string, string> = new Map()
 
   constructor(routes: Route[], root: HTMLElement) {
     this.routes = routes
     this.rootEl = root
+
+    for (const route of routes) {
+      if (route.name) this.nameIndex.set(route.name, route.path)
+    }
     this.handleNavigationBound = this.handleNavigation.bind(this)
     this.handleLinkClickBound = this.handleLinkClick.bind(this)
 
@@ -41,6 +47,23 @@ export class Router {
     }
     history.pushState({}, '', path)
     void this.handleNavigation()
+  }
+
+  public href(name: string, params?: Record<string, string>): string {
+    const pattern = this.nameIndex.get(name)
+    if (pattern === undefined) {
+      throw new Error(`No route named "${name}".`)
+    }
+    return pattern
+      .split('/')
+      .map((segment) => {
+        if (!segment.startsWith(':')) return segment
+        const key = segment.slice(1)
+        const value = params?.[key]
+        if (value === undefined) throw new Error(`Missing param "${key}" for route "${name}".`)
+        return encodeURIComponent(value)
+      })
+      .join('/')
   }
 
   public destroy() {
@@ -108,7 +131,7 @@ export class Router {
         return
       }
 
-      if (navId !== this.currentNavId) return
+      if (navId !== this.currentNavId || !this.rootEl) return
 
       this.destroyCurrentPage()
       this.rootEl.innerHTML = ''
