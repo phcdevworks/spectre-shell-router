@@ -13,17 +13,11 @@ For multi-agent coordination, follow `AGENTS.md`. Claude Code owns implementatio
 architecture, tests, and final validation; Codex owns documentation, release preparation,
 production stabilization, and repo hygiene.
 
-## AI Team
+## Multi-Agent Team
 
-| Role                   | Agent          | Authority                                                     |
-| ---------------------- | -------------- | ------------------------------------------------------------- |
-| Human owner            | Bradley Potts  | Final authority — commits, tags, releases                     |
-| Lead developer         | Claude Code    | Implementation, architecture, tests, CI                       |
-| Release/docs oversight | OpenAI Codex   | Release readiness, changelog, production safety               |
-| Development support    | GitHub Copilot | Inline suggestions, IDE support                               |
-| Maintenance            | Google Jules   | Bounded micro-maintenance and dependency updates (`JULES.md`) |
-
-See [AGENTS.md](./AGENTS.md) for full role boundaries and per-agent handoff rules.
+`AGENTS.md` is the shared guide for the agent roster, edit boundaries, PR requirements, and
+coordination rules. Claude Code is the lead implementation authority for all routing behavior,
+source changes, and architecture. Resolve scope conflicts by referencing `AGENTS.md` first.
 
 ---
 
@@ -75,24 +69,10 @@ tests/
 dist/                 — build output (gitignored, published to npm)
 ```
 
-## What the Router Owns
+## Package Scope
 
-- URL matching (`:param` segments, exact path matching)
-- Query string parsing (`URLSearchParams`)
-- Navigation: `navigate(path)`, `popstate` handling, same-domain link interception
-- Page lifecycle: calling `render(ctx)` and `destroy()` in order, with race-condition protection
-
-## What the Router Does NOT Own
-
-Do not add to this package:
-
-- Application state management
-- Rendering logic or DOM helpers beyond clearing `root.innerHTML`
-- Framework-specific adapters (React, Vue, etc.)
-- Styling, design tokens, or CSS
-- Server-side routing or SSR
-- Signals / reactivity
-- Meta tag management
+Router scope and working boundaries are defined in `AGENTS.md` under "Responsibility Boundary"
+and "Core Rules". Claude Code must keep this package focused on routing primitives only.
 
 ## Coding Standards
 
@@ -129,10 +109,6 @@ Codex prepares releases and changelog updates. Before handoff, Codex runs the
 release-readiness checklist in `CODEX.md` — verify CI, README/API sync, CHANGELOG format,
 semver, and no unexpected runtime dependencies. `prepublishOnly` runs `npm run check`; never
 publish or tag without human approval and a passing full check. Versioning follows semver.
-
-## Boundaries Reference
-
-This package is part of the Spectre shell ecosystem. It provides routing primitives only. Consuming packages decide how they render, compose state, and structure application behavior.
 
 ## Roadmap
 
