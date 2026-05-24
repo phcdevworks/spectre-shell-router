@@ -59,7 +59,7 @@ the remaining routing gaps, ergonomics, and controlled expansion.
   - Acceptance: scroll to top on forward navigation; restore saved position on back/forward;
     opt-out available for custom scroll management
 
-- [ ] **Named routes + `router.href()` helper**
+- [x] **Named routes + `router.href()` helper**
   - Files: `src/index.ts`, `tests/router.test.ts`, `README.md`
   - Acceptance: optional `name` on route definitions; `router.href('name', params)` generates
     the correct path; tests confirm resolution; documented in `README.md`

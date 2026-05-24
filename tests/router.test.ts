@@ -203,4 +203,61 @@ describe("spectre-shell-router", () => {
 
     expect(render).not.toHaveBeenCalled()
   })
+
+  describe("router.href()", () => {
+    it("generates a path for a static named route", async () => {
+      const { Router } = await import("../src/index")
+      const routes = [{ name: "home", path: "/", loader: async () => ({ render: vi.fn() }) }]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root)
+      expect(router.href("home")).toBe("/")
+      router.destroy()
+    })
+
+    it("substitutes params for a parameterized named route", async () => {
+      const { Router } = await import("../src/index")
+      const routes = [{ name: "user", path: "/users/:id", loader: async () => ({ render: vi.fn() }) }]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root)
+      expect(router.href("user", { id: "42" })).toBe("/users/42")
+      router.destroy()
+    })
+
+    it("encodes special characters in params", async () => {
+      const { Router } = await import("../src/index")
+      const routes = [{ name: "user", path: "/users/:id", loader: async () => ({ render: vi.fn() }) }]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root)
+      expect(router.href("user", { id: "Brad Potts" })).toBe("/users/Brad%20Potts")
+      router.destroy()
+    })
+
+    it("throws for an unknown route name", async () => {
+      const { Router } = await import("../src/index")
+      const routes = [{ path: "/", loader: async () => ({ render: vi.fn() }) }]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root)
+      expect(() => router.href("missing")).toThrow('No route named "missing"')
+      router.destroy()
+    })
+
+    it("throws when a required param is missing", async () => {
+      const { Router } = await import("../src/index")
+      const routes = [{ name: "user", path: "/users/:id", loader: async () => ({ render: vi.fn() }) }]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root)
+      expect(() => router.href("user")).toThrow('Missing param "id"')
+      router.destroy()
+    })
+  })
 })

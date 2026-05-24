@@ -33,6 +33,7 @@ Part of the [PHCDevworks Spectre shell ecosystem](https://github.com/phcdevworks
 - Browser History API integration for programmatic navigation and link interception.
 - Query string access through `URLSearchParams`.
 - Page cleanup through optional `destroy` hooks.
+- Named routes with `router.href()` for safe path generation.
 
 ## Install
 
@@ -84,6 +85,7 @@ router.navigate('/docs/getting-started?tab=api')
 ```ts
 type Route = {
   path: string
+  name?: string            // optional; enables router.href() lookup
   loader: () => Promise<PageModule>
 }
 
@@ -109,9 +111,27 @@ class Router {
   // Push a new path onto history and navigate to it.
   navigate(path: string): void
 
+  // Build a path string from a named route and optional params.
+  // Throws if the name is unknown or a required :param segment has no matching key.
+  href(name: string, params?: Record<string, string>): string
+
   // Remove all event listeners, call destroy() on the current page, and release the root reference.
   destroy(): void
 }
+```
+
+**`router.href()` examples:**
+
+```ts
+// Static route
+const routes: Route[] = [
+  { name: 'home', path: '/', loader: ... },
+  { name: 'user', path: '/users/:id', loader: ... },
+]
+const router = new Router(routes, root)
+
+router.href('home')              // '/'
+router.href('user', { id: '42' })  // '/users/42'
 ```
 
 ### Behavior
