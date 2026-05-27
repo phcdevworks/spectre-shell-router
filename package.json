@@ -17,7 +17,7 @@
   "author": "PHCDevworks",
   "license": "MIT",
   "type": "module",
-  "packageManager": "npm@11.15.0",
+  "packageManager": "npm@11.16.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

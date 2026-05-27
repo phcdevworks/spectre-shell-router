@@ -1,5 +1,3 @@
-# TODO.md
-
 # Spectre Shell Router — Execution Todo
 
 Aligned to the current repository and the roadmap in `ROADMAP.md`. Scoped to routing
@@ -47,7 +45,7 @@ the remaining routing gaps, ergonomics, and controlled expansion.
   - Acceptance: `mode: 'hash'` reads/writes `location.hash`; params, query, and navigation work
     in hash mode; test parity with history mode; documented in `README.md`
 
-- [ ] **Route guard / `beforeNavigate` hook**
+- [x] **Route guard / `beforeNavigate` hook**
   - Files: `src/index.ts`, `tests/router.test.ts`, `README.md`
   - Acceptance: optional `beforeNavigate(context, next)` on constructor; guard can allow,
     redirect, or cancel; all three paths are tested; documented in `README.md`

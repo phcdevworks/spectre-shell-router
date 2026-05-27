@@ -204,6 +204,94 @@ describe("spectre-shell-router", () => {
     expect(render).not.toHaveBeenCalled()
   })
 
+  describe("beforeNavigate guard", () => {
+    it("allows navigation when next() is called without a redirect", async () => {
+      const { Router } = await import("../src/index")
+      const render = vi.fn()
+      const routes = [{ path: "/guarded", loader: async () => ({ render }) }]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root, {
+        beforeNavigate: (_ctx, next) => { next() },
+      })
+      router.navigate("/guarded")
+      await tick()
+
+      expect(render).toHaveBeenCalledOnce()
+      router.destroy()
+    })
+
+    it("cancels navigation when next() is never called", async () => {
+      const { Router } = await import("../src/index")
+      const render = vi.fn()
+      const routes = [
+        { path: "/", loader: async () => ({ render: vi.fn((ctx) => { ctx.root.innerHTML = "home" }) }) },
+        { path: "/blocked", loader: async () => ({ render }) },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root, {
+        beforeNavigate: (_ctx, _next) => { /* intentionally not calling next */ },
+      })
+      await tick()
+      root.innerHTML = "home"
+
+      router.navigate("/blocked")
+      await tick()
+
+      expect(render).not.toHaveBeenCalled()
+      router.destroy()
+    })
+
+    it("redirects navigation when next() is called with a path", async () => {
+      const { Router } = await import("../src/index")
+      const renderBlocked = vi.fn()
+      const renderTarget = vi.fn()
+      const routes = [
+        { path: "/blocked", loader: async () => ({ render: renderBlocked }) },
+        { path: "/target", loader: async () => ({ render: renderTarget }) },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root, {
+        beforeNavigate: (ctx, next) => { next(ctx.to === "/blocked" ? "/target" : undefined) },
+      })
+      router.navigate("/blocked")
+      await tick()
+      await tick()
+
+      expect(renderBlocked).not.toHaveBeenCalled()
+      expect(renderTarget).toHaveBeenCalledOnce()
+      router.destroy()
+    })
+
+    it("passes correct from/to context to the guard", async () => {
+      const { Router } = await import("../src/index")
+      const guardCtxs: Array<{ from: string | null; to: string }> = []
+      const routes = [
+        { path: "/", loader: async () => ({ render: vi.fn() }) },
+        { path: "/about", loader: async () => ({ render: vi.fn() }) },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root, {
+        beforeNavigate: (ctx, next) => { guardCtxs.push({ from: ctx.from, to: ctx.to }); next() },
+      })
+      await tick()
+
+      router.navigate("/about")
+      await tick()
+
+      expect(guardCtxs[0]).toEqual({ from: null, to: "/" })
+      expect(guardCtxs[1]).toEqual({ from: "/", to: "/about" })
+      router.destroy()
+    })
+  })
+
   describe("router.href()", () => {
     it("generates a path for a static named route", async () => {
       const { Router } = await import("../src/index")

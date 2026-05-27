@@ -16,18 +16,33 @@ export type Route = {
   loader: () => Promise<PageModule>
 }
 
+export type NavigationContext = {
+  from: string | null
+  to: string
+}
+
+export type RouterOptions = {
+  beforeNavigate?: (
+    context: NavigationContext,
+    next: (redirect?: string) => void,
+  ) => void | Promise<void>
+}
+
 export class Router {
   private routes: Route[]
   private rootEl: HTMLElement | null
+  private options: RouterOptions
   private currentPage: PageModule | null = null
   private handleNavigationBound: () => void
   private handleLinkClickBound: (e: MouseEvent) => void
   private currentNavId = 0
+  private currentPath: string | null = null
   private nameIndex: Map<string, string> = new Map()
 
-  constructor(routes: Route[], root: HTMLElement) {
+  constructor(routes: Route[], root: HTMLElement, options: RouterOptions = {}) {
     this.routes = routes
     this.rootEl = root
+    this.options = options
 
     for (const route of routes) {
       if (route.name) this.nameIndex.set(route.name, route.path)
@@ -67,10 +82,7 @@ export class Router {
   }
 
   public destroy() {
-    if (this.currentPage?.destroy) {
-      this.currentPage.destroy()
-      this.currentPage = null
-    }
+    this.destroyCurrentPage()
     window.removeEventListener('popstate', this.handleNavigationBound)
     document.removeEventListener('click', this.handleLinkClickBound)
     this.rootEl = null
@@ -115,6 +127,23 @@ export class Router {
     const navId = ++this.currentNavId
     const url = new URL(window.location.href)
 
+    if (this.options.beforeNavigate) {
+      let allowed = false
+      let redirectTo: string | undefined
+
+      await this.options.beforeNavigate({ from: this.currentPath, to: url.pathname }, (redirect?: string) => {
+        allowed = true
+        redirectTo = redirect
+      })
+
+      if (navId !== this.currentNavId || !this.rootEl) return
+      if (!allowed) return
+      if (redirectTo !== undefined) {
+        this.navigate(redirectTo)
+        return
+      }
+    }
+
     for (const route of this.routes) {
       const params = this.matchRoute(route.path, url.pathname)
       if (!params) continue
@@ -136,6 +165,7 @@ export class Router {
       this.destroyCurrentPage()
       this.rootEl.innerHTML = ''
       this.currentPage = page
+      this.currentPath = url.pathname
 
       page.render({
         path: url.pathname,
