@@ -71,10 +71,8 @@ the remaining routing gaps, ergonomics, and controlled expansion.
 ## Recommended Execution Order
 
 1. Hash routing (WordPress deployment priority)
-2. Route guards / `beforeNavigate` hook
-3. Scroll position restoration
-4. Named routes + `router.href()` helper
-5. Nested routing proposal (only when a concrete application need is proven)
+2. Scroll position restoration
+3. Nested routing proposal (only when a concrete application need is proven)
 
 ---
 
