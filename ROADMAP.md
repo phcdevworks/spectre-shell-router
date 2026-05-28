@@ -26,11 +26,10 @@ hardening the package toward a stable v1.0 before expanding scope.
 
 - Hash-based routing (`#/path`) is not supported, limiting compatibility with
   WordPress and Elementor deployments that cannot control server routing.
-- Route guards and middleware are absent — there is no way to intercept
-  navigation for auth checks or redirects.
+- ~~Route guards and middleware are absent.~~ **Done** — `beforeNavigate(context, next)` hook added; guard can allow, redirect, or cancel navigation.
 - Nested routing is not supported — child routes cannot be rendered inside parent
   route modules.
-- Named routes are not supported — links must hardcode path strings.
+- ~~Named routes are not supported — links must hardcode path strings.~~ **Done** — optional `name` on route definitions; `router.href('name', params)` generates the correct path.
 - Scroll position is not restored on navigation — browser-expected behavior is
   missing.
 - ~~No CI pipeline for automated build and test validation.~~ **Done** — GitHub Actions CI runs `npm run check` on push and PR across Node 22 and 24.
@@ -64,29 +63,12 @@ Risk if skipped
 - Spectre shell applications cannot be deployed on WordPress/shared hosting
   without custom server configuration
 
-### P0.2 Route Guards / Navigation Middleware
+### ~~P0.2 Route Guards / Navigation Middleware~~ — **Complete**
 
-Objective Add an optional guard hook that can intercept navigation before it
-commits.
-
-Why it matters Auth checks, permission gates, and redirect logic need a clean
-interception point. Without guards, consumers implement fragile workarounds
-inside route modules.
-
-Suggested deliverables
-
-- Add an optional `beforeNavigate(context, next)` hook to the router
-- Guard can call `next()` to continue, or `next('/path')` to redirect
-- Tests for guard invocation, redirect, and cancellation
-- Document guard pattern in `README.md`
-
-Dependency notes
-
-- Depends on hash routing being stable or running in parallel
-
-Risk if skipped
-
-- Auth and permission patterns require consumers to bypass the router
+Optional `beforeNavigate(context, next)` hook added to the router constructor.
+Guard can call `next()` to continue, `next('/path')` to redirect, or return
+without calling `next()` to cancel. All three paths are tested and documented
+in `README.md`.
 
 ### ~~P0.3 CI Pipeline~~ — **Complete**
 
@@ -117,28 +99,11 @@ Risk if skipped
 
 - Navigation feels broken compared to standard browser behavior
 
-### P1.2 Named Routes
+### ~~P1.2 Named Routes~~ — **Complete**
 
-Objective Allow routes to be named so links can reference names instead of
-hardcoded path strings.
-
-Why it matters Named routes prevent path-string duplication and make path
-refactors safer.
-
-Suggested deliverables
-
-- Optional `name` field on route definitions
-- `router.href('routeName', params)` helper for generating paths
-- Tests for named route resolution
-- Document in `README.md`
-
-Dependency notes
-
-- Low dependencies; can run after P0
-
-Risk if skipped
-
-- Path strings are duplicated across route modules and templates
+Optional `name` field on route definitions. `router.href('routeName', params)`
+generates the correct path. Named route resolution is tested and documented in
+`README.md`.
 
 ## P2: Later / Controlled Improvement
 
@@ -172,8 +137,5 @@ Dependency notes
 ## 4. Recommended Execution Order
 
 1. Hash-based routing (WordPress deployment priority)
-2. Route guards / navigation middleware
-3. CI pipeline
-4. Scroll position restoration
-5. Named routes
-6. Evaluate nested routing only when proven necessary
+2. Scroll position restoration
+3. Evaluate nested routing only when a concrete application need is proven
