@@ -292,6 +292,138 @@ describe("spectre-shell-router", () => {
     })
   })
 
+  describe("hash mode", () => {
+    it("renders the matching route on start in hash mode", async () => {
+      const { Router } = await import("../src/index")
+      const render = vi.fn()
+      const routes = [{ path: "/", loader: async () => ({ render }) }]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root, { mode: "hash" })
+      await tick()
+
+      expect(render).toHaveBeenCalledOnce()
+      router.destroy()
+    })
+
+    it("navigates to a hash route", async () => {
+      const { Router } = await import("../src/index")
+      const render = vi.fn()
+      const routes = [{ path: "/about", loader: async () => ({ render }) }]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root, { mode: "hash" })
+      router.navigate("/about")
+      await tick()
+
+      expect(render).toHaveBeenCalledOnce()
+      expect(window.location.hash).toBe("#/about")
+      router.destroy()
+    })
+
+    it("passes params and query to the page module in hash mode", async () => {
+      const { Router } = await import("../src/index")
+      const render = vi.fn()
+      const routes = [{ path: "/users/:id", loader: async () => ({ render }) }]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root, { mode: "hash" })
+      router.navigate("/users/42?tab=info")
+      await tick()
+
+      const ctx = render.mock.calls.at(-1)?.[0]
+      expect(ctx?.params.id).toBe("42")
+      expect(ctx?.query.get("tab")).toBe("info")
+      expect(ctx?.path).toBe("/users/42")
+      router.destroy()
+    })
+
+    it("intercepts hash links in hash mode", async () => {
+      const { Router } = await import("../src/index")
+      const render = vi.fn()
+      const routes = [{ path: "/about", loader: async () => ({ render }) }]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root, { mode: "hash" })
+
+      const link = document.createElement("a")
+      link.href = "#/about"
+      document.body.appendChild(link)
+
+      link.click()
+      await tick()
+
+      expect(render).toHaveBeenCalledOnce()
+      router.destroy()
+      document.body.removeChild(link)
+    })
+
+    it("does not intercept plain anchor links in hash mode", async () => {
+      const { Router } = await import("../src/index")
+      const render = vi.fn()
+      const routes = [{ path: "/", loader: async () => ({ render }) }]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root, { mode: "hash" })
+      await tick()
+      render.mockClear()
+
+      const link = document.createElement("a")
+      link.href = "#section"
+      document.body.appendChild(link)
+
+      link.click()
+      await tick()
+
+      expect(render).not.toHaveBeenCalled()
+      router.destroy()
+      document.body.removeChild(link)
+    })
+
+    it("fires hashchange handler for external hash navigation", async () => {
+      const { Router } = await import("../src/index")
+      const render = vi.fn()
+      const routes = [
+        { path: "/", loader: async () => ({ render: vi.fn() }) },
+        { path: "/about", loader: async () => ({ render }) },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root, { mode: "hash" })
+      await tick()
+
+      window.history.replaceState({}, "", "#/about")
+      window.dispatchEvent(new HashChangeEvent("hashchange"))
+      await tick()
+
+      expect(render).toHaveBeenCalledOnce()
+      router.destroy()
+    })
+
+    it("removes hashchange listener on destroy", async () => {
+      const { Router } = await import("../src/index")
+      const render = vi.fn()
+      const routes = [{ path: "/about", loader: async () => ({ render }) }]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root, { mode: "hash" })
+      router.destroy()
+
+      window.history.replaceState({}, "", "#/about")
+      window.dispatchEvent(new HashChangeEvent("hashchange"))
+      await tick()
+
+      expect(render).not.toHaveBeenCalled()
+    })
+  })
+
   describe("router.href()", () => {
     it("generates a path for a static named route", async () => {
       const { Router } = await import("../src/index")
@@ -345,6 +477,21 @@ describe("spectre-shell-router", () => {
 
       const router = new Router(routes, root)
       expect(() => router.href("user")).toThrow('Missing param "id"')
+      router.destroy()
+    })
+
+    it("returns a hash-prefixed path in hash mode", async () => {
+      const { Router } = await import("../src/index")
+      const routes = [
+        { name: "home", path: "/", loader: async () => ({ render: vi.fn() }) },
+        { name: "user", path: "/users/:id", loader: async () => ({ render: vi.fn() }) },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root, { mode: "hash" })
+      expect(router.href("home")).toBe("#/")
+      expect(router.href("user", { id: "42" })).toBe("#/users/42")
       router.destroy()
     })
   })
