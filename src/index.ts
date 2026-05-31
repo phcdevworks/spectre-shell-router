@@ -22,6 +22,7 @@ export type NavigationContext = {
 }
 
 export type RouterOptions = {
+  mode?: 'history' | 'hash'
   beforeNavigate?: (
     context: NavigationContext,
     next: (redirect?: string) => void,
@@ -32,8 +33,10 @@ export class Router {
   private routes: Route[]
   private rootEl: HTMLElement | null
   private options: RouterOptions
+  private mode: 'history' | 'hash'
   private currentPage: PageModule | null = null
   private handleNavigationBound: () => void
+  private handleHashChangeBound: () => void
   private handleLinkClickBound: (e: MouseEvent) => void
   private currentNavId = 0
   private currentPath: string | null = null
@@ -43,14 +46,19 @@ export class Router {
     this.routes = routes
     this.rootEl = root
     this.options = options
+    this.mode = options.mode ?? 'history'
 
     for (const route of routes) {
       if (route.name) this.nameIndex.set(route.name, route.path)
     }
     this.handleNavigationBound = this.handleNavigation.bind(this)
+    this.handleHashChangeBound = this.handleHashChange.bind(this)
     this.handleLinkClickBound = this.handleLinkClick.bind(this)
 
     window.addEventListener('popstate', this.handleNavigationBound)
+    if (this.mode === 'hash') {
+      window.addEventListener('hashchange', this.handleHashChangeBound)
+    }
     document.addEventListener('click', this.handleLinkClickBound)
 
     void this.handleNavigation()
@@ -60,7 +68,7 @@ export class Router {
     if (!this.rootEl) {
       throw new Error('Router has been destroyed or not initialized.')
     }
-    history.pushState({}, '', path)
+    history.pushState({}, '', this.mode === 'hash' ? `#${path}` : path)
     void this.handleNavigation()
   }
 
@@ -69,7 +77,7 @@ export class Router {
     if (pattern === undefined) {
       throw new Error(`No route named "${name}".`)
     }
-    return pattern
+    const path = pattern
       .split('/')
       .map((segment) => {
         if (!segment.startsWith(':')) return segment
@@ -79,13 +87,40 @@ export class Router {
         return encodeURIComponent(value)
       })
       .join('/')
+    return this.mode === 'hash' ? `#${path}` : path
   }
 
   public destroy() {
     this.destroyCurrentPage()
     window.removeEventListener('popstate', this.handleNavigationBound)
+    if (this.mode === 'hash') {
+      window.removeEventListener('hashchange', this.handleHashChangeBound)
+    }
     document.removeEventListener('click', this.handleLinkClickBound)
     this.rootEl = null
+  }
+
+  private getCurrentPath(): string {
+    if (this.mode === 'hash') {
+      const hash = window.location.hash
+      return (hash.startsWith('#/') ? hash.slice(1) : '/').split('?')[0] || '/'
+    }
+    return window.location.pathname
+  }
+
+  private getCurrentQuery(): URLSearchParams {
+    if (this.mode === 'hash') {
+      const hash = window.location.hash.slice(1)
+      const qIndex = hash.indexOf('?')
+      return new URLSearchParams(qIndex >= 0 ? hash.slice(qIndex + 1) : '')
+    }
+    return new URL(window.location.href).searchParams
+  }
+
+  private handleHashChange() {
+    if (window.location.hash.startsWith('#/')) {
+      void this.handleNavigation()
+    }
   }
 
   private handleLinkClick(e: MouseEvent) {
@@ -107,6 +142,13 @@ export class Router {
     const url = new URL(link.href)
     if (url.origin !== window.location.origin) return
 
+    if (this.mode === 'hash') {
+      if (!url.hash.startsWith('#/')) return
+      e.preventDefault()
+      this.navigate(url.hash.slice(1))
+      return
+    }
+
     e.preventDefault()
     this.navigate(url.pathname + url.search + url.hash)
   }
@@ -125,13 +167,14 @@ export class Router {
   private async handleNavigation() {
     if (!this.rootEl) return
     const navId = ++this.currentNavId
-    const url = new URL(window.location.href)
+    const path = this.getCurrentPath()
+    const query = this.getCurrentQuery()
 
     if (this.options.beforeNavigate) {
       let allowed = false
       let redirectTo: string | undefined
 
-      await this.options.beforeNavigate({ from: this.currentPath, to: url.pathname }, (redirect?: string) => {
+      await this.options.beforeNavigate({ from: this.currentPath, to: path }, (redirect?: string) => {
         allowed = true
         redirectTo = redirect
       })
@@ -145,7 +188,7 @@ export class Router {
     }
 
     for (const route of this.routes) {
-      const params = this.matchRoute(route.path, url.pathname)
+      const params = this.matchRoute(route.path, path)
       if (!params) continue
 
       let page: PageModule
@@ -165,19 +208,18 @@ export class Router {
       this.destroyCurrentPage()
       this.rootEl.innerHTML = ''
       this.currentPage = page
-      this.currentPath = url.pathname
+      this.currentPath = path
 
       page.render({
-        path: url.pathname,
+        path,
         params,
-        query: url.searchParams,
+        query,
         root: this.rootEl,
       })
 
       return
     }
 
-    // No route matched: clear the root.
     this.destroyCurrentPage()
     this.rootEl.innerHTML = ''
   }

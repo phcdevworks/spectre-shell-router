@@ -40,7 +40,7 @@ the remaining routing gaps, ergonomics, and controlled expansion.
 
 ### P0: Core Routing Completeness
 
-- [ ] **Hash-based routing mode** (`mode: 'hash'`)
+- [x] **Hash-based routing mode** (`mode: 'hash'`)
   - Files: `src/index.ts`, `tests/router.test.ts`, `README.md`
   - Acceptance: `mode: 'hash'` reads/writes `location.hash`; params, query, and navigation work
     in hash mode; test parity with history mode; documented in `README.md`
