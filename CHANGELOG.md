@@ -4,6 +4,12 @@ All notable changes to this project will be documented here. The format follows 
 
 ## [Unreleased]
 
+### Fixed
+
+- **Navigation**: Ensured `currentPath` is updated even when no route matches (404), providing correct context for subsequent navigation guards.
+- **Navigation**: Implemented automatic URL reversion using `history.replaceState` when a navigation is cancelled by the `beforeNavigate` guard.
+- **Route Matching**: Strengthened `matchRoute` to decode URL segments before comparison, ensuring static routes with special characters (like spaces) match correctly.
+
 ## [1.0.0] - 2026-04-25
 
 Release Title: Stable Router Release and Navigation Polish

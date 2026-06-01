@@ -180,7 +180,14 @@ export class Router {
       })
 
       if (navId !== this.currentNavId || !this.rootEl) return
-      if (!allowed) return
+
+      if (!allowed) {
+        if (this.currentPath !== null) {
+          history.replaceState({}, '', this.mode === 'hash' ? `#${this.currentPath}` : this.currentPath)
+        }
+        return
+      }
+
       if (redirectTo !== undefined) {
         this.navigate(redirectTo)
         return
@@ -222,6 +229,7 @@ export class Router {
 
     this.destroyCurrentPage()
     this.rootEl.innerHTML = ''
+    this.currentPath = path
   }
 
   private matchRoute(routePath: string, urlPath: string): Record<string, string> | null {
@@ -234,10 +242,10 @@ export class Router {
 
     for (let i = 0; i < routeParts.length; i++) {
       const routePart = routeParts[i]
-      const urlPart = urlParts[i]
+      const urlPart = decodeURIComponent(urlParts[i])
 
       if (routePart.startsWith(':')) {
-        params[routePart.slice(1)] = decodeURIComponent(urlPart)
+        params[routePart.slice(1)] = urlPart
       } else if (routePart !== urlPart) {
         return null
       }
