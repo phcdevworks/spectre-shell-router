@@ -52,7 +52,7 @@ the remaining routing gaps, ergonomics, and controlled expansion.
 
 ### P1: Routing Ergonomics
 
-- [ ] **Scroll position restoration**
+- [x] **Scroll position restoration**
   - Files: `src/index.ts`, `tests/router.test.ts`
   - Acceptance: scroll to top on forward navigation; restore saved position on back/forward;
     opt-out available for custom scroll management
