@@ -23,6 +23,7 @@ export type NavigationContext = {
 
 export type RouterOptions = {
   mode?: 'history' | 'hash'
+  scrollRestoration?: boolean
   beforeNavigate?: (
     context: NavigationContext,
     next: (redirect?: string) => void,
@@ -34,6 +35,7 @@ export class Router {
   private rootEl: HTMLElement | null
   private options: RouterOptions
   private mode: 'history' | 'hash'
+  private scrollRestoration: boolean
   private currentPage: PageModule | null = null
   private handleNavigationBound: () => void
   private handleHashChangeBound: () => void
@@ -47,11 +49,12 @@ export class Router {
     this.rootEl = root
     this.options = options
     this.mode = options.mode ?? 'history'
+    this.scrollRestoration = options.scrollRestoration !== false
 
     for (const route of routes) {
       if (route.name) this.nameIndex.set(route.name, route.path)
     }
-    this.handleNavigationBound = this.handleNavigation.bind(this)
+    this.handleNavigationBound = () => { void this.handleNavigation('pop') }
     this.handleHashChangeBound = this.handleHashChange.bind(this)
     this.handleLinkClickBound = this.handleLinkClick.bind(this)
 
@@ -61,15 +64,18 @@ export class Router {
     }
     document.addEventListener('click', this.handleLinkClickBound)
 
-    void this.handleNavigation()
+    void this.handleNavigation('push')
   }
 
   public navigate(path: string) {
     if (!this.rootEl) {
       throw new Error('Router has been destroyed or not initialized.')
     }
+    if (this.scrollRestoration) {
+      history.replaceState({ ...history.state, scrollY: window.scrollY }, '')
+    }
     history.pushState({}, '', this.mode === 'hash' ? `#${path}` : path)
-    void this.handleNavigation()
+    void this.handleNavigation('push')
   }
 
   public href(name: string, params?: Record<string, string>): string {
@@ -119,7 +125,7 @@ export class Router {
 
   private handleHashChange() {
     if (window.location.hash.startsWith('#/')) {
-      void this.handleNavigation()
+      void this.handleNavigation('pop')
     }
   }
 
@@ -164,7 +170,7 @@ export class Router {
     this.currentPage = null
   }
 
-  private async handleNavigation() {
+  private async handleNavigation(source: 'push' | 'pop') {
     if (!this.rootEl) return
     const navId = ++this.currentNavId
     const path = this.getCurrentPath()
@@ -223,6 +229,15 @@ export class Router {
         query,
         root: this.rootEl,
       })
+
+      if (this.scrollRestoration) {
+        if (source === 'pop') {
+          const savedY = (history.state as Record<string, unknown>)?.scrollY
+          window.scrollTo(0, typeof savedY === 'number' ? savedY : 0)
+        } else {
+          window.scrollTo(0, 0)
+        }
+      }
 
       return
     }

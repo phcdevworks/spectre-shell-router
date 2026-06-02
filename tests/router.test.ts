@@ -424,6 +424,96 @@ describe("spectre-shell-router", () => {
     })
   })
 
+  describe("scroll restoration", () => {
+    it("scrolls to top on forward navigation", async () => {
+      const { Router } = await import("../src/index")
+      const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => {})
+      const routes = [
+        { path: "/", loader: async () => ({ render: vi.fn() }) },
+        { path: "/about", loader: async () => ({ render: vi.fn() }) },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root)
+      await tick()
+      scrollTo.mockClear()
+
+      router.navigate("/about")
+      await tick()
+
+      expect(scrollTo).toHaveBeenCalledWith(0, 0)
+      router.destroy()
+      scrollTo.mockRestore()
+    })
+
+    it("restores saved scroll position on back/forward navigation", async () => {
+      const { Router } = await import("../src/index")
+      const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => {})
+      const routes = [
+        { path: "/", loader: async () => ({ render: vi.fn() }) },
+        { path: "/about", loader: async () => ({ render: vi.fn() }) },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root)
+      await tick()
+      scrollTo.mockClear()
+
+      // Simulate a popstate (back/forward) with a saved scroll position in state
+      window.history.replaceState({ scrollY: 350 }, "", "/")
+      window.dispatchEvent(new PopStateEvent("popstate"))
+      await tick()
+
+      expect(scrollTo).toHaveBeenCalledWith(0, 350)
+      router.destroy()
+      scrollTo.mockRestore()
+    })
+
+    it("scrolls to top when popstate state has no saved scroll", async () => {
+      const { Router } = await import("../src/index")
+      const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => {})
+      const routes = [{ path: "/", loader: async () => ({ render: vi.fn() }) }]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root)
+      await tick()
+      scrollTo.mockClear()
+
+      window.history.replaceState({}, "", "/")
+      window.dispatchEvent(new PopStateEvent("popstate"))
+      await tick()
+
+      expect(scrollTo).toHaveBeenCalledWith(0, 0)
+      router.destroy()
+      scrollTo.mockRestore()
+    })
+
+    it("does not scroll when scrollRestoration is disabled", async () => {
+      const { Router } = await import("../src/index")
+      const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => {})
+      const routes = [
+        { path: "/", loader: async () => ({ render: vi.fn() }) },
+        { path: "/about", loader: async () => ({ render: vi.fn() }) },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root, { scrollRestoration: false })
+      await tick()
+      scrollTo.mockClear()
+
+      router.navigate("/about")
+      await tick()
+
+      expect(scrollTo).not.toHaveBeenCalled()
+      router.destroy()
+      scrollTo.mockRestore()
+    })
+  })
+
   describe("router.href()", () => {
     it("generates a path for a static named route", async () => {
       const { Router } = await import("../src/index")
