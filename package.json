@@ -37,6 +37,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "format:md": "prettier --write \"**/*.md\"",
     "check": "npm run typecheck && npm run lint && npm run build && npm test -- --run",
     "prepublishOnly": "npm run check"
   },
