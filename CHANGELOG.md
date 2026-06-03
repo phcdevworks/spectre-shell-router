@@ -4,11 +4,33 @@ All notable changes to this project will be documented here. The format follows 
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-06-04
+
+Release Title: Router Options and Navigation Reliability
+
+Contract change type: additive
+
+### Added
+
+- **Router Options**: Added `RouterOptions` with opt-in hash routing mode, route guards via `beforeNavigate`, and configurable scroll restoration.
+- **Named Routes**: Added optional route names and `router.href()` path generation, including encoded params and hash-mode paths.
+- **Navigation**: Added automatic scroll reset on push navigation and saved-position restoration on browser back/forward navigation.
+- **Release Tooling**: Added `scripts/propose-version.ts` and the `release:propose` script to classify unreleased contract changes before proposing a semver bump.
+- **Repo Coordination**: Added AI-agent governance docs, issue templates, PR-template requirements, and CI/release-readiness tracking.
+
+### Changed
+
+- **Documentation**: Refreshed README usage, Node.js requirements, CI/package metadata, roadmap, TODO tracking, and contribution guidance.
+- **CI**: Expanded GitHub Actions coverage with a Node.js version matrix, concurrency control, and workflow timeouts.
+- **Package Metadata**: Added public npm publish config, package manager metadata, Node.js engine requirements, and GitHub-oriented repository/homepage metadata.
+- **Dependencies**: Refreshed development dependencies and lockfile entries.
+
 ### Fixed
 
 - **Navigation**: Ensured `currentPath` is updated even when no route matches (404), providing correct context for subsequent navigation guards.
 - **Navigation**: Implemented automatic URL reversion using `history.replaceState` when a navigation is cancelled by the `beforeNavigate` guard.
 - **Route Matching**: Strengthened `matchRoute` to decode URL segments before comparison, ensuring static routes with special characters (like spaces) match correctly.
+- **Reliability**: Hardened router boundary behavior, lifecycle cleanup, link interception, and stale async navigation handling.
 
 ## [1.0.0] - 2026-04-25
 
@@ -54,7 +76,8 @@ Release Title: Initial Router Foundation
 - **Initial Release**: Minimal, framework-agnostic client-side router for Spectre-based applications.
 - **Features**: Includes string-based path matching, dynamic parameter extraction, and native History API integration.
 
-[unreleased]: https://github.com/phcdevworks/spectre-shell-router/compare/1.0.0...HEAD
+[unreleased]: https://github.com/phcdevworks/spectre-shell-router/compare/1.1.0...HEAD
+[1.1.0]: https://github.com/phcdevworks/spectre-shell-router/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/phcdevworks/spectre-shell-router/compare/0.0.2...1.0.0
 [0.0.2]: https://github.com/phcdevworks/spectre-shell-router/compare/0.0.1...0.0.2
 [0.0.1]: https://github.com/phcdevworks/spectre-shell-router/tree/0.0.1
