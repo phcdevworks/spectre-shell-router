@@ -7,12 +7,12 @@ signals, state, styling, or rendering beyond clearing the route outlet.
 
 **Ecosystem siblings:**
 
-| Package | Role |
-| ------- | ---- |
+| Package                              | Role                                                 |
+| ------------------------------------ | ---------------------------------------------------- |
 | `@phcdevworks/spectre-shell-signals` | Reactive primitives (`signal`, `computed`, `effect`) |
-| `@phcdevworks/spectre-tokens` | Design token authority |
-| `@phcdevworks/spectre-ui` | Token-backed CSS recipes and component styling |
-| `@phcdevworks/spectre-ui-astro` | Astro component layer built on spectre-ui |
+| `@phcdevworks/spectre-tokens`        | Design token authority                               |
+| `@phcdevworks/spectre-ui`            | Token-backed CSS recipes and component styling       |
+| `@phcdevworks/spectre-ui-astro`      | Astro component layer built on spectre-ui            |
 
 The router is the navigation backbone. Phase 3 is about making it genuinely connectable to
 these packages — exposing enough surface that signals can observe route state, components can
