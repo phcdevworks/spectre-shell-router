@@ -17,13 +17,13 @@ Part of the [PHCDevworks Spectre shell ecosystem](https://github.com/phcdevworks
 - You need a framework-agnostic client-side router with zero runtime dependencies
 - You want `:param` URL matching, query string access, and lazy page loading via dynamic `import()`
 - You want a clean `render` / `destroy` lifecycle with race-condition safety built in
+- You need history or hash-based routing with optional navigation guards and scroll restoration
 - You are building on top of a Spectre shell or a similar minimal shell pattern
 
 ## When not to use this package
 
 - You need a framework-integrated router (React Router, Vue Router, TanStack Router, etc.)
 - You need server-side rendering or file-based routing
-- You need hash-based routing — planned, not yet available; see [ROADMAP.md](./ROADMAP.md)
 - You need application state management, persistent layouts, or design tokens
 
 ## Capabilities
@@ -31,6 +31,9 @@ Part of the [PHCDevworks Spectre shell ecosystem](https://github.com/phcdevworks
 - Route matching with `:param` path segments.
 - Lazy page loading through route `loader` functions.
 - Browser History API integration for programmatic navigation and link interception.
+- Optional hash-based routing mode.
+- Route guards with cancellation and redirect support.
+- Scroll restoration for push and browser back/forward navigation.
 - Query string access through `URLSearchParams`.
 - Page cleanup through optional `destroy` hooks.
 - Named routes with `router.href()` for safe path generation.
@@ -89,8 +92,22 @@ router.navigate('/docs/getting-started?tab=api')
 ```ts
 type Route = {
   path: string
-  name?: string            // optional; enables router.href() lookup
+  name?: string // optional; enables router.href() lookup
   loader: () => Promise<PageModule>
+}
+
+type NavigationContext = {
+  from: string | null
+  to: string
+}
+
+type RouterOptions = {
+  mode?: 'history' | 'hash'
+  scrollRestoration?: boolean
+  beforeNavigate?: (
+    context: NavigationContext,
+    next: (redirect?: string) => void
+  ) => void | Promise<void>
 }
 
 type PageModule = {
@@ -110,7 +127,7 @@ type RouteContext = {
 
 ```ts
 class Router {
-  constructor(routes: Route[], root: HTMLElement)
+  constructor(routes: Route[], root: HTMLElement, options?: RouterOptions)
 
   // Push a new path onto history and navigate to it.
   navigate(path: string): void
@@ -138,13 +155,33 @@ router.href('home')              // '/'
 router.href('user', { id: '42' })  // '/users/42'
 ```
 
+**Router options examples:**
+
+```ts
+const router = new Router(routes, root, {
+  mode: 'hash',
+  scrollRestoration: true,
+  beforeNavigate({ to }, next) {
+    if (to === '/admin' && !sessionStorage.getItem('isAdmin')) {
+      next('/login')
+      return
+    }
+
+    next()
+  },
+})
+```
+
 ### Behavior
 
 - `destroy()` on the current page is always called before the next `render()` runs.
 - If a `loader` throws, the root is cleared and the navigation is silently abandoned.
 - If a faster navigation supersedes a pending one, the stale result is discarded (race-safe via monotonic counter).
 - If no route matches, the root is cleared and `destroy()` is called on the current page.
+- If `beforeNavigate` does not call `next()`, navigation is cancelled and the URL reverts to the current route.
+- If `beforeNavigate` calls `next('/path')`, the router redirects to that path.
 - Same-domain `<a>` clicks are intercepted automatically; modified clicks (ctrl, meta, shift, alt) and external links pass through.
+- In hash mode, router paths are stored after `#/` and `router.href()` returns hash-prefixed URLs.
 
 ## Boundaries
 
