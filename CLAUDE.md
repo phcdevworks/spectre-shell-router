@@ -42,7 +42,7 @@ check `AGENTS.md` for the owning agent before acting.
 
 `@phcdevworks/spectre-shell-router` is a minimal, zero-dependency, framework-agnostic client-side router for Spectre applications. It maps URL paths to lazy page modules, renders into a root `HTMLElement`, and manages page lifecycle via `render` / `destroy` hooks.
 
-Single source file: `src/index.ts` (153 lines). Keep it lean.
+Single source file: `src/index.ts`. Keep it lean.
 
 ## Commands
 
@@ -112,4 +112,4 @@ publish or tag without human approval and a passing full check. Versioning follo
 
 ## Roadmap
 
-See `ROADMAP.md`. Next priorities: hash-based routing (P0), route guards (P0), scroll restoration (P1), named routes (P1).
+See `ROADMAP.md`. Phase 2 is complete. Phase 3 is the active phase — priorities: navigation subscription API (P0, unblocks spectre-shell-signals), navigating state hooks (P0), per-route metadata (P1), `afterNavigate` hook (P1).

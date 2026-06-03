@@ -1,141 +1,96 @@
 # Spectre Shell Router Roadmap
 
-This roadmap is grounded in the current repository shape and public contract of
-`@phcdevworks/spectre-shell-router` as it exists today.
+`@phcdevworks/spectre-shell-router` is the URL routing layer for the Spectre shell ecosystem.
+It owns URL resolution, route matching, param and query parsing, history management, navigation
+primitives, and page lifecycle. It composes with the rest of the ecosystem — it does not own
+signals, state, styling, or rendering beyond clearing the route outlet.
 
-`@phcdevworks/spectre-shell-router` is the minimal, framework-agnostic
-client-side router for Spectre applications. It owns URL resolution, route
-matching, param and query parsing, history management, and navigation
-primitives. It does not own application state, rendering, signals, or styling.
+**Ecosystem siblings:**
 
-The work below focuses on closing the known gaps in the routing contract and
-hardening the package toward a stable v1.0 before expanding scope.
+| Package | Role |
+| ------- | ---- |
+| `@phcdevworks/spectre-shell-signals` | Reactive primitives (`signal`, `computed`, `effect`) |
+| `@phcdevworks/spectre-tokens` | Design token authority |
+| `@phcdevworks/spectre-ui` | Token-backed CSS recipes and component styling |
+| `@phcdevworks/spectre-ui-astro` | Astro component layer built on spectre-ui |
 
-## 1. Current Repo Assessment
+The router is the navigation backbone. Phase 3 is about making it genuinely connectable to
+these packages — exposing enough surface that signals can observe route state, components can
+react to loading, and apps can manage metadata without building workarounds.
 
-### Current strengths
+---
 
-- The router already handles path matching, params, query parsing, navigation,
-  and History API integration.
-- The `RouteContext` interface provides a stable contract for route modules.
-- TypeScript strict mode is in place throughout.
-- The minimal-by-design philosophy is documented and enforced.
-- v0.0.2 refactored the router into a class with hardened navigation behavior.
+## Phase 1 — Foundation: Complete
 
-### Current gaps to harden
+Router class, path matching, params, query parsing, History API, race-condition safety,
+page lifecycle, CI, TypeScript strict mode, test suite. Shipped in v1.0.0.
 
-- Hash-based routing (`#/path`) is not supported, limiting compatibility with
-  WordPress and Elementor deployments that cannot control server routing.
-- ~~Route guards and middleware are absent.~~ **Done** — `beforeNavigate(context, next)` hook added; guard can allow, redirect, or cancel navigation.
-- Nested routing is not supported — child routes cannot be rendered inside parent
-  route modules.
-- ~~Named routes are not supported — links must hardcode path strings.~~ **Done** — optional `name` on route definitions; `router.href('name', params)` generates the correct path.
-- Scroll position is not restored on navigation — browser-expected behavior is
-  missing.
-- ~~No CI pipeline for automated build and test validation.~~ **Done** — GitHub Actions CI runs `npm run check` on push and PR across Node 22 and 24.
-## 2. Roadmap
+---
 
-## P0: Core Routing Completeness / Must-Do
+## Phase 2 — Routing Contract: Complete
 
-### P0.1 Hash-Based Routing
+Hash-based routing (`mode: 'hash'`), route guards (`beforeNavigate`), scroll position
+restoration, named routes (`router.href()`). All delivered and documented.
 
-Objective Add support for hash-based routing (`#/path`) as an opt-in mode.
+---
 
-Why it matters WordPress and shared-hosting environments often cannot configure
-server-side URL rewriting. Hash routing is the fallback that makes Spectre shell
-applications deployable in those environments, which is a core part of the
-WordPress strategy.
+## Phase 3 — Ecosystem Integration (Active)
 
-Suggested deliverables
+The foundation is stable. Phase 3 focuses on making the router connectable to
+`spectre-shell-signals`, `spectre-ui`, and application-level concerns like metadata and
+analytics.
 
-- Add a `mode: 'hash' | 'history'` option to the router constructor
-- Hash mode reads and writes `location.hash` instead of `location.pathname`
-- All existing navigation and param behavior works in hash mode
-- Tests for hash mode parity with history mode
+### P0: Signals Bridge
 
-Dependency notes
+#### Navigation subscription API
 
-- No upstream dependencies; can start immediately
-- Required before WordPress theme deep integration
+Add `router.subscribe(callback)` — fires with the current `RouteContext` after each completed
+navigation, returns an unsubscribe function. Zero new runtime dependencies. This is the seam
+that lets `spectre-shell-signals` wrap router state in a `signal()` at the app layer, keeping
+the router itself dependency-free while enabling full reactivity.
 
-Risk if skipped
+#### Navigating state hooks
 
-- Spectre shell applications cannot be deployed on WordPress/shared hosting
-  without custom server configuration
+Add `onNavigationStart` and `onNavigationEnd` callbacks to the constructor options. Used at
+the app layer to drive `navigating$` signals and loading indicators in `spectre-ui` components.
 
-### ~~P0.2 Route Guards / Navigation Middleware~~ — **Complete**
+### P1: Application Primitives
 
-Optional `beforeNavigate(context, next)` hook added to the router constructor.
-Guard can call `next()` to continue, `next('/path')` to redirect, or return
-without calling `next()` to cancel. All three paths are tested and documented
-in `README.md`.
+#### Per-route metadata
 
-### ~~P0.3 CI Pipeline~~ — **Complete**
+Add an optional `meta` object to route definitions. `RouteContext` exposes it so page modules
+and app code can read document title, analytics keys, guard data, etc. Typed but open-ended —
+apps define their own metadata shape.
 
-GitHub Actions CI runs `npm run check` on every push and PR across Node 22 and
-24 with concurrency cancellation. CI badge added to `README.md`.
+#### `afterNavigate` hook
 
-## P1: Routing Ergonomics
+Add an optional `afterNavigate(context)` to constructor options. Fires after render completes.
+Complements `beforeNavigate` and enables a11y focus management, analytics events, and
+post-navigation side effects in production apps.
 
-### P1.1 Scroll Position Restoration
+### P2: Controlled Expansion
 
-Objective Restore scroll position on navigation, matching browser-expected
-behavior.
+#### Nested routing
 
-Why it matters Users expect the page to scroll to top on navigation and to
-restore position on back/forward. This is a baseline web standard behavior.
+Support child routes rendered inside parent outlet elements. Design-only until a concrete
+application need is proven — evaluate alongside `spectre-ui-astro` layout patterns first.
 
-Suggested deliverables
+---
 
-- Scroll to top on forward navigation by default
-- Restore saved scroll position on history back/forward
-- Opt-out available for custom scroll management
+## Recommended Execution Order
 
-Dependency notes
+1. Navigation subscription API — unblocks `spectre-shell-signals` integration
+2. Navigating state hooks — unblocks loading UI in `spectre-ui`
+3. Per-route metadata — unblocks title management and analytics
+4. `afterNavigate` hook — completes the navigation lifecycle surface
+5. Nested routing — only when a concrete app need is confirmed
 
-- Low dependencies; can run alongside P0
+---
 
-Risk if skipped
+## Explicitly Out of Scope
 
-- Navigation feels broken compared to standard browser behavior
-
-### ~~P1.2 Named Routes~~ — **Complete**
-
-Optional `name` field on route definitions. `router.href('routeName', params)`
-generates the correct path. Named route resolution is tested and documented in
-`README.md`.
-
-## P2: Later / Controlled Improvement
-
-### P2.1 Nested Routing
-
-Objective Support child routes rendered inside parent route outlet elements.
-
-Why it matters Some application layouts require nested routing (e.g. a shell
-with persistent navigation and a swappable content area).
-
-Suggested deliverables
-
-- Proposal for nested route API
-- Implement only when a concrete application need is proven
-
-Dependency notes
-
-- Only after P0 and P1 are stable
-- Evaluate with WordPress theme and Astro adapter use cases
-
-## 3. Explicitly Out of Scope
-
-- Do not add application state management here
-- Do not add rendering logic or DOM helpers beyond route outlet management
-- Do not add framework-specific adapters (React, Vue, etc.)
-- Do not add styling or token definitions
-- Do not add server-side routing or SSR rendering
-- Do not add signals integration
-- Do not add meta tag management
-
-## 4. Recommended Execution Order
-
-1. Hash-based routing (WordPress deployment priority)
-2. Scroll position restoration
-3. Evaluate nested routing only when a concrete application need is proven
+- Application state management — owned by `spectre-shell-signals`
+- Rendering logic or DOM helpers beyond clearing the route outlet
+- Framework-specific adapters (React, Vue, etc.)
+- Styling or token definitions — owned by `spectre-tokens` / `spectre-ui`
+- SSR / server-side routing
