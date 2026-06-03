@@ -35,6 +35,10 @@ Part of the [PHCDevworks Spectre shell ecosystem](https://github.com/phcdevworks
 - Page cleanup through optional `destroy` hooks.
 - Named routes with `router.href()` for safe path generation.
 
+## Requirements
+
+- Node.js `^22.12.0 || >=24.0.0`
+
 ## Install
 
 ```bash
