@@ -38,7 +38,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "format:md": "prettier --write \"**/*.md\"",
-    "check": "npm run typecheck && npm run lint && npm run build && npm test -- --run",
+    "check:ecosystem": "spectre-manifest-validate spectre.manifest.json && spectre-manifest-check spectre.manifest.json .",
+    "check": "npm run typecheck && npm run lint && npm run build && npm test -- --run && npm run check:ecosystem",
     "prepublishOnly": "npm run check"
   },
   "funding": [
@@ -62,6 +63,7 @@
     "access": "public"
   },
   "devDependencies": {
+    "@phcdevworks/spectre-manifest": "^1.0.0",
     "@eslint/js": "^10.0.1",
     "eslint": "^10.4.1",
     "globals": "^17.6.0",
