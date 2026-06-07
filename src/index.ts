@@ -28,7 +28,11 @@ export type RouterOptions = {
     context: NavigationContext,
     next: (redirect?: string) => void,
   ) => void | Promise<void>
+  onNavigationStart?: (context: NavigationContext) => void
+  onNavigationEnd?: (context: NavigationContext) => void
 }
+
+export type Unsubscribe = () => void
 
 export class Router {
   private routes: Route[]
@@ -43,6 +47,7 @@ export class Router {
   private currentNavId = 0
   private currentPath: string | null = null
   private nameIndex: Map<string, string> = new Map()
+  private subscribers: Set<(context: RouteContext) => void> = new Set()
 
   constructor(routes: Route[], root: HTMLElement, options: RouterOptions = {}) {
     this.routes = routes
@@ -76,6 +81,13 @@ export class Router {
     }
     history.pushState({}, '', this.mode === 'hash' ? `#${path}` : path)
     void this.handleNavigation('push')
+  }
+
+  public subscribe(callback: (context: RouteContext) => void): Unsubscribe {
+    this.subscribers.add(callback)
+    return () => {
+      this.subscribers.delete(callback)
+    }
   }
 
   public href(name: string, params?: Record<string, string>): string {
@@ -159,6 +171,12 @@ export class Router {
     this.navigate(url.pathname + url.search + url.hash)
   }
 
+  private notifySubscribers(context: RouteContext) {
+    for (const subscriber of this.subscribers) {
+      subscriber(context)
+    }
+  }
+
   private destroyCurrentPage() {
     if (this.currentPage?.destroy) {
       try {
@@ -175,12 +193,30 @@ export class Router {
     const navId = ++this.currentNavId
     const path = this.getCurrentPath()
     const query = this.getCurrentQuery()
+    const navContext: NavigationContext = { from: this.currentPath, to: path }
+
+    this.options.onNavigationStart?.(navContext)
+    try {
+      await this.runNavigation(navId, source, path, query, navContext)
+    } finally {
+      this.options.onNavigationEnd?.(navContext)
+    }
+  }
+
+  private async runNavigation(
+    navId: number,
+    source: 'push' | 'pop',
+    path: string,
+    query: URLSearchParams,
+    navContext: NavigationContext,
+  ) {
+    if (!this.rootEl) return
 
     if (this.options.beforeNavigate) {
       let allowed = false
       let redirectTo: string | undefined
 
-      await this.options.beforeNavigate({ from: this.currentPath, to: path }, (redirect?: string) => {
+      await this.options.beforeNavigate(navContext, (redirect?: string) => {
         allowed = true
         redirectTo = redirect
       })
@@ -223,12 +259,15 @@ export class Router {
       this.currentPage = page
       this.currentPath = path
 
-      page.render({
+      const context: RouteContext = {
         path,
         params,
         query,
         root: this.rootEl,
-      })
+      }
+
+      page.render(context)
+      this.notifySubscribers(context)
 
       if (this.scrollRestoration) {
         if (source === 'pop') {
