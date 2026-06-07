@@ -585,4 +585,136 @@ describe("spectre-shell-router", () => {
       router.destroy()
     })
   })
+
+  describe("router.subscribe()", () => {
+    it("notifies subscribers with the route context after each completed navigation", async () => {
+      const { Router } = await import("../src/index")
+      const routes = [
+        { path: "/", loader: async () => ({ render: vi.fn() }) },
+        { path: "/users/:id", loader: async () => ({ render: vi.fn() }) },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root)
+      await tick()
+
+      const subscriber = vi.fn()
+      router.subscribe(subscriber)
+
+      router.navigate("/users/42?tab=info")
+      await tick()
+
+      expect(subscriber).toHaveBeenCalledOnce()
+      const ctx = subscriber.mock.calls.at(-1)?.[0]
+      expect(ctx?.path).toBe("/users/42")
+      expect(ctx?.params.id).toBe("42")
+      expect(ctx?.query.get("tab")).toBe("info")
+      expect(ctx?.root).toBe(root)
+      router.destroy()
+    })
+
+    it("returns an unsubscribe function that stops further notifications", async () => {
+      const { Router } = await import("../src/index")
+      const routes = [
+        { path: "/", loader: async () => ({ render: vi.fn() }) },
+        { path: "/next", loader: async () => ({ render: vi.fn() }) },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root)
+      await tick()
+
+      const subscriber = vi.fn()
+      const unsubscribe = router.subscribe(subscriber)
+      unsubscribe()
+
+      router.navigate("/next")
+      await tick()
+
+      expect(subscriber).not.toHaveBeenCalled()
+      router.destroy()
+    })
+
+    it("does not notify subscribers when no route matches", async () => {
+      const { Router } = await import("../src/index")
+      const routes = [{ path: "/", loader: async () => ({ render: vi.fn() }) }]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root)
+      await tick()
+
+      const subscriber = vi.fn()
+      router.subscribe(subscriber)
+
+      router.navigate("/missing")
+      await tick()
+
+      expect(subscriber).not.toHaveBeenCalled()
+      router.destroy()
+    })
+  })
+
+  describe("navigation start/end hooks", () => {
+    it("fires onNavigationStart and onNavigationEnd around each navigation", async () => {
+      const { Router } = await import("../src/index")
+      const onNavigationStart = vi.fn()
+      const onNavigationEnd = vi.fn()
+      const routes = [
+        { path: "/", loader: async () => ({ render: vi.fn() }) },
+        { path: "/next", loader: async () => ({ render: vi.fn() }) },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root, { onNavigationStart, onNavigationEnd })
+      await tick()
+
+      expect(onNavigationStart).toHaveBeenCalledWith({ from: null, to: "/" })
+      expect(onNavigationEnd).toHaveBeenCalledWith({ from: null, to: "/" })
+
+      onNavigationStart.mockClear()
+      onNavigationEnd.mockClear()
+
+      router.navigate("/next")
+      await tick()
+
+      expect(onNavigationStart).toHaveBeenCalledWith({ from: "/", to: "/next" })
+      expect(onNavigationEnd).toHaveBeenCalledWith({ from: "/", to: "/next" })
+      router.destroy()
+    })
+
+    it("fires onNavigationEnd even when no route matches or the loader throws", async () => {
+      const { Router } = await import("../src/index")
+      const onNavigationStart = vi.fn()
+      const onNavigationEnd = vi.fn()
+      const routes = [
+        { path: "/", loader: async () => ({ render: vi.fn() }) },
+        { path: "/broken", loader: async () => { throw new Error("boom") } },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root, { onNavigationStart, onNavigationEnd })
+      await tick()
+      onNavigationStart.mockClear()
+      onNavigationEnd.mockClear()
+
+      router.navigate("/missing")
+      await tick()
+      expect(onNavigationStart).toHaveBeenCalledTimes(1)
+      expect(onNavigationEnd).toHaveBeenCalledTimes(1)
+
+      onNavigationStart.mockClear()
+      onNavigationEnd.mockClear()
+
+      router.navigate("/broken")
+      await tick()
+      expect(onNavigationStart).toHaveBeenCalledTimes(1)
+      expect(onNavigationEnd).toHaveBeenCalledTimes(1)
+      router.destroy()
+    })
+  })
 })

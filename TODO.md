@@ -57,7 +57,7 @@ on top of it. Focus is on exposing router state reactively and supporting real a
 
 ### P0: Signals Bridge
 
-- [ ] **Navigation subscription API (`router.subscribe()`)**
+- [x] **Navigation subscription API (`router.subscribe()`)**
   - Files: `src/index.ts`, `tests/router.test.ts`
   - Acceptance: `router.subscribe(callback)` fires with current `RouteContext` on every
     completed navigation; returns an unsubscribe function; zero new runtime deps;
@@ -65,7 +65,7 @@ on top of it. Focus is on exposing router state reactively and supporting real a
   - Why: lets spectre-shell-signals, spectre-ui components, and app-level code react to route
     changes without the router owning the signal primitive
 
-- [ ] **Navigating state hooks (`onNavigationStart` / `onNavigationEnd`)**
+- [x] **Navigating state hooks (`onNavigationStart` / `onNavigationEnd`)**
   - Files: `src/index.ts`, `tests/router.test.ts`
   - Acceptance: optional callbacks on the constructor options for navigation start and end;
     used to drive loading indicators and `navigating$` signals at the app layer
