@@ -5,7 +5,7 @@ completeness, ergonomics, and package health.
 
 ---
 
-## Phase 1 - Foundation: Completed
+## Phase 1 — Foundation: Completed
 
 All Phase 1 items were delivered in the v1.0.0 release cycle.
 
@@ -33,23 +33,23 @@ All Phase 1 items were delivered in the v1.0.0 release cycle.
 
 ---
 
-## Phase 2 - Mature Operations: Completed
+## Phase 2 — Routing Contract: Completed
 
-All Phase 2 items were delivered. Foundation is stable and the routing contract is complete.
+All Phase 2 items were delivered. The routing contract is stable and complete.
 
 ### P0: Core Routing Completeness
 
-- [x] **Hash-based routing mode** (`mode: 'hash'`)
-- [x] **Route guard / `beforeNavigate` hook**
+- [x] Hash-based routing mode (`mode: 'hash'`)
+- [x] Route guard / `beforeNavigate` hook
 
 ### P1: Routing Ergonomics
 
-- [x] **Scroll position restoration**
-- [x] **Named routes + `router.href()` helper**
+- [x] Scroll position restoration
+- [x] Named routes + `router.href()` helper
 
 ---
 
-## Phase 3 - Ecosystem Integration
+## Phase 3 — Ecosystem Integration
 
 Active phase. The foundation is solid — now the router needs to integrate with the broader
 Spectre ecosystem so `spectre-shell-signals`, `spectre-ui`, and `spectre-ui-astro` can build
@@ -65,7 +65,7 @@ on top of it. Focus is on exposing router state reactively and supporting real a
   - Why: lets spectre-shell-signals, spectre-ui components, and app-level code react to route
     changes without the router owning the signal primitive
 
-- [ ] **Navigating state hook (`onNavigationStart` / `onNavigationEnd`)**
+- [ ] **Navigating state hooks (`onNavigationStart` / `onNavigationEnd`)**
   - Files: `src/index.ts`, `tests/router.test.ts`
   - Acceptance: optional callbacks on the constructor options for navigation start and end;
     used to drive loading indicators and `navigating$` signals at the app layer
@@ -76,7 +76,7 @@ on top of it. Focus is on exposing router state reactively and supporting real a
 - [ ] **Per-route metadata support**
   - Files: `src/index.ts`, `tests/router.test.ts`, `README.md`
   - Acceptance: optional `meta` object on route definitions (typed but open-ended);
-    `RouteContext` exposes `meta` so page modules and app code can read title, guards data,
+    `RouteContext` exposes `meta` so page modules and app code can read title, guard data,
     analytics keys, etc.
   - Why: real apps need document title management, analytics tagging, and route-level
     data that does not belong in the page module itself
@@ -95,13 +95,62 @@ on top of it. Focus is on exposing router state reactively and supporting real a
 
 ---
 
+## Phase 4 — Production Readiness
+
+Builds on the complete Phase 3 contract. Closes remaining gaps that surface in real production
+applications: explicit error handling, navigation history helpers, and nested outlet support
+promoted from Phase 3 when a concrete need is confirmed.
+
+### P0: Error Routes
+
+- [ ] **`errorRoute` option on `RouterOptions`**
+  - Files: `src/index.ts`, `tests/reliability.test.ts`, `README.md`
+  - Acceptance: when a loader throws or no route matches, the router navigates to `errorRoute`
+    rather than silently clearing the outlet; `errorRoute` path must exist in the route list
+  - Why: silent root-clearing gives users a blank page with no feedback; named error routes
+    make failure states explicit and testable
+
+- [ ] **`onError(error, context)` callback**
+  - Files: `src/index.ts`, `tests/reliability.test.ts`
+  - Acceptance: optional callback on constructor options; fires when a loader throws;
+    apps can log, report, or handle programmatically without requiring a redirect
+  - Why: not all error handling is a redirect — apps need a seam for error telemetry
+
+### P1: Navigation History Helpers
+
+- [ ] **`router.back()` and `router.forward()`**
+  - Files: `src/index.ts`, `tests/router.test.ts`
+  - Acceptance: thin wrappers around `history.back()` and `history.forward()`; consistent
+    with the existing `navigate()` contract
+  - Why: exposes common navigation actions as first-class router methods so callers do not
+    reach around the router to the History API directly
+
+- [ ] **`router.replace(path)`**
+  - Files: `src/index.ts`, `tests/router.test.ts`, `README.md`
+  - Acceptance: navigates to `path` without adding a new history entry (`replaceState`);
+    race-condition guard applies as with `navigate()`
+  - Why: redirect flows (post-login, form submission) need replace-not-push semantics
+
+### P2: Nested Routing
+
+- [ ] **Nested route definitions** (implement only when a concrete app need is confirmed)
+  - Files: `src/index.ts`, `tests/router.test.ts`, `README.md`
+  - Acceptance: child `routes` array on parent route entries; parent page modules declare an
+    inner outlet element; child routes render into it; lifecycle enforced at both levels
+  - Why: `spectre-ui-astro` layout patterns will require nested outlets — evaluate the API
+    shape against a real layout before committing
+
+---
+
 ## Recommended Execution Order
 
 1. Navigation subscription API (unblocks spectre-shell-signals integration)
 2. Navigating state hooks (unblocks loading UI in spectre-ui)
 3. Per-route metadata (unblocks title management and analytics)
 4. `afterNavigate` hook (completes the lifecycle surface)
-5. Nested routing (only when a concrete application need is proven)
+5. Error routes (closes the silent-failure gap for production apps)
+6. Navigation history helpers (ergonomic, low-risk, additive)
+7. Nested routing (only when a concrete application need is proven)
 
 ---
 

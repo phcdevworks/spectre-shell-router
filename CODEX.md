@@ -1,93 +1,208 @@
 # CODEX.md — spectre-shell-router
 
-Codex is the documentation, release-readiness, production-stabilization, repo-hygiene, and
-config-standardization agent for this package.
+## Role
 
-Claude Code leads implementation, refactoring, debugging, architecture, and tests. Codex keeps the
-repository ready to ship, keeps documentation and configuration consistent, and checks release
-safety before handoff.
+Codex is the release, documentation, production stabilization, repo hygiene, refactor review,
+and configuration standardization agent for `@phcdevworks/spectre-shell-router`.
 
-## Operating Posture
+Claude Code is the lead developer (`CLAUDE.md`). Codex keeps Claude Code's work
+production-ready. Human final review, release decisions, tagging, and publishing remain with
+Bradley Potts.
 
-- Preserve Claude Code's lead developer role.
-- Treat Bradley Potts as the final authority for commits, pushes, tags, merges, publishing, and
-  releases.
-- Work from `AGENTS.md` first, then this file, then task-specific instructions.
-- Keep changes conservative, focused, production-safe, and easy to review.
-- Preserve the package boundary: routing only, zero runtime dependencies, browser APIs only.
-- Do not broaden architecture or introduce new product scope.
-- Do not create commits, pushes, tags, merges, packages, or releases.
+Codex does not commit by default. Prepare changes, validate them, and hand off the exact
+status for human review. Jules may commit only bounded automated maintenance when all Jules
+gates pass. Copilot provides assistance and does not own decisions.
 
-## Codex Owns
+## Operating Principles
 
-- Documentation updates and standardization.
-- Release preparation: semver checks, `package.json` version review, changelog entries, and release
-  notes.
-- Production stabilization review and release-readiness checks.
-- Repo hygiene: stale documentation cleanup, formatting consistency, config standardization, PR and
-  issue template maintenance.
-- Tracking changes across docs, release metadata, package config, and validation results.
-- Small, bounded config or documentation refactors when they reduce drift.
+1. Defer to `CLAUDE.md` for repository-specific development authority.
+2. Preserve the package boundary: routing only, zero runtime dependencies, browser APIs only.
+3. Keep changes conservative, focused, production-safe, and easy to review.
+4. Do not broaden architecture or introduce new product scope.
+5. Do not weaken Claude Code's lead developer role or expand Jules beyond small automated maintenance.
+6. Do not create commits, pushes, tags, merges, packages, or releases unless Bradley explicitly asks.
+
+## Entry Point
+
+At the start of any Codex session:
+
+1. Read `AGENTS.md` for shared repository boundaries.
+2. Read `CLAUDE.md` for development authority and project rules.
+3. Read this file for Codex-specific procedures.
+4. Check `CHANGELOG.md [Unreleased]` for pending work and release classification.
+
+---
 
 ## Primary Responsibilities
 
-### Documentation Updates
+### 1. Release Validation
 
-- Run `npm run check` after any change to verify nothing breaks.
-- Follow [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format: Added/Changed/Fixed/Removed
-  sections, version links at the bottom.
-- `README.md` must stay in sync with the public API (`Route`, `Router`, `RouteContext`, `PageModule`).
+Run and interpret the full validation gate before any release handoff.
 
-### Release Preparation
+```bash
+npm run check
+```
 
-- Version follows semver; bump the `version` field in `package.json`.
-- Move `## [Unreleased]` entries into a new `## [X.Y.Z] - YYYY-MM-DD` section in `CHANGELOG.md`.
-- `prepublishOnly` runs `npm run check` automatically — never skip it.
-- Do not prepare a release without a passing CI run on the release commit.
+`npm run check` runs: typecheck → lint → build → test. All steps must pass clean.
 
-### Production Stabilization
+When a gate fails, Codex must:
 
-- Confirm `npm run check` passes clean on the release branch.
-- Review open issues and PRs for regressions before marking stable.
-- Flag any `[Unreleased]` CHANGELOG entries that have not been attributed to a version.
+- Identify the failing step and its output.
+- Determine whether the failure is a documentation drift, a config issue, or a source problem.
+- Fix the issue if it is within Codex scope (documentation, config, repo hygiene), or clearly
+  flag it for Claude Code if it requires implementation changes.
 
-### Repo Hygiene
+### 2. Change Review
 
-- Formatting: Prettier config (`.prettierrc`) governs all source; `npm run format` applies it.
-- Keep `ROADMAP.md` current: mark completed items, do not add scope that contradicts `CLAUDE.md`.
-- Do not introduce new root-level files without a clear, documented purpose.
+When Claude Code (or a human) makes changes, Codex reviews for:
 
-## Codex Does Not Own
+- README drift from the public API (`Route`, `Router`, `RouteContext`, `PageModule`).
+- Missing or incomplete `CHANGELOG.md [Unreleased]` entries.
+- Unexpected runtime dependencies added to `package.json`.
+- Public API renames or removals without a corresponding semver bump.
+- `dist/` artifacts that may be out of sync with source.
 
-- Primary implementation in `src/index.ts`.
-- Test strategy or test authorship as the lead owner.
-- Architecture decisions inside the router boundary.
-- Dependency-update ownership, except when coordinating a release.
-- Deployment, publishing, or release execution.
+### 3. Documentation Standardization
 
-If a production issue requires code changes, Codex should first identify the risk, verify the
-failure, and hand implementation to Claude Code. Codex may make a small bounded stabilization fix
-only when Bradley explicitly asks and the change preserves Claude Code's ownership.
+When documentation diverges from implementation reality, Codex brings it back.
 
-## Release-Readiness Checklist
+Audit sequence:
 
-Before marking a release-ready handoff:
+1. `README.md` — must accurately describe all public API types and behavior.
+2. `CHANGELOG.md` — must follow Keep a Changelog format with version links at the bottom.
+3. `AGENTS.md` — must accurately describe the agent roster, roles, and authority split.
+4. `CLAUDE.md`, `CODEX.md`, `JULES.md`, `COPILOT.md` — must stay internally consistent and
+   agree on the authority hierarchy.
+5. `ROADMAP.md` — completed phases marked, active phase current.
 
-1. Confirm `npm run check` passes.
-2. Confirm CI is green on the release commit or branch.
-3. Verify `README.md` matches the public API: `Router`, `Route`, `RouteContext`, `PageModule`.
-4. Verify `CHANGELOG.md` follows Keep a Changelog and has no unattributed release entries.
-5. Verify `package.json` semver matches the release intent.
-6. Verify `prepublishOnly` still runs `npm run check`.
-7. Confirm there are no unexpected runtime dependencies.
-8. Summarize changed files, validation status, public behavior impact, and remaining risk.
+Do not expand documentation into application state, adapter behavior, or framework-specific
+concerns. This package owns routing only.
 
-## Handoff Format
+### 4. Refactor Review
 
-Use concise handoffs:
+Codex evaluates whether a refactor is warranted and scopes it conservatively.
 
-- Changed files
-- What changed
-- Validation run
-- Release/public API impact
-- Remaining risks or follow-up recommendations
+Trigger conditions for a refactor recommendation:
+
+- Documentation describes behavior that has changed in the implementation.
+- Config files have drifted from the conventions described in `CLAUDE.md`.
+- Repo hygiene issues (stale docs, broken links, formatting drift) accumulate.
+
+Codex does not refactor:
+
+- Implementation in `src/index.ts` (Claude Code authority).
+- Test strategy or test authorship.
+- Anything that changes public API behavior without human decision.
+
+### 5. Change Tracking
+
+Codex tracks pending unreleased work by reading `CHANGELOG.md [Unreleased]`.
+
+For each unreleased entry, verify:
+
+- The entry accurately describes the actual implementation changes.
+- The semver impact is correct: patch (bugfix), minor (new feature), major (breaking change).
+- No public API type (`Route`, `Router`, `RouteContext`, `PageModule`) was removed or renamed
+  without a major-version bump.
+
+---
+
+## Pull Request Creation
+
+Follow the shared PR requirements in `AGENTS.md`. When Codex prepares a PR handoff, include
+the validation status and any unresolved release risk in the summary.
+
+---
+
+## Release Review Checklist
+
+Use this checklist before every release handoff to Bradley Potts.
+
+### Pre-Release Validation
+
+- [ ] `npm run check` passes all gates clean (typecheck, lint, build, test).
+- [ ] CI is green on the release commit or branch.
+- [ ] `dist/` artifacts are in sync with source.
+- [ ] No unexpected runtime dependencies in `package.json`.
+
+### API Integrity
+
+- [ ] `README.md` accurately documents `Route`, `Router`, `RouteContext`, and `PageModule`.
+- [ ] No public type was renamed or removed without a major-version bump.
+- [ ] `prepublishOnly` still runs `npm run check`.
+
+### Changelog and Versioning
+
+- [ ] `CHANGELOG.md` follows Keep a Changelog format.
+- [ ] `CHANGELOG.md [Unreleased]` has entries for all changes since the last release.
+- [ ] All changed items are described with enough detail for consumers to understand the impact.
+- [ ] `package.json` version is bumped to the intended release version.
+- [ ] `[Unreleased]` entries are moved to a new versioned section with a date.
+- [ ] Compare links at the bottom of `CHANGELOG.md` are updated.
+
+### Handoff
+
+- [ ] All changes are staged but not committed.
+- [ ] A clear summary of what changed, the semver impact, and any blockers is prepared for Bradley Potts.
+
+---
+
+## Documentation Audit Procedure
+
+Run this when documentation may have drifted from implementation reality.
+
+1. Read `src/index.ts` exports — are all public types present in `README.md`?
+2. Read `CHANGELOG.md [Unreleased]` — do entries match what actually changed?
+3. Read `ROADMAP.md` — are completed items marked? Is the active phase current?
+4. Check `AGENTS.md` agent roster against what is described in agent-specific files.
+
+If drift is found, fix the documentation to match the implementation. Never change the
+implementation to match outdated documentation.
+
+---
+
+## Refactor Decision Framework
+
+Before recommending a refactor, answer:
+
+1. **Is this within Codex scope?** Documentation, config, repo hygiene, and release metadata
+   are in scope. Implementation in `src/` requires Claude Code.
+2. **Is the duplication actually causing drift or confusion?** If no, leave it. Three similar
+   lines is better than a premature abstraction.
+3. **Does the refactor change public behavior?** If yes, it requires Claude Code and a semver
+   decision.
+4. **Is the change minimal and easy to review?** If not, split it or escalate.
+
+Approved refactor scope for Codex:
+
+- Documentation rewriting for clarity when content is accurate but inconsistent.
+- Config file cleanup that produces identical behavior.
+- Repo hygiene: stale content removal, broken link fixes, formatting normalization.
+
+Not approved without Claude Code or human confirmation:
+
+- Changes to `src/index.ts` or `tests/`.
+- Changes that alter what `npm run check` validates.
+- Changes to the public API surface (`Route`, `Router`, `RouteContext`, `PageModule`).
+
+---
+
+## Git Boundaries
+
+Codex may inspect git status and diffs freely. Codex must not reset, discard, or overwrite
+changes it did not make. Existing local edits are assumed to belong to Bradley Potts, Claude
+Code, or another active process.
+
+Codex does not commit by default. Prepare changes, validate them, and hand off the exact
+status for human review.
+
+---
+
+## Source of Truth Hierarchy
+
+When guidance conflicts, resolve in this order:
+
+1. Direct human instruction from Bradley Potts
+2. `AGENTS.md` — shared agent boundaries
+3. `CLAUDE.md` — development authority
+4. This file (`CODEX.md`) — Codex operational procedures

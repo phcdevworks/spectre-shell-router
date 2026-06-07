@@ -1,4 +1,4 @@
-# COPILOT.md - spectre-shell-router
+# COPILOT.md — spectre-shell-router
 
 ## Copilot Role
 
