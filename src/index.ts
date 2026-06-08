@@ -8,11 +8,13 @@ export type RouteContext = {
   params: Record<string, string>
   query: URLSearchParams
   root: HTMLElement
+  meta?: Record<string, unknown>
 }
 
 export type Route = {
   path: string
   name?: string
+  meta?: Record<string, unknown>
   loader: () => Promise<PageModule>
 }
 
@@ -30,6 +32,7 @@ export type RouterOptions = {
   ) => void | Promise<void>
   onNavigationStart?: (context: NavigationContext) => void
   onNavigationEnd?: (context: NavigationContext) => void
+  afterNavigate?: (context: RouteContext) => void
 }
 
 export type Unsubscribe = () => void
@@ -264,10 +267,12 @@ export class Router {
         params,
         query,
         root: this.rootEl,
+        meta: route.meta,
       }
 
       page.render(context)
       this.notifySubscribers(context)
+      this.options.afterNavigate?.(context)
 
       if (this.scrollRestoration) {
         if (source === 'pop') {

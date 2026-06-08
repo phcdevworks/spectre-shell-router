@@ -73,7 +73,7 @@ on top of it. Focus is on exposing router state reactively and supporting real a
 
 ### P1: Application Primitives
 
-- [ ] **Per-route metadata support**
+- [x] **Per-route metadata support**
   - Files: `src/index.ts`, `tests/router.test.ts`, `README.md`
   - Acceptance: optional `meta` object on route definitions (typed but open-ended);
     `RouteContext` exposes `meta` so page modules and app code can read title, guard data,
@@ -81,7 +81,7 @@ on top of it. Focus is on exposing router state reactively and supporting real a
   - Why: real apps need document title management, analytics tagging, and route-level
     data that does not belong in the page module itself
 
-- [ ] **`afterNavigate` hook**
+- [x] **`afterNavigate` hook**
   - Files: `src/index.ts`, `tests/router.test.ts`, `README.md`
   - Acceptance: optional `afterNavigate(context)` on constructor options; fires after
     render completes; complements `beforeNavigate` for analytics, focus management, etc.

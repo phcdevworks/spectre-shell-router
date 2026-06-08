@@ -717,4 +717,98 @@ describe("spectre-shell-router", () => {
       router.destroy()
     })
   })
+
+  describe("route meta", () => {
+    it("exposes a route's meta object on the route context", async () => {
+      const { Router } = await import("../src/index")
+      const render = vi.fn()
+      const routes = [
+        { path: "/", meta: { title: "Home" }, loader: async () => ({ render: vi.fn() }) },
+        { path: "/users/:id", meta: { title: "User", requiresAuth: true }, loader: async () => ({ render }) },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root)
+      await tick()
+
+      router.navigate("/users/42")
+      await tick()
+
+      const ctx = render.mock.calls.at(-1)?.[0]
+      expect(ctx?.meta).toEqual({ title: "User", requiresAuth: true })
+      router.destroy()
+    })
+
+    it("leaves meta undefined for routes without a meta object", async () => {
+      const { Router } = await import("../src/index")
+      const render = vi.fn()
+      const routes = [{ path: "/", loader: async () => ({ render }) }]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root)
+      await tick()
+
+      const ctx = render.mock.calls.at(-1)?.[0]
+      expect(ctx?.meta).toBeUndefined()
+      router.destroy()
+    })
+  })
+
+  describe("afterNavigate hook", () => {
+    it("fires with the route context after render completes", async () => {
+      const { Router } = await import("../src/index")
+      const afterNavigate = vi.fn()
+      const routes = [
+        { path: "/", meta: { title: "Home" }, loader: async () => ({ render: vi.fn() }) },
+        { path: "/users/:id", loader: async () => ({ render: vi.fn() }) },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root, { afterNavigate })
+      await tick()
+
+      expect(afterNavigate).toHaveBeenCalledOnce()
+      let ctx = afterNavigate.mock.calls.at(-1)?.[0]
+      expect(ctx?.path).toBe("/")
+      expect(ctx?.meta).toEqual({ title: "Home" })
+
+      afterNavigate.mockClear()
+      router.navigate("/users/42?tab=info")
+      await tick()
+
+      expect(afterNavigate).toHaveBeenCalledOnce()
+      ctx = afterNavigate.mock.calls.at(-1)?.[0]
+      expect(ctx?.path).toBe("/users/42")
+      expect(ctx?.params.id).toBe("42")
+      expect(ctx?.query.get("tab")).toBe("info")
+      router.destroy()
+    })
+
+    it("does not fire when no route matches or the loader throws", async () => {
+      const { Router } = await import("../src/index")
+      const afterNavigate = vi.fn()
+      const routes = [
+        { path: "/", loader: async () => ({ render: vi.fn() }) },
+        { path: "/broken", loader: async () => { throw new Error("boom") } },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root, { afterNavigate })
+      await tick()
+      afterNavigate.mockClear()
+
+      router.navigate("/missing")
+      await tick()
+      expect(afterNavigate).not.toHaveBeenCalled()
+
+      router.navigate("/broken")
+      await tick()
+      expect(afterNavigate).not.toHaveBeenCalled()
+      router.destroy()
+    })
+  })
 })
