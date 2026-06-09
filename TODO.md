@@ -49,11 +49,11 @@ All Phase 2 items were delivered. The routing contract is stable and complete.
 
 ---
 
-## Phase 3 — Ecosystem Integration
+## Phase 3 — Ecosystem Integration: P0/P1 Complete — P3 Docs Blocking Phase 4
 
-Active phase. The foundation is solid — now the router needs to integrate with the broader
-Spectre ecosystem so `spectre-shell-signals`, `spectre-ui`, and `spectre-ui-astro` can build
-on top of it. Focus is on exposing router state reactively and supporting real application needs.
+P0 and P1 delivered. P2 (nested routing) remains evaluation-only. P3 API docs
+are NOT done and are blocking Phase 4 ship and spectre-init Phase 6 templates.
+Close P3 docs before starting any Phase 4 work.
 
 ### P0: Signals Bridge
 
@@ -93,13 +93,45 @@ on top of it. Focus is on exposing router state reactively and supporting real a
 - [ ] **Nested routing proposal** (planning doc only; implement only when a concrete need is proven)
   - Evaluate alongside `spectre-ui-astro` layout patterns before committing to an API
 
+### P3: Phase 3 API Documentation — NEXT — Blocking Phase 4 and spectre-init
+
+These APIs shipped in v1.1.0 but README examples are missing or incomplete.
+Do these before any Phase 4 work. spectre-init templates cannot safely scaffold
+these patterns without documented examples to copy.
+
+- [ ] **Document `meta: { title: string }` pattern in README**
+  - Files: `README.md`
+  - Acceptance: route definition shows `meta` field; `afterNavigate` example reads
+    `context.meta?.title` and sets `document.title`
+  - Why: spectre-init shell-app template needs a copy-able title management pattern
+
+- [ ] **Document `afterNavigate` hook in README**
+  - Files: `README.md`
+  - Acceptance: `RouterOptions` example shows `afterNavigate(context)` reading
+    `context.meta?.title`; includes note on a11y focus management use case
+  - Why: without a documented example, consumers will not know how to complete
+    the navigation lifecycle
+
+- [ ] **Document `onNavigationStart` / `onNavigationEnd` loading-state pattern in README**
+  - Files: `README.md`
+  - Acceptance: `RouterOptions` example shows both callbacks toggling a boolean;
+    includes note that these drive a `navigating` signal at the app layer via
+    `spectre-shell-signals`
+  - Why: spectre-init loading indicator pattern depends on this being documented
+
+- [ ] **Document `router.subscribe()` signals integration pattern in README**
+  - Files: `README.md`
+  - Acceptance: example shows wrapping `router.subscribe()` in a `signal()` from
+    `spectre-shell-signals` to get a reactive `currentRoute` at the app layer
+  - Why: this is the canonical bridge between the router and signals — consumers
+    need a single clear example
+
 ---
 
-## Phase 4 — Production Readiness
+## Phase 4 — Production Readiness: Active
 
-Builds on the complete Phase 3 contract. Closes remaining gaps that surface in real production
-applications: explicit error handling, navigation history helpers, and nested outlet support
-promoted from Phase 3 when a concrete need is confirmed.
+Phase 3 core APIs are delivered. Phase 4 closes remaining production gaps: deterministic error
+handling, navigation history helpers, and nested outlet support when a concrete need is proven.
 
 ### P0: Error Routes
 
@@ -144,15 +176,45 @@ promoted from Phase 3 when a concrete need is confirmed.
 
 ## Recommended Execution Order
 
-1. Navigation subscription API (unblocks spectre-shell-signals integration)
-2. Navigating state hooks (unblocks loading UI in spectre-ui)
-3. Per-route metadata (unblocks title management and analytics)
-4. `afterNavigate` hook (completes the lifecycle surface)
-5. Error routes (closes the silent-failure gap for production apps)
-6. Navigation history helpers (ergonomic, low-risk, additive)
-7. Nested routing (only when a concrete application need is proven)
+1. ~~Navigation subscription API~~ ✓
+2. ~~Navigating state hooks~~ ✓
+3. ~~Per-route metadata~~ ✓
+4. ~~`afterNavigate` hook~~ ✓
+5. **Phase 3 API docs** ← current (meta, afterNavigate, onNavigationStart/End, subscribe pattern)
+6. Error routes (closes the silent-failure gap; Phase 4 P0)
+7. Navigation history helpers (back/forward/replace; Phase 4 P1)
+8. Nested routing (only when a concrete application need is proven)
 
 ---
+
+---
+
+## spectre-init Consumer Requirements
+
+`@phcdevworks/spectre-init` scaffolds templates against this package. These items
+are needed for templates to work correctly and demonstrate the full routing surface.
+
+### P0: Confirmed — Route Array Contract
+
+`bootstrapApp` calls `routes()` and expects `Route[]` as the return value.
+Templates have been fixed to return `Route[]` with `{ path, loader }` shape.
+No router changes needed — this is confirmed correct.
+
+- [x] `Route` type (`path`, `name?`, `meta?`, `loader`) is the correct shape — templates updated
+
+### P1: Template Showcase Items — Needed for Phase 6
+
+These are shipped in v1.1.0 but not yet used in scaffolded templates. Confirm
+they are stable and covered in README examples so spectre-init can reference them.
+
+- [ ] Confirm `meta: { title: string }` on route definitions is documented with an example
+- [ ] Confirm `afterNavigate(context)` usage for `document.title` is documented
+- [ ] Confirm `onNavigationStart` / `onNavigationEnd` pattern is documented
+
+### P2: Error Routes — Needed for Phase 6 template hardening
+
+- [ ] `errorRoute` option on `RouterOptions` (Phase 4 P0) — when shipped, spectre-init shell-app template should add an error route
+- [ ] `onError(error, context)` callback — when shipped, document the pattern for template consumers
 
 ## Explicitly Out of Scope
 

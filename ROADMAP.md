@@ -120,8 +120,42 @@ Complete the navigation lifecycle surface for a11y, analytics, and side effects.
 
 #### Nested routing
 
-Design-only until a concrete application need is proven. Evaluate alongside `spectre-ui-astro`
-layout patterns before committing to an API.
+Design-only until a concrete application need is proven. Evaluate alongside
+`spectre-ui-astro` layout patterns before committing to an API.
+
+---
+
+### P3: API Documentation — BLOCKING Phase 4
+
+These APIs shipped in v1.1.0 but README examples are missing or incomplete.
+This section must be closed before any Phase 4 work ships. `spectre-init`
+templates cannot safely scaffold these patterns without documented examples.
+
+#### `meta` + `afterNavigate` — document title and a11y pattern
+
+Add a README example showing:
+
+- A route definition with `meta: { title: string }`.
+- An `afterNavigate(context)` handler that reads `context.meta?.title` and
+  sets `document.title`.
+- A note on a11y focus management as a secondary use case.
+
+#### `onNavigationStart` / `onNavigationEnd` — loading state pattern
+
+Add a README example showing:
+
+- Both callbacks toggling a boolean.
+- A note that these drive a `navigating` signal at the app layer via
+  `spectre-shell-signals`.
+
+#### `router.subscribe()` — signals bridge pattern
+
+Add a README example showing:
+
+- Wrapping `router.subscribe()` in a `signal()` from `spectre-shell-signals`
+  to expose a reactive `currentRoute` at the app layer.
+- This is the canonical pattern for reactive route state — one example is
+  enough; the goal is a copy-able reference.
 
 ---
 
