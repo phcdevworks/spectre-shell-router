@@ -93,11 +93,17 @@ Close P3 docs before starting any Phase 4 work.
 - [ ] **Nested routing proposal** (planning doc only; implement only when a concrete need is proven)
   - Evaluate alongside `spectre-ui-astro` layout patterns before committing to an API
 
-### P3: Phase 3 API Documentation — NEXT — Blocking Phase 4 and spectre-init
+### P3: Phase 3 API Documentation — CURRENT PRIORITY — Blocking Phase 4 + spectre-init Phase 6
 
-These APIs shipped in v1.1.0 but README examples are missing or incomplete.
-Do these before any Phase 4 work. spectre-init templates cannot safely scaffold
-these patterns without documented examples to copy.
+These APIs shipped in v1.1.0 but README examples are missing. Do all four before
+starting any Phase 4 work. spectre-init Phase 6 templates cannot scaffold these
+patterns without documented examples to copy.
+
+Unblocks when complete:
+
+- This repo: Phase 4 can start (error routes, history helpers)
+- `spectre-init`: Phase 6 template modernization (lifecycle, title, loading, plugin)
+- `spectre-shell`: P2.5 release readiness (templates need stable examples first)
 
 - [ ] **Document `meta: { title: string }` pattern in README**
   - Files: `README.md`
@@ -180,10 +186,10 @@ handling, navigation history helpers, and nested outlet support when a concrete 
 2. ~~Navigating state hooks~~ ✓
 3. ~~Per-route metadata~~ ✓
 4. ~~`afterNavigate` hook~~ ✓
-5. **Phase 3 API docs** ← current (meta, afterNavigate, onNavigationStart/End, subscribe pattern)
-6. Error routes (closes the silent-failure gap; Phase 4 P0)
-7. Navigation history helpers (back/forward/replace; Phase 4 P1)
-8. Nested routing (only when a concrete application need is proven)
+5. **Phase 3 P3 API docs** ← current (meta, afterNavigate, onNavigationStart/End, subscribe pattern)
+6. Error routes — Phase 4 P0 (starts after P3 docs close)
+7. Navigation history helpers — Phase 4 P1 (back/forward/replace)
+8. Nested routing — only when a concrete application need is proven
 
 ---
 

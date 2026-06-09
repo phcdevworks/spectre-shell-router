@@ -125,11 +125,17 @@ Design-only until a concrete application need is proven. Evaluate alongside
 
 ---
 
-### P3: API Documentation — BLOCKING Phase 4
+### P3: API Documentation — CURRENT PRIORITY — BLOCKING Phase 4 + spectre-init Phase 6
 
-These APIs shipped in v1.1.0 but README examples are missing or incomplete.
-This section must be closed before any Phase 4 work ships. `spectre-init`
-templates cannot safely scaffold these patterns without documented examples.
+These APIs shipped in v1.1.0 but README examples are missing. This is the current
+work item. Nothing in Phase 4 starts until these are written. `spectre-init` Phase 6
+templates cannot scaffold these patterns without copy-able examples to reference.
+
+**Unblocks:**
+
+- `spectre-shell-router` Phase 4 (error routes, history helpers)
+- `spectre-init` Phase 6 (lifecycle, title, loading state, plugin templates)
+- `spectre-shell` P2.5 release (can ship once templates have stable examples)
 
 #### `meta` + `afterNavigate` — document title and a11y pattern
 
@@ -200,13 +206,14 @@ Support child routes rendered inside parent outlet elements.
 
 ## Recommended Execution Order
 
-1. Navigation subscription API — unblocks `spectre-shell-signals` integration
-2. Navigating state hooks — unblocks loading UI in `spectre-ui`
-3. Per-route metadata — unblocks title management and analytics
-4. `afterNavigate` hook — completes the navigation lifecycle surface
-5. Error routes — closes the silent-failure gap for production apps
-6. Navigation history helpers — ergonomic, low-risk, additive
-7. Nested routing — only when a concrete app need is confirmed
+1. ~~Navigation subscription API~~ ✓
+2. ~~Navigating state hooks~~ ✓
+3. ~~Per-route metadata~~ ✓
+4. ~~`afterNavigate` hook~~ ✓
+5. **Phase 3 P3 API docs** ← current (meta, afterNavigate, onNavigationStart/End, subscribe pattern)
+6. Error routes — closes the silent-failure gap; Phase 4 P0 (starts after P3 docs close)
+7. Navigation history helpers — ergonomic, low-risk, additive; Phase 4 P1
+8. Nested routing — only when a concrete app need is confirmed
 
 ---
 
