@@ -68,7 +68,7 @@ All Phase 2 work is complete.
 
 ---
 
-## 3. Phase 3 — Ecosystem Integration (Active)
+## 3. Phase 3 — Ecosystem Integration (Complete)
 
 The foundation is stable. Phase 3 focuses on making the router connectable to
 `spectre-shell-signals`, `spectre-ui`, and application-level concerns like metadata and
@@ -209,8 +209,8 @@ Support child routes rendered inside parent outlet elements.
 2. ~~Navigating state hooks~~ ✓
 3. ~~Per-route metadata~~ ✓
 4. ~~`afterNavigate` hook~~ ✓
-5. **Phase 3 P3 API docs** ← current (meta, afterNavigate, onNavigationStart/End, subscribe pattern)
-6. Error routes — closes the silent-failure gap; Phase 4 P0 (starts after P3 docs close)
+5. ~~Phase 3 P3 API docs~~ ✓
+6. **Error routes** ← current — closes the silent-failure gap; Phase 4 P0
 7. Navigation history helpers — ergonomic, low-risk, additive; Phase 4 P1
 8. Nested routing — only when a concrete app need is confirmed
 
