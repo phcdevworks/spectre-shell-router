@@ -49,11 +49,10 @@ All Phase 2 items were delivered. The routing contract is stable and complete.
 
 ---
 
-## Phase 3 — Ecosystem Integration: P0/P1 Complete — P3 Docs Blocking Phase 4
+## Phase 3 — Ecosystem Integration: P0/P1/P3 Complete — Phase 4 Unblocked
 
-P0 and P1 delivered. P2 (nested routing) remains evaluation-only. P3 API docs
-are NOT done and are blocking Phase 4 ship and spectre-init Phase 6 templates.
-Close P3 docs before starting any Phase 4 work.
+P0, P1, and P3 (API docs) delivered. P2 (nested routing) remains evaluation-only.
+Phase 4 (error routes, history helpers) can now begin.
 
 ### P0: Signals Bridge
 
@@ -93,39 +92,38 @@ Close P3 docs before starting any Phase 4 work.
 - [ ] **Nested routing proposal** (planning doc only; implement only when a concrete need is proven)
   - Evaluate alongside `spectre-ui-astro` layout patterns before committing to an API
 
-### P3: Phase 3 API Documentation — CURRENT PRIORITY — Blocking Phase 4 + spectre-init Phase 6
+### P3: Phase 3 API Documentation — Complete
 
-These APIs shipped in v1.1.0 but README examples are missing. Do all four before
-starting any Phase 4 work. spectre-init Phase 6 templates cannot scaffold these
-patterns without documented examples to copy.
+These APIs shipped in v1.1.0 and README examples are now documented. spectre-init
+Phase 6 templates can scaffold these patterns using the documented examples.
 
-Unblocks when complete:
+Unblocked:
 
 - This repo: Phase 4 can start (error routes, history helpers)
 - `spectre-init`: Phase 6 template modernization (lifecycle, title, loading, plugin)
 - `spectre-shell`: P2.5 release readiness (templates need stable examples first)
 
-- [ ] **Document `meta: { title: string }` pattern in README**
+- [x] **Document `meta: { title: string }` pattern in README**
   - Files: `README.md`
   - Acceptance: route definition shows `meta` field; `afterNavigate` example reads
     `context.meta?.title` and sets `document.title`
   - Why: spectre-init shell-app template needs a copy-able title management pattern
 
-- [ ] **Document `afterNavigate` hook in README**
+- [x] **Document `afterNavigate` hook in README**
   - Files: `README.md`
   - Acceptance: `RouterOptions` example shows `afterNavigate(context)` reading
     `context.meta?.title`; includes note on a11y focus management use case
   - Why: without a documented example, consumers will not know how to complete
     the navigation lifecycle
 
-- [ ] **Document `onNavigationStart` / `onNavigationEnd` loading-state pattern in README**
+- [x] **Document `onNavigationStart` / `onNavigationEnd` loading-state pattern in README**
   - Files: `README.md`
   - Acceptance: `RouterOptions` example shows both callbacks toggling a boolean;
     includes note that these drive a `navigating` signal at the app layer via
     `spectre-shell-signals`
   - Why: spectre-init loading indicator pattern depends on this being documented
 
-- [ ] **Document `router.subscribe()` signals integration pattern in README**
+- [x] **Document `router.subscribe()` signals integration pattern in README**
   - Files: `README.md`
   - Acceptance: example shows wrapping `router.subscribe()` in a `signal()` from
     `spectre-shell-signals` to get a reactive `currentRoute` at the app layer
@@ -186,8 +184,8 @@ handling, navigation history helpers, and nested outlet support when a concrete 
 2. ~~Navigating state hooks~~ ✓
 3. ~~Per-route metadata~~ ✓
 4. ~~`afterNavigate` hook~~ ✓
-5. **Phase 3 P3 API docs** ← current (meta, afterNavigate, onNavigationStart/End, subscribe pattern)
-6. Error routes — Phase 4 P0 (starts after P3 docs close)
+5. ~~Phase 3 P3 API docs~~ ✓
+6. **Error routes** ← current — Phase 4 P0
 7. Navigation history helpers — Phase 4 P1 (back/forward/replace)
 8. Nested routing — only when a concrete application need is proven
 
@@ -213,9 +211,9 @@ No router changes needed — this is confirmed correct.
 These are shipped in v1.1.0 but not yet used in scaffolded templates. Confirm
 they are stable and covered in README examples so spectre-init can reference them.
 
-- [ ] Confirm `meta: { title: string }` on route definitions is documented with an example
-- [ ] Confirm `afterNavigate(context)` usage for `document.title` is documented
-- [ ] Confirm `onNavigationStart` / `onNavigationEnd` pattern is documented
+- [x] Confirm `meta: { title: string }` on route definitions is documented with an example
+- [x] Confirm `afterNavigate(context)` usage for `document.title` is documented
+- [x] Confirm `onNavigationStart` / `onNavigationEnd` pattern is documented
 
 ### P2: Error Routes — Needed for Phase 6 template hardening
 
