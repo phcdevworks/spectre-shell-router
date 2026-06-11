@@ -37,6 +37,9 @@ Part of the [PHCDevworks Spectre shell ecosystem](https://github.com/phcdevworks
 - Query string access through `URLSearchParams`.
 - Page cleanup through optional `destroy` hooks.
 - Named routes with `router.href()` for safe path generation.
+- Per-route `meta` and an `afterNavigate` hook for titles and a11y focus management.
+- `onNavigationStart` / `onNavigationEnd` hooks for loading state.
+- `router.subscribe()` for reactive route state at the app layer.
 
 ## Requirements
 
@@ -93,6 +96,7 @@ router.navigate('/docs/getting-started?tab=api')
 type Route = {
   path: string
   name?: string // optional; enables router.href() lookup
+  meta?: Record<string, unknown> // optional; available on RouteContext.meta
   loader: () => Promise<PageModule>
 }
 
@@ -108,6 +112,9 @@ type RouterOptions = {
     context: NavigationContext,
     next: (redirect?: string) => void
   ) => void | Promise<void>
+  onNavigationStart?: (context: NavigationContext) => void
+  onNavigationEnd?: (context: NavigationContext) => void
+  afterNavigate?: (context: RouteContext) => void
 }
 
 type PageModule = {
@@ -120,7 +127,10 @@ type RouteContext = {
   params: Record<string, string>
   query: URLSearchParams
   root: HTMLElement
+  meta?: Record<string, unknown>
 }
+
+type Unsubscribe = () => void
 ```
 
 ### Router class
@@ -135,6 +145,10 @@ class Router {
   // Build a path string from a named route and optional params.
   // Throws if the name is unknown or a required :param segment has no matching key.
   href(name: string, params?: Record<string, string>): string
+
+  // Subscribe to completed navigations. Fires with the current RouteContext
+  // after every render. Returns an unsubscribe function.
+  subscribe(callback: (context: RouteContext) => void): Unsubscribe
 
   // Remove all event listeners, call destroy() on the current page, and release the root reference.
   destroy(): void
@@ -171,6 +185,85 @@ const router = new Router(routes, root, {
   },
 })
 ```
+
+### Ecosystem integration patterns
+
+**Document titles and a11y focus with `meta` + `afterNavigate`:**
+
+```ts
+const routes: Route[] = [
+  {
+    path: '/',
+    meta: { title: 'Home' },
+    loader: async () => ({
+      render({ root }) {
+        root.textContent = 'Home'
+      },
+    }),
+  },
+  {
+    path: '/docs/:slug',
+    meta: { title: 'Docs' },
+    loader: async () => ({
+      render({ params, root }) {
+        root.textContent = `Doc: ${params.slug}`
+      },
+    }),
+  },
+]
+
+const router = new Router(routes, root, {
+  afterNavigate(context) {
+    if (context.meta?.title) {
+      document.title = `${context.meta.title} — My App`
+    }
+
+    // a11y: move focus to the root after each navigation so screen readers
+    // announce the new page.
+    context.root.setAttribute('tabindex', '-1')
+    context.root.focus()
+  },
+})
+```
+
+**Loading state with `onNavigationStart` / `onNavigationEnd`:**
+
+```ts
+let navigating = false
+
+const router = new Router(routes, root, {
+  onNavigationStart() {
+    navigating = true
+    // e.g. show a loading indicator
+  },
+  onNavigationEnd() {
+    navigating = false
+    // e.g. hide a loading indicator
+  },
+})
+```
+
+At the app layer, `spectre-shell-signals` can wrap these two callbacks to expose a
+reactive `navigating$` signal that `spectre-ui` loading indicators subscribe to.
+
+**Reactive route state with `router.subscribe()`:**
+
+```ts
+import { signal } from '@phcdevworks/spectre-shell-signals'
+
+const currentRoute = signal<RouteContext | null>(null)
+
+const unsubscribe = router.subscribe((context) => {
+  currentRoute.set(context)
+})
+
+// Later, when the shell unmounts:
+// unsubscribe()
+```
+
+`router.subscribe()` is the canonical bridge between the router and
+`spectre-shell-signals` — wrap it once at the app layer to get a reactive
+`currentRoute` signal that any component can read from.
 
 ### Behavior
 

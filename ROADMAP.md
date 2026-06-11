@@ -125,13 +125,12 @@ Design-only until a concrete application need is proven. Evaluate alongside
 
 ---
 
-### P3: API Documentation — CURRENT PRIORITY — BLOCKING Phase 4 + spectre-init Phase 6
+### P3: API Documentation — Complete
 
-These APIs shipped in v1.1.0 but README examples are missing. This is the current
-work item. Nothing in Phase 4 starts until these are written. `spectre-init` Phase 6
-templates cannot scaffold these patterns without copy-able examples to reference.
+These APIs shipped in v1.1.0 and are now documented in the README with copy-able
+examples.
 
-**Unblocks:**
+**Unblocked:**
 
 - `spectre-shell-router` Phase 4 (error routes, history helpers)
 - `spectre-init` Phase 6 (lifecycle, title, loading state, plugin templates)
