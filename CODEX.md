@@ -43,7 +43,7 @@ Run and interpret the full validation gate before any release handoff.
 npm run check
 ```
 
-`npm run check` runs: typecheck → lint → build → test. All steps must pass clean.
+`npm run check` runs: typecheck → lint → build → test → check:ecosystem. All steps must pass clean.
 
 When a gate fails, Codex must:
 
@@ -120,7 +120,7 @@ Use this checklist before every release handoff to Bradley Potts.
 
 ### Pre-Release Validation
 
-- [ ] `npm run check` passes all gates clean (typecheck, lint, build, test).
+- [ ] `npm run check` passes all gates clean (typecheck, lint, build, test, check:ecosystem).
 - [ ] CI is green on the release commit or branch.
 - [ ] `dist/` artifacts are in sync with source.
 - [ ] No unexpected runtime dependencies in `package.json`.

@@ -29,33 +29,6 @@ public behavior or contract impact, and unresolved risks. Do not edit generated
 outputs directly. Do not update [CHANGELOG.md](CHANGELOG.md) unless the change
 is release-relevant.
 
-## Primary AI Developer
-
-**Claude Code** (`claude-sonnet-4-6`) is the designated primary AI developer for this
-repository, maintained on behalf of Bradley Potts at PHCDevworks. All development is driven
-through Claude Code operating from `CLAUDE.md` as the authoritative working guide. Human final
-review and commit authority rests with Bradley Potts.
-
-Claude Code does not create git commits; changes are prepared and validated, then handed off
-for human review and commit.
-
-## AI Operating Model
-
-This is the central AI coordination document for the repository. Agent-specific files may add
-tool-local guidance, but they must not override the role boundaries below.
-
-| Agent              | Role                                                                            | Authority                                          |
-| ------------------ | ------------------------------------------------------------------------------- | -------------------------------------------------- |
-| **Claude Code**    | Lead developer — primary implementation, architecture, tests                    | `CLAUDE.md`                                        |
-| **OpenAI Codex**   | Documentation, releases, production stabilization, repo hygiene                 | `CODEX.md`                                         |
-| **ChatGPT**        | Strategy, coordination, prompt design, and external review — support layer only | —                                                  |
-| **GitHub Copilot** | General development assistance (in-editor suggestions)                          | `COPILOT.md` and `.github/copilot-instructions.md` |
-| **Google Jules**   | Automated maintenance — small fixes, dependency updates, micro-patches          | `JULES.md`                                         |
-
-**Bradley Potts** holds final authority for all commits, merges, tags, publishing, and
-releases. No AI agent holds commit authority in this repository except Jules, which may commit
-bounded automated maintenance when all validation gates pass.
-
 ## Instruction Map
 
 | File                              | Audience                     | Purpose                                                            |
@@ -235,7 +208,7 @@ All agents: before marking any change done, run:
 npm run check
 ```
 
-All of typecheck, lint, build, and tests must pass.
+All of typecheck, lint, build, tests, and `check:ecosystem` must pass.
 
 ## AI Workflow (any agent)
 
