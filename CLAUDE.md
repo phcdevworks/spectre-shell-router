@@ -58,13 +58,14 @@ npm run check         # full validation gate — must pass before any handoff
 Key scripts:
 
 ```bash
-npm run check          # Full verification: typecheck + lint + build + test
+npm run check          # Full verification: typecheck + lint + build + test + check:ecosystem
 npm run typecheck      # tsc --noEmit only
 npm run lint           # ESLint
 npm run lint:fix       # ESLint with auto-fix
 npm run build          # tsc emit to dist/
 npm test -- --run      # Vitest once (no watch)
 npm run format         # Prettier across all source files
+npm run check:ecosystem  # spectre-manifest validation only
 ```
 
 `npm run check` is the gate. All must pass before handoff.
@@ -150,6 +151,7 @@ explicitly out of scope:
 
 ## Roadmap
 
-See `ROADMAP.md`. Phase 2 is complete. Phase 3 is the active phase — priorities: navigation
-subscription API (P0, unblocks spectre-shell-signals), navigating state hooks (P0), per-route
-metadata (P1), `afterNavigate` hook (P1).
+See `ROADMAP.md`. Phases 1-3 are complete. Phase 4 (Production Readiness) is the active
+phase — priorities: error routes (P0, `errorRoute` option and `onError` callback), navigation
+history helpers (P1, `router.back()` / `router.forward()` / `router.replace()`), and nested
+routing (P2, evaluation-only until a concrete need is confirmed).

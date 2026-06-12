@@ -325,7 +325,7 @@ Useful scripts:
 - `npm run lint` runs ESLint.
 - `npm test -- --run` runs the Vitest suite once.
 - `npm run build` emits declarations and JavaScript to `dist`.
-- `npm run check` runs the full verification gate (typecheck + lint + build + test).
+- `npm run check` runs the full verification gate (typecheck + lint + build + test + check:ecosystem).
 
 AI-agent coordination starts in [AGENTS.md](./AGENTS.md), with companion
 guidance in [CLAUDE.md](./CLAUDE.md), [CODEX.md](./CODEX.md),
@@ -343,7 +343,7 @@ guidance in [CLAUDE.md](./CLAUDE.md), [CODEX.md](./CODEX.md),
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md). The gate is `npm run check` — all of typecheck, lint, build, and tests must pass before opening a pull request.
+See [CONTRIBUTING.md](./CONTRIBUTING.md). The gate is `npm run check` — all of typecheck, lint, build, tests, and `check:ecosystem` must pass before opening a pull request.
 
 ## Release Notes
 
