@@ -1,6 +1,6 @@
 # COPILOT.md — spectre-shell-router
 
-## Copilot Role
+## Role Summary
 
 GitHub Copilot is a support assistant for inline coding help, small refactors,
 test suggestions, and docs/workflow support. Copilot does not own architecture
@@ -45,3 +45,8 @@ Follow the shared PR requirements in `AGENTS.md`.
 
 Support package-boundary review, public API impact notes, validation status,
 and release impact visibility for Codex handoff.
+
+## Source of Detailed Guidance
+
+Primary Copilot guidance lives in `.github/copilot-instructions.md`.
+Shared repo boundaries live in `AGENTS.md`.
