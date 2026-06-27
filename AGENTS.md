@@ -45,6 +45,29 @@ is release-relevant.
 
 ---
 
+## Upstream Requests and Roadmap Self-Expansion
+
+Full directive: project-team [AGENTS.md](../AGENTS.md) "Upstream Requests and
+Roadmap Self-Expansion." Applied to this repo:
+
+- This repo is an independent peer package — it has no upstream dependency
+  within this workspace; do not invent one.
+- Downstream repos `spectre-shell` (composes this router) and `spectre-init`
+  (scaffolds against it) may append routing-contract requests (e.g. a new
+  `subscribe()` event, navigation helper, or `Route`/`Router` type) to this
+  repo's own `TODO.md` under `## Requested by Downstream`, dated and linked
+  back to the requesting repo's TODO.md/ROADMAP.md. Keep that section visible
+  and separate from self-planned routing work.
+- This repo's own [ROADMAP.md](ROADMAP.md) may be proactively expanded with new
+  or reordered phases by the agent's own analysis — but never mark a phase
+  delivered without `npm run check` passing, and never contradict the
+  deliberate app-layer router/signals separation documented in
+  `project-shell/CLAUDE.md` (router does not import
+  `spectre-shell-signals`, and vice versa).
+- Surface any new TODO request or roadmap expansion in the handoff for Bradley
+  Potts in the same change it was made, and reflect cross-repo-relevant
+  changes in the project-team's own ROADMAP.md/TODO.md.
+
 ## Shared Source Rules
 
 These rules apply to every agent without exception.
@@ -199,6 +222,8 @@ for Spectre applications. It maps URL paths to lazy page modules and enforces th
 4. **Async loaders** — dynamic `import()` pattern for page loading
 5. **Native History API** — `pushState` / `popstate`; no hash routing by default (hash mode is a planned opt-in)
 6. **Race-condition safe** — `currentNavId` monotonic counter guards stale renders
+7. **Scripts are TypeScript** — all `scripts/` tooling is `.ts`, run via
+   `node --experimental-strip-types`; never add a new `.js`/`.mjs` script.
 
 ## Verification Gate
 
