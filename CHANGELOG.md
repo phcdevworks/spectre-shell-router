@@ -4,6 +4,13 @@ All notable changes to this project will be documented here. The format follows 
 
 ## [Unreleased]
 
+### Fixed
+
+- Added `@types/node` as a devDependency so `scripts/check-readme-version.ts`
+  resolves Node globals correctly (no functional impact — script already ran
+  fine via `node --experimental-strip-types`, this only affects editor/IDE
+  type-checking and any future widening of `tsconfig.json`'s `include`).
+
 ### Added
 
 - Added `@phcdevworks/spectre-manifest` as a devDependency. `spectre.manifest.json`
