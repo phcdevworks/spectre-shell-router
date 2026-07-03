@@ -19,7 +19,7 @@ All notable changes to this project will be documented here. The format follows 
 
 ## [1.1.0] - 2026-06-04
 
-Release Title: Router Options and Navigation Reliability
+Release Title: Phase 2 - Router Options and Navigation Reliability
 
 Contract change type: additive
 
@@ -47,7 +47,7 @@ Contract change type: additive
 
 ## [1.0.0] - 2026-04-25
 
-Release Title: Stable Router Release and Navigation Polish
+Release Title: Phase 1 - Stable Router Release and Navigation Polish
 
 ### Added
 
@@ -64,7 +64,7 @@ Release Title: Stable Router Release and Navigation Polish
 
 ## [0.0.2] - 2026-04-13
 
-Release Title: Router Class Refactor and Navigation Hardening
+Release Title: Phase 1 - Router Class Refactor and Navigation Hardening
 
 ### Added
 
@@ -82,7 +82,7 @@ Release Title: Router Class Refactor and Navigation Hardening
 
 ## [0.0.1] - 2026-02-05
 
-Release Title: Initial Router Foundation
+Release Title: Phase 1 - Initial Router Foundation
 
 ### Added
 
