@@ -811,4 +811,68 @@ describe("spectre-shell-router", () => {
       router.destroy()
     })
   })
+
+  describe("router.replace()", () => {
+    it("navigates without adding a new history entry", async () => {
+      const { Router } = await import("../src/index")
+      const render = vi.fn()
+      const routes = [
+        { path: "/", loader: async () => ({ render: vi.fn() }) },
+        { path: "/next", loader: async () => ({ render }) },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root)
+      await tick()
+      const lengthBefore = window.history.length
+
+      router.replace("/next")
+      await tick()
+
+      expect(render).toHaveBeenCalledOnce()
+      expect(window.location.pathname).toBe("/next")
+      expect(window.history.length).toBe(lengthBefore)
+      router.destroy()
+    })
+
+    it("uses a hash-prefixed URL in hash mode", async () => {
+      const { Router } = await import("../src/index")
+      const render = vi.fn()
+      const routes = [{ path: "/about", loader: async () => ({ render }) }]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const router = new Router(routes, root, { mode: "hash" })
+      router.replace("/about")
+      await tick()
+
+      expect(render).toHaveBeenCalledOnce()
+      expect(window.location.hash).toBe("#/about")
+      router.destroy()
+    })
+  })
+
+  describe("router.back() and router.forward()", () => {
+    it("delegates to the History API", async () => {
+      const { Router } = await import("../src/index")
+      const routes = [{ path: "/", loader: async () => ({ render: vi.fn() }) }]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/")
+
+      const back = vi.spyOn(window.history, "back").mockImplementation(() => {})
+      const forward = vi.spyOn(window.history, "forward").mockImplementation(() => {})
+
+      const router = new Router(routes, root)
+      router.back()
+      router.forward()
+
+      expect(back).toHaveBeenCalledOnce()
+      expect(forward).toHaveBeenCalledOnce()
+
+      router.destroy()
+      back.mockRestore()
+      forward.mockRestore()
+    })
+  })
 })

@@ -114,4 +114,97 @@ describe("Router Reliability Tests", () => {
     expect(renderCalls).toEqual(["3"])
     router.destroy()
   })
+
+  it("navigates to errorRoute when a loader throws", async () => {
+    const { Router } = await import("../src/index")
+    const onError = vi.fn()
+
+    const routes = [
+      {
+        path: "/fail",
+        loader: async (): Promise<never> => { throw new Error("Load failed") }
+      },
+      {
+        path: "/error",
+        loader: async () => ({ render: (ctx) => { ctx.root.innerHTML = "Error" } })
+      },
+      {
+        path: "/",
+        loader: async () => ({ render: (ctx) => { ctx.root.innerHTML = "Home" } })
+      }
+    ]
+
+    const root = document.createElement("div")
+    const router = new Router(routes, root, { errorRoute: "/error", onError })
+    await tick()
+
+    router.navigate("/fail")
+    await tick()
+
+    expect(root.innerHTML).toBe("Error")
+    expect(onError).toHaveBeenCalledTimes(1)
+    expect(onError.mock.calls[0][1]).toEqual({ from: "/", to: "/fail" })
+
+    router.destroy()
+  })
+
+  it("navigates to errorRoute when no route matches", async () => {
+    const { Router } = await import("../src/index")
+    const onError = vi.fn()
+
+    const routes = [
+      {
+        path: "/error",
+        loader: async () => ({ render: (ctx) => { ctx.root.innerHTML = "Error" } })
+      },
+      {
+        path: "/",
+        loader: async () => ({ render: (ctx) => { ctx.root.innerHTML = "Home" } })
+      }
+    ]
+
+    const root = document.createElement("div")
+    const router = new Router(routes, root, { errorRoute: "/error", onError })
+    await tick()
+
+    router.navigate("/does-not-exist")
+    await tick()
+
+    expect(root.innerHTML).toBe("Error")
+    expect(onError).toHaveBeenCalledTimes(1)
+
+    router.destroy()
+  })
+
+  it("clears the root instead of looping when the errorRoute itself has no match", async () => {
+    const { Router } = await import("../src/index")
+
+    const routes = [
+      { path: "/", loader: async () => ({ render: () => {} }) },
+      {
+        path: "/error",
+        loader: async (): Promise<never> => { throw new Error("Error route itself is broken") }
+      }
+    ]
+    const root = document.createElement("div")
+    const router = new Router(routes, root, { errorRoute: "/error" })
+    await tick()
+
+    router.navigate("/error")
+    await tick()
+
+    expect(root.innerHTML).toBe("")
+
+    router.destroy()
+  })
+
+  it("throws in the constructor when errorRoute does not match any route path", async () => {
+    const { Router } = await import("../src/index")
+    const routes = [{ path: "/", loader: async () => ({ render: () => {} }) }]
+    const root = document.createElement("div")
+
+    expect(() => new Router(routes, root, { errorRoute: "/missing" })).toThrow(
+      'errorRoute "/missing" does not match any route path.'
+    )
+  })
 })

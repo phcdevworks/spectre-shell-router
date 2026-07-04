@@ -26,6 +26,7 @@ export type NavigationContext = {
 export type RouterOptions = {
   mode?: 'history' | 'hash'
   scrollRestoration?: boolean
+  errorRoute?: string
   beforeNavigate?: (
     context: NavigationContext,
     next: (redirect?: string) => void,
@@ -33,6 +34,7 @@ export type RouterOptions = {
   onNavigationStart?: (context: NavigationContext) => void
   onNavigationEnd?: (context: NavigationContext) => void
   afterNavigate?: (context: RouteContext) => void
+  onError?: (error: unknown, context: NavigationContext) => void
 }
 
 export type Unsubscribe = () => void
@@ -62,6 +64,12 @@ export class Router {
     for (const route of routes) {
       if (route.name) this.nameIndex.set(route.name, route.path)
     }
+    if (
+      options.errorRoute !== undefined &&
+      !routes.some((route) => route.path === options.errorRoute)
+    ) {
+      throw new Error(`errorRoute "${options.errorRoute}" does not match any route path.`)
+    }
     this.handleNavigationBound = () => { void this.handleNavigation('pop') }
     this.handleHashChangeBound = this.handleHashChange.bind(this)
     this.handleLinkClickBound = this.handleLinkClick.bind(this)
@@ -84,6 +92,25 @@ export class Router {
     }
     history.pushState({}, '', this.mode === 'hash' ? `#${path}` : path)
     void this.handleNavigation('push')
+  }
+
+  public replace(path: string) {
+    if (!this.rootEl) {
+      throw new Error('Router has been destroyed or not initialized.')
+    }
+    if (this.scrollRestoration) {
+      history.replaceState({ ...history.state, scrollY: window.scrollY }, '')
+    }
+    history.replaceState({}, '', this.mode === 'hash' ? `#${path}` : path)
+    void this.handleNavigation('push')
+  }
+
+  public back() {
+    history.back()
+  }
+
+  public forward() {
+    history.forward()
   }
 
   public subscribe(callback: (context: RouteContext) => void): Unsubscribe {
@@ -246,9 +273,12 @@ export class Router {
       let page: PageModule
       try {
         page = await route.loader()
-      } catch {
-        // Loader failure: abandon this navigation and clear stale content.
-        if (navId === this.currentNavId && this.rootEl) {
+      } catch (error) {
+        if (navId !== this.currentNavId || !this.rootEl) return
+        this.options.onError?.(error, navContext)
+        if (this.options.errorRoute !== undefined && path !== this.options.errorRoute) {
+          this.replace(this.options.errorRoute)
+        } else {
           this.destroyCurrentPage()
           this.rootEl.innerHTML = ''
         }
@@ -283,6 +313,12 @@ export class Router {
         }
       }
 
+      return
+    }
+
+    if (this.options.errorRoute !== undefined && path !== this.options.errorRoute) {
+      this.options.onError?.(new Error(`No route matches "${path}".`), navContext)
+      this.replace(this.options.errorRoute)
       return
     }
 

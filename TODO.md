@@ -52,7 +52,7 @@ All Phase 2 items were delivered. The routing contract is stable and complete.
 ## Phase 3 — Ecosystem Integration: P0/P1/P3 Complete — Phase 4 Unblocked
 
 P0, P1, and P3 (API docs) delivered. P2 (nested routing) remains evaluation-only.
-Phase 4 (error routes, history helpers) can now begin.
+Phase 4 error routes and history helpers are now implemented — see Phase 4 below.
 
 ### P0: Signals Bridge
 
@@ -99,7 +99,7 @@ Phase 6 templates can scaffold these patterns using the documented examples.
 
 Unblocked:
 
-- This repo: Phase 4 can start (error routes, history helpers)
+- This repo: Phase 4 P0/P1 delivered (error routes, history helpers)
 - `spectre-init`: Phase 6 template modernization (lifecycle, title, loading, plugin)
 - `spectre-shell`: P2.5 release readiness (templates need stable examples first)
 
@@ -132,21 +132,21 @@ Unblocked:
 
 ---
 
-## Phase 4 — Production Readiness: Active
+## Phase 4 — Production Readiness: P0/P1 Complete — README/CHANGELOG Pending (Codex)
 
-Phase 3 core APIs are delivered. Phase 4 closes remaining production gaps: deterministic error
-handling, navigation history helpers, and nested outlet support when a concrete need is proven.
+Error routes and navigation history helpers are implemented and tested. Nested outlet
+support (P2) remains evaluation-only until a concrete need is proven.
 
 ### P0: Error Routes
 
-- [ ] **`errorRoute` option on `RouterOptions`**
-  - Files: `src/index.ts`, `tests/reliability.test.ts`, `README.md`
+- [x] **`errorRoute` option on `RouterOptions`**
+  - Files: `src/index.ts`, `tests/reliability.test.ts` — `README.md` still needed (Codex)
   - Acceptance: when a loader throws or no route matches, the router navigates to `errorRoute`
     rather than silently clearing the outlet; `errorRoute` path must exist in the route list
   - Why: silent root-clearing gives users a blank page with no feedback; named error routes
     make failure states explicit and testable
 
-- [ ] **`onError(error, context)` callback**
+- [x] **`onError(error, context)` callback**
   - Files: `src/index.ts`, `tests/reliability.test.ts`
   - Acceptance: optional callback on constructor options; fires when a loader throws;
     apps can log, report, or handle programmatically without requiring a redirect
@@ -154,15 +154,15 @@ handling, navigation history helpers, and nested outlet support when a concrete 
 
 ### P1: Navigation History Helpers
 
-- [ ] **`router.back()` and `router.forward()`**
+- [x] **`router.back()` and `router.forward()`**
   - Files: `src/index.ts`, `tests/router.test.ts`
   - Acceptance: thin wrappers around `history.back()` and `history.forward()`; consistent
     with the existing `navigate()` contract
   - Why: exposes common navigation actions as first-class router methods so callers do not
     reach around the router to the History API directly
 
-- [ ] **`router.replace(path)`**
-  - Files: `src/index.ts`, `tests/router.test.ts`, `README.md`
+- [x] **`router.replace(path)`**
+  - Files: `src/index.ts`, `tests/router.test.ts` — `README.md` still needed (Codex)
   - Acceptance: navigates to `path` without adding a new history entry (`replaceState`);
     race-condition guard applies as with `navigate()`
   - Why: redirect flows (post-login, form submission) need replace-not-push semantics
@@ -185,9 +185,10 @@ handling, navigation history helpers, and nested outlet support when a concrete 
 3. ~~Per-route metadata~~ ✓
 4. ~~`afterNavigate` hook~~ ✓
 5. ~~Phase 3 P3 API docs~~ ✓
-6. **Error routes** ← current — Phase 4 P0
-7. Navigation history helpers — Phase 4 P1 (back/forward/replace)
-8. Nested routing — only when a concrete application need is proven
+6. ~~Error routes~~ ✓ — Phase 4 P0
+7. ~~Navigation history helpers~~ ✓ — Phase 4 P1 (back/forward/replace)
+8. **README/CHANGELOG updates for Phase 4 P0/P1** ← current (Codex)
+9. Nested routing — only when a concrete application need is proven
 
 ---
 
@@ -217,8 +218,8 @@ they are stable and covered in README examples so spectre-init can reference the
 
 ### P2: Error Routes — Needed for Phase 6 template hardening
 
-- [ ] `errorRoute` option on `RouterOptions` (Phase 4 P0) — when shipped, spectre-init shell-app template should add an error route
-- [ ] `onError(error, context)` callback — when shipped, document the pattern for template consumers
+- [x] `errorRoute` option on `RouterOptions` (Phase 4 P0) — implemented; spectre-init shell-app template can now add an error route
+- [x] `onError(error, context)` callback — implemented; document the pattern for template consumers once README lands
 
 ## Explicitly Out of Scope
 
