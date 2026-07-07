@@ -132,22 +132,23 @@ Unblocked:
 
 ---
 
-## Phase 4 — Production Readiness: P0/P1 Complete — README/CHANGELOG Pending (Codex)
+## Phase 4 — Production Readiness: P0/P1 Complete, Documented
 
-Error routes and navigation history helpers are implemented and tested. Nested outlet
-support (P2) remains evaluation-only until a concrete need is proven.
+Error routes and navigation history helpers are implemented, tested, and documented
+in README.md/CHANGELOG.md. Nested outlet support (P2) remains evaluation-only until
+a concrete need is proven.
 
 ### P0: Error Routes
 
 - [x] **`errorRoute` option on `RouterOptions`**
-  - Files: `src/index.ts`, `tests/reliability.test.ts` — `README.md` still needed (Codex)
+  - Files: `src/index.ts`, `tests/reliability.test.ts`, `README.md`, `CHANGELOG.md`
   - Acceptance: when a loader throws or no route matches, the router navigates to `errorRoute`
     rather than silently clearing the outlet; `errorRoute` path must exist in the route list
   - Why: silent root-clearing gives users a blank page with no feedback; named error routes
     make failure states explicit and testable
 
 - [x] **`onError(error, context)` callback**
-  - Files: `src/index.ts`, `tests/reliability.test.ts`
+  - Files: `src/index.ts`, `tests/reliability.test.ts`, `README.md`, `CHANGELOG.md`
   - Acceptance: optional callback on constructor options; fires when a loader throws;
     apps can log, report, or handle programmatically without requiring a redirect
   - Why: not all error handling is a redirect — apps need a seam for error telemetry
@@ -155,14 +156,14 @@ support (P2) remains evaluation-only until a concrete need is proven.
 ### P1: Navigation History Helpers
 
 - [x] **`router.back()` and `router.forward()`**
-  - Files: `src/index.ts`, `tests/router.test.ts`
+  - Files: `src/index.ts`, `tests/router.test.ts`, `README.md`, `CHANGELOG.md`
   - Acceptance: thin wrappers around `history.back()` and `history.forward()`; consistent
     with the existing `navigate()` contract
   - Why: exposes common navigation actions as first-class router methods so callers do not
     reach around the router to the History API directly
 
 - [x] **`router.replace(path)`**
-  - Files: `src/index.ts`, `tests/router.test.ts` — `README.md` still needed (Codex)
+  - Files: `src/index.ts`, `tests/router.test.ts`, `README.md`, `CHANGELOG.md`
   - Acceptance: navigates to `path` without adding a new history entry (`replaceState`);
     race-condition guard applies as with `navigate()`
   - Why: redirect flows (post-login, form submission) need replace-not-push semantics
@@ -187,8 +188,9 @@ support (P2) remains evaluation-only until a concrete need is proven.
 5. ~~Phase 3 P3 API docs~~ ✓
 6. ~~Error routes~~ ✓ — Phase 4 P0
 7. ~~Navigation history helpers~~ ✓ — Phase 4 P1 (back/forward/replace)
-8. **README/CHANGELOG updates for Phase 4 P0/P1** ← current (Codex)
-9. Nested routing — only when a concrete application need is proven
+8. ~~README/CHANGELOG updates for Phase 4 P0/P1~~ ✓
+9. **Release prep** ← current — version bump, tag, publish (human action)
+10. Nested routing — only when a concrete application need is proven
 
 ---
 

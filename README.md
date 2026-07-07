@@ -7,7 +7,7 @@
 | Project team | `project-shell` |
 | Repository role | Spectre client-side router |
 | Package/artifact | `@phcdevworks/spectre-shell-router` |
-| Current version/status | 1.1.0 |
+| Current version/status | 1.2.0 |
 
 ## Standard Workflow
 
@@ -72,6 +72,8 @@ Part of the [PHCDevworks Spectre shell ecosystem](https://github.com/phcdevworks
 - Per-route `meta` and an `afterNavigate` hook for titles and a11y focus management.
 - `onNavigationStart` / `onNavigationEnd` hooks for loading state.
 - `router.subscribe()` for reactive route state at the app layer.
+- `errorRoute` and `onError` for deterministic error handling instead of a silently cleared outlet.
+- `router.back()`, `router.forward()`, and `router.replace()` navigation history helpers.
 
 ## Requirements
 
@@ -140,6 +142,7 @@ type NavigationContext = {
 type RouterOptions = {
   mode?: 'history' | 'hash'
   scrollRestoration?: boolean
+  errorRoute?: string
   beforeNavigate?: (
     context: NavigationContext,
     next: (redirect?: string) => void
@@ -147,6 +150,7 @@ type RouterOptions = {
   onNavigationStart?: (context: NavigationContext) => void
   onNavigationEnd?: (context: NavigationContext) => void
   afterNavigate?: (context: RouteContext) => void
+  onError?: (error: unknown, context: NavigationContext) => void
 }
 
 type PageModule = {
@@ -173,6 +177,13 @@ class Router {
 
   // Push a new path onto history and navigate to it.
   navigate(path: string): void
+
+  // Navigate to path without adding a new history entry (uses replaceState).
+  replace(path: string): void
+
+  // Thin wrappers around history.back() / history.forward().
+  back(): void
+  forward(): void
 
   // Build a path string from a named route and optional params.
   // Throws if the name is unknown or a required :param segment has no matching key.
@@ -297,12 +308,49 @@ const unsubscribe = router.subscribe((context) => {
 `spectre-shell-signals` — wrap it once at the app layer to get a reactive
 `currentRoute` signal that any component can read from.
 
+**Deterministic error handling with `errorRoute` / `onError`:**
+
+```ts
+const routes: Route[] = [
+  { path: '/', loader: async () => ({ render({ root }) { root.textContent = 'Home' } }) },
+  {
+    path: '/error',
+    loader: async () => ({ render({ root }) { root.textContent = 'Something went wrong.' } }),
+  },
+]
+
+const router = new Router(routes, root, {
+  errorRoute: '/error',
+  onError(error, context) {
+    console.error(`Navigation to "${context.to}" failed:`, error)
+  },
+})
+```
+
+When a `loader` throws or no route matches, the router navigates to `errorRoute`
+(via `replace()`, so the failing URL is not pushed onto history) instead of
+silently clearing the outlet. `onError` fires first regardless of whether
+`errorRoute` is configured, so apps can log or report errors without a redirect.
+`errorRoute` must match an existing route path or the constructor throws.
+
+**Navigation history helpers:**
+
+```ts
+router.replace('/login') // navigate without adding a history entry
+router.back()            // wraps history.back()
+router.forward()         // wraps history.forward()
+```
+
 ### Behavior
 
 - `destroy()` on the current page is always called before the next `render()` runs.
-- If a `loader` throws, the root is cleared and the navigation is silently abandoned.
+- If a `loader` throws: `onError` fires (if configured), then the router
+  navigates to `errorRoute` if configured and the failing path is not already
+  `errorRoute`; otherwise the root is cleared and the navigation is abandoned.
 - If a faster navigation supersedes a pending one, the stale result is discarded (race-safe via monotonic counter).
-- If no route matches, the root is cleared and `destroy()` is called on the current page.
+- If no route matches: `onError` fires (if configured), then the router
+  navigates to `errorRoute` if configured and the unmatched path is not already
+  `errorRoute`; otherwise the root is cleared and `destroy()` is called on the current page.
 - If `beforeNavigate` does not call `next()`, navigation is cancelled and the URL reverts to the current route.
 - If `beforeNavigate` calls `next('/path')`, the router redirects to that path.
 - Same-domain `<a>` clicks are intercepted automatically; modified clicks (ctrl, meta, shift, alt) and external links pass through.
