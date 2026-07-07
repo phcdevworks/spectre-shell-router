@@ -132,7 +132,7 @@ examples.
 
 **Unblocked:**
 
-- `spectre-shell-router` Phase 4 (error routes, history helpers)
+- `spectre-shell-router` Phase 4 P0/P1 (error routes, history helpers) — delivered, see below
 - `spectre-init` Phase 6 (lifecycle, title, loading state, plugin templates)
 - `spectre-shell` P2.5 release (can ship once templates have stable examples)
 
@@ -166,30 +166,31 @@ Add a README example showing:
 
 ## 4. Phase 4 — Production Readiness
 
-The routing contract will be complete after Phase 3. Phase 4 closes remaining gaps that
-surface in real production applications: explicit error handling, navigation history helpers,
-and nested outlet support (promoted from Phase 3 P2 when a concrete need is confirmed).
+Phase 4 closes remaining gaps that surface in real production applications: explicit
+error handling, navigation history helpers, and nested outlet support (promoted from
+Phase 3 P2 when a concrete need is confirmed). P0 and P1 are implemented and tested;
+README/CHANGELOG documentation is complete as of this update.
 
-### P0: Error Routes
+### P0: Error Routes — Delivered
 
 Provide deterministic, user-visible error handling instead of silent root-clearing.
 
-- Add an optional `errorRoute` path to `RouterOptions`. When a loader throws or no route
-  matches, the router navigates to `errorRoute` rather than silently clearing the outlet.
-- Add an optional `onError(error, context)` callback for apps that want to handle errors
-  programmatically without a redirect.
-- Cover error route behavior in `reliability.test.ts`.
+- `errorRoute` option on `RouterOptions`. When a loader throws or no route matches, the
+  router navigates to `errorRoute` (via `replace()`) rather than silently clearing the
+  outlet. Throws at construction time if `errorRoute` does not match an existing route path.
+- `onError(error, context)` callback for apps that want to handle errors programmatically
+  without a redirect. Fires regardless of whether `errorRoute` is configured.
+- Covered in `reliability.test.ts` and `router.test.ts`.
 
 ---
 
-### P1: Navigation History Helpers
+### P1: Navigation History Helpers — Delivered
 
 Expose History API navigation as first-class router methods.
 
-- Add `router.back()` and `router.forward()` wrappers around `history.back()` and
-  `history.forward()`.
-- Add `router.replace(path)` — navigates to `path` without adding a new history entry.
-- Consistent with the existing `router.navigate()` contract and race-condition guard.
+- `router.back()` and `router.forward()` wrap `history.back()` and `history.forward()`.
+- `router.replace(path)` navigates to `path` without adding a new history entry
+  (`history.replaceState`), with the same race-condition guard as `navigate()`.
 
 ---
 
@@ -210,9 +211,10 @@ Support child routes rendered inside parent outlet elements.
 3. ~~Per-route metadata~~ ✓
 4. ~~`afterNavigate` hook~~ ✓
 5. ~~Phase 3 P3 API docs~~ ✓
-6. **Error routes** ← current — closes the silent-failure gap; Phase 4 P0
-7. Navigation history helpers — ergonomic, low-risk, additive; Phase 4 P1
-8. Nested routing — only when a concrete app need is confirmed
+6. ~~Error routes~~ ✓ — Phase 4 P0
+7. ~~Navigation history helpers~~ ✓ — Phase 4 P1
+8. **Release prep** ← current — version bump, tag, publish (human action)
+9. Nested routing — only when a concrete app need is confirmed; Phase 4 P2
 
 ---
 

@@ -4,18 +4,37 @@ All notable changes to this project will be documented here. The format follows 
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-07
+
+Release Title: Phase 4 - Production Readiness and Ecosystem Manifest
+
+Contract change type: additive
+
+### Added
+
+- **`errorRoute` option on `RouterOptions`**: when a `loader` throws or no
+  route matches, the router navigates to `errorRoute` (via `replace()`)
+  instead of silently clearing the outlet. Throws at construction time if
+  `errorRoute` does not match an existing route path.
+- **`onError(error, context)` callback**: fires whenever a `loader` throws or
+  no route matches, regardless of whether `errorRoute` is configured, so apps
+  can log or report errors without requiring a redirect.
+- **`router.back()` / `router.forward()`**: thin wrappers around
+  `history.back()` / `history.forward()`.
+- **`router.replace(path)`**: navigates to `path` using `history.replaceState`
+  instead of `pushState`, so no new history entry is added. Same
+  race-condition guard as `navigate()`.
+- Added `@phcdevworks/spectre-manifest` as a devDependency.
+  `spectre.manifest.json` at the repo root declares this package's ecosystem
+  role, layer, exports, and allowed dependency targets. `check:ecosystem`
+  validates it in the check pipeline.
+
 ### Fixed
 
 - Added `@types/node` as a devDependency so `scripts/check-readme-version.ts`
   resolves Node globals correctly (no functional impact — script already ran
   fine via `node --experimental-strip-types`, this only affects editor/IDE
   type-checking and any future widening of `tsconfig.json`'s `include`).
-
-### Added
-
-- Added `@phcdevworks/spectre-manifest` as a devDependency. `spectre.manifest.json`
-  at the repo root declares this package's ecosystem role, layer, exports, and
-  allowed dependency targets. `check:ecosystem` validates it in the check pipeline.
 
 ## [1.1.0] - 2026-06-04
 
@@ -89,7 +108,8 @@ Release Title: Phase 1 - Initial Router Foundation
 - **Initial Release**: Minimal, framework-agnostic client-side router for Spectre-based applications.
 - **Features**: Includes string-based path matching, dynamic parameter extraction, and native History API integration.
 
-[unreleased]: https://github.com/phcdevworks/spectre-shell-router/compare/1.1.0...HEAD
+[unreleased]: https://github.com/phcdevworks/spectre-shell-router/compare/1.2.0...HEAD
+[1.2.0]: https://github.com/phcdevworks/spectre-shell-router/compare/1.1.0...1.2.0
 [1.1.0]: https://github.com/phcdevworks/spectre-shell-router/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/phcdevworks/spectre-shell-router/compare/0.0.2...1.0.0
 [0.0.2]: https://github.com/phcdevworks/spectre-shell-router/compare/0.0.1...0.0.2
