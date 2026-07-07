@@ -168,8 +168,8 @@ Add a README example showing:
 
 Phase 4 closes remaining gaps that surface in real production applications: explicit
 error handling, navigation history helpers, and nested outlet support (promoted from
-Phase 3 P2 when a concrete need is confirmed). P0 and P1 are implemented and tested;
-README/CHANGELOG documentation is complete as of this update.
+Phase 3 P2 when a concrete need is confirmed). P0 and P1 shipped in the `1.2.0` release
+(2026-07-07); README/CHANGELOG documentation is complete.
 
 ### P0: Error Routes — Delivered
 
@@ -213,8 +213,8 @@ Support child routes rendered inside parent outlet elements.
 5. ~~Phase 3 P3 API docs~~ ✓
 6. ~~Error routes~~ ✓ — Phase 4 P0
 7. ~~Navigation history helpers~~ ✓ — Phase 4 P1
-8. **Release prep** ← current — version bump, tag, publish (human action)
-9. Nested routing — only when a concrete app need is confirmed; Phase 4 P2
+8. ~~Release prep~~ ✓ — published as `1.2.0` (2026-07-07)
+9. **Nested routing** ← only open item — only when a concrete app need is confirmed; Phase 4 P2
 
 ---
 
