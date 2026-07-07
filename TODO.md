@@ -52,7 +52,7 @@ All Phase 2 items were delivered. The routing contract is stable and complete.
 ## Phase 3 — Ecosystem Integration: P0/P1/P3 Complete — Phase 4 Unblocked
 
 P0, P1, and P3 (API docs) delivered. P2 (nested routing) remains evaluation-only.
-Phase 4 error routes and history helpers are now implemented — see Phase 4 below.
+Phase 4 error routes and history helpers shipped in `1.2.0` — see Phase 4 below.
 
 ### P0: Signals Bridge
 
@@ -132,11 +132,11 @@ Unblocked:
 
 ---
 
-## Phase 4 — Production Readiness: P0/P1 Complete, Documented
+## Phase 4 — Production Readiness: P0/P1 Released in 1.2.0
 
-Error routes and navigation history helpers are implemented, tested, and documented
-in README.md/CHANGELOG.md. Nested outlet support (P2) remains evaluation-only until
-a concrete need is proven.
+Error routes and navigation history helpers are implemented, tested, documented, and
+published in the `1.2.0` release (2026-07-07). Nested outlet support (P2) remains
+evaluation-only until a concrete need is proven.
 
 ### P0: Error Routes
 
@@ -189,10 +189,8 @@ a concrete need is proven.
 6. ~~Error routes~~ ✓ — Phase 4 P0
 7. ~~Navigation history helpers~~ ✓ — Phase 4 P1 (back/forward/replace)
 8. ~~README/CHANGELOG updates for Phase 4 P0/P1~~ ✓
-9. **Release prep** ← current — version bump, tag, publish (human action)
-10. Nested routing — only when a concrete application need is proven
-
----
+9. ~~Release prep~~ ✓ — published as `1.2.0` (2026-07-07)
+10. **Nested routing** ← only open item — only when a concrete application need is proven
 
 ---
 
