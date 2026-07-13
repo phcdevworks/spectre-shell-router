@@ -1,5 +1,15 @@
 # @phcdevworks/spectre-shell-router
 
+`@phcdevworks/spectre-shell-router` is the client-side router package of the
+Spectre system. It maps URL paths to lazy page modules, renders into a root
+element, and keeps navigation behavior framework-agnostic for Spectre-based
+applications.
+
+Maintained by [PHCDevworks](https://go.phcdev.co). It is an independent peer
+package with zero runtime dependencies, deliberately separate from
+`spectre-shell-signals`, and is consumed by `spectre-shell` (which composes
+it) and `spectre-init` (which scaffolds new apps against it).
+
 ## Repository Snapshot
 
 | Field | Value |

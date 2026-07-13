@@ -1,4 +1,4 @@
-# AGENTS.md — spectre-shell-router
+# AGENTS.md - spectre-shell-router
 
 ## Repository Snapshot
 
@@ -86,80 +86,10 @@ These rules apply to every agent without exception.
 
 ## Agent-Specific Guides
 
-- `CLAUDE.md` — primary development authority and implementation workflow.
-- `CODEX.md` — documentation, release, stabilization, and repo hygiene workflow.
-- `JULES.md` — bounded automated maintenance workflow.
-- `COPILOT.md` and `.github/copilot-instructions.md` — support-assistant workflow.
-
----
-
-## Claude Code — Lead Developer
-
-Claude Code (`claude-sonnet-4-6`) is the designated lead developer. All primary implementation
-work is driven through Claude Code operating from `CLAUDE.md` as its authoritative working guide.
-
-**Owns:**
-
-- All feature implementation and refactoring in `src/index.ts`
-- Test coverage across `tests/`
-- Architecture decisions within the router boundary
-- Final validation before handoff (`npm run check` must pass)
-
-**Does not own:** documentation publishing, release versioning, changelog authorship, or
-dependency bump PRs.
-
----
-
-## OpenAI Codex — Documentation & Releases
-
-Codex handles documentation quality, release preparation, production stabilization, repo
-hygiene, config standardization, and release-readiness checks. Codex operates from `AGENTS.md`
-and `CODEX.md`.
-
-**Owns:**
-
-- `README.md`, `CHANGELOG.md`, `ROADMAP.md`, `CONTRIBUTING.md`, and other root documentation
-- Release preparation: version bumps in `package.json`, CHANGELOG entries, and release notes
-- Production stabilization: reviewing release-readiness, flagging regressions, ensuring the gate passes
-- Repo hygiene: consistent formatting, removing stale content, keeping docs current with code
-- PR and issue template maintenance (`.github/`)
-
-**Does not own:** implementation in `src/`, test authorship, architecture decisions, or
-deployment.
-
----
-
-## GitHub Copilot — Development Assistance
-
-Copilot provides in-editor code suggestions and assists developers during active coding
-sessions. See `.github/copilot-instructions.md` for Copilot-specific guidance.
-
-**Supports:** inline completions, small code suggestions, test suggestions, TypeScript/API
-hints, refactor suggestions, pattern-aware implementation help, and developer productivity
-inside the IDE.
-
-**Owns:** nothing directly — suggestions only, human-reviewed before acceptance.
-
-**Does not own:** lead implementation decisions, architecture direction, release coordination,
-production stabilization ownership, repo-wide AI governance, automated maintenance workflows,
-or commit authority.
-
----
-
-## Google Jules — Automated Maintenance
-
-Jules handles small, automated maintenance tasks that do not require architectural judgment.
-
-**Owns:**
-
-- Dependency version bumps (coordinated with Dependabot schedules in `.github/dependabot.yml`)
-- Small config file corrections (whitespace, key ordering, obvious typos in non-source files)
-- Mechanical doc fixes (broken links, formatting drift in markdown)
-
-**Jules limits:** Jules must not touch `src/index.ts` for anything beyond whitespace or import
-order. Any change to routing logic, types, or the public API requires Claude Code.
-
-**Does not own:** feature work, API changes, test rewrites, or release decisions.
+- `CLAUDE.md` - primary development authority and implementation workflow.
+- `CODEX.md` - documentation, release, stabilization, and repo hygiene workflow.
+- `JULES.md` - bounded automated maintenance workflow.
+- `COPILOT.md` and `.github/copilot-instructions.md` - support-assistant workflow.
 
 ---
 

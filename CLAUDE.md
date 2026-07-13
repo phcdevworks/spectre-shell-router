@@ -1,4 +1,4 @@
-# CLAUDE.md — spectre-shell-router
+# CLAUDE.md - spectre-shell-router
 
 ## Project Identity
 
