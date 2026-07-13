@@ -1,7 +1,7 @@
 {
   "name": "@phcdevworks/spectre-shell-router",
   "version": "1.2.0",
-  "description": "Minimal, framework-agnostic client-side router for Spectre-based applications.",
+  "description": "@phcdevworks/spectre-shell-router is the client-side router package of the Spectre system. It maps URL paths to lazy page modules, renders into a root element, and keeps navigation behavior framework-agnostic for Spectre-based applications.",
   "keywords": [
     "phcdevworks",
     "spectre",
@@ -17,7 +17,7 @@
   "author": "PHCDevworks",
   "license": "MIT",
   "type": "module",
-  "packageManager": "npm@11.18.0",
+  "packageManager": "npm@12.0.1",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -65,13 +65,13 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@phcdevworks/spectre-manifest": "^1.0.0",
-    "@types/node": "^26.1.0",
-    "eslint": "^10.6.0",
+    "@phcdevworks/spectre-manifest": "^1.1.0",
+    "@types/node": "^26.1.1",
+    "eslint": "^10.7.0",
     "globals": "^17.7.0",
     "jiti": "^2.7.0",
     "jsdom": "^29.1.1",
-    "prettier": "^3.9.4",
+    "prettier": "^3.9.5",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.63.0",
     "vitest": "^4.1.10"

@@ -1,4 +1,4 @@
-# CODEX.md — spectre-shell-router
+# CODEX.md - spectre-shell-router
 
 ## Role
 
