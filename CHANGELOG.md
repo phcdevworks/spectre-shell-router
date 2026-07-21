@@ -4,6 +4,18 @@ All notable changes to this project will be documented here. The format follows 
 
 ## [Unreleased]
 
+Contract change type: additive
+
+### Changed
+
+- Added a `typescript` peer dependency range, `^5.0 || ^6.0 || ^7.0`, adding
+  TypeScript 7 support alongside TypeScript 6. Internal tooling
+  (ESLint/typescript-eslint) runs against TypeScript 6 via an
+  `npm:@typescript/typescript6` alias since `typescript-eslint` does not yet
+  support TypeScript 7's programmatic API; TypeScript 7's native compiler is
+  available via the `@typescript/native` devDependency alias. Bumped
+  `typescript-eslint` to `^8.65.0`.
+
 ## [1.2.0] - 2026-07-07
 
 Release Title: Phase 4 - Production Readiness and Ecosystem Manifest
