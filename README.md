@@ -17,7 +17,7 @@ it) and `spectre-init` (which scaffolds new apps against it).
 | Project team | `project-shell` |
 | Repository role | Spectre client-side router |
 | Package/artifact | `@phcdevworks/spectre-shell-router` |
-| Current version/status | 1.2.0 |
+| Current version/status | 1.3.0 |
 
 ## Standard Workflow
 

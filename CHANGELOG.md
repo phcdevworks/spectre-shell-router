@@ -4,6 +4,10 @@ All notable changes to this project will be documented here. The format follows 
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-07-21
+
+Release Title: TypeScript 7 Compatibility
+
 Contract change type: additive
 
 ### Changed
@@ -120,7 +124,8 @@ Release Title: Phase 1 - Initial Router Foundation
 - **Initial Release**: Minimal, framework-agnostic client-side router for Spectre-based applications.
 - **Features**: Includes string-based path matching, dynamic parameter extraction, and native History API integration.
 
-[unreleased]: https://github.com/phcdevworks/spectre-shell-router/compare/1.2.0...HEAD
+[unreleased]: https://github.com/phcdevworks/spectre-shell-router/compare/1.3.0...HEAD
+[1.3.0]: https://github.com/phcdevworks/spectre-shell-router/compare/1.2.0...1.3.0
 [1.2.0]: https://github.com/phcdevworks/spectre-shell-router/compare/1.1.0...1.2.0
 [1.1.0]: https://github.com/phcdevworks/spectre-shell-router/compare/1.0.0...1.1.0
 [1.0.0]: https://github.com/phcdevworks/spectre-shell-router/compare/0.0.2...1.0.0
