@@ -6,7 +6,7 @@ All notable changes to this project will be documented here. The format follows 
 
 ## [1.3.0] - 2026-07-21
 
-Release Title: TypeScript 7 Compatibility
+Release Title: Phase 4 - TypeScript 7 Compatibility
 
 Contract change type: additive
 
