@@ -18,14 +18,10 @@ Read `CLAUDE.md` for package boundaries, architecture, and implementation standa
 
 ## Copilot Does Not Own
 
-- Lead implementation decisions
-- Architecture direction or scope changes
-- Release coordination, versioning, or changelog ownership
-- Production stabilization ownership
-- Repo-wide AI governance
-- Automated maintenance workflows
-- Config standardization ownership
-- Commit, push, tag, or publish authority
+Lead implementation decisions, architecture direction, release coordination,
+production stabilization, repo-wide AI governance, automated maintenance
+workflows, config standardization, or commit/push/tag/publish authority. Full
+roster and authority table: [AGENTS.md](../AGENTS.md).
 
 ## Key constraints for suggestions
 

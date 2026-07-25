@@ -8,10 +8,9 @@ or release governance.
 
 ## Authority Boundaries
 
-Agent roster, role authority, edit permissions, and package scope boundaries all live in
-`AGENTS.md`. Read it before suggesting any change. Claude Code is the lead implementation
-owner; Codex owns documentation, releases, and repo hygiene; Jules handles automated
-micro-maintenance.
+Full roster and authority table: [AGENTS.md](AGENTS.md). Read it before
+suggesting any change. Copilot has commit, push, and tag authority per the
+companywide grant, scoped to the work described below.
 
 ## Allowed Work
 
@@ -24,7 +23,7 @@ micro-maintenance.
 
 - Do not replace Claude Code as lead implementation owner.
 - Do not override Codex release-readiness findings.
-- Do not publish, merge, tag, or release.
+- Do not publish packages, merge PRs, or cut releases.
 - Do not broaden package scope.
 
 ## Validation

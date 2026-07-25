@@ -14,15 +14,17 @@ This file is the authoritative guide for Claude Code operating in this repositor
 
 ## Multi-Agent Team
 
-`AGENTS.md` is the shared guide for the agent roster, edit boundaries, PR requirements, and
-coordination rules. Claude Code is the lead implementation authority for all routing behavior,
-source changes, and architecture. Resolve scope conflicts by referencing `AGENTS.md` first.
+Full roster, authority table, and PR requirements: [AGENTS.md](AGENTS.md).
+Claude Code is the lead implementation authority for all routing behavior,
+source changes, and architecture. Resolve scope conflicts by referencing
+`AGENTS.md` first.
 
 ## Commit Policy
 
-Claude Code does **not** create git commits, push branches, create tags, merge pull requests,
-publish packages, or create releases in this repository. Changes are prepared and validated but
-left for human review and approval.
+See [AGENTS.md](AGENTS.md) for the full grant of authority. Changes are
+validated, then staged, committed, tagged, and pushed without per-action
+confirmation. Publishing packages and creating releases remain with Bradley
+Potts.
 
 ## Pull Request Creation
 

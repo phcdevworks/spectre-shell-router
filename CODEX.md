@@ -5,31 +5,27 @@
 Codex is the release, documentation, production stabilization, repo hygiene, refactor review,
 and configuration standardization agent for `@phcdevworks/spectre-shell-router`.
 
-Claude Code is the lead developer (`CLAUDE.md`). Codex keeps Claude Code's work
-production-ready. Human final review, release decisions, tagging, and publishing remain with
-Bradley Potts.
-
-Codex does not commit by default. Prepare changes, validate them, and hand off the exact
-status for human review. Jules may commit only bounded automated maintenance when all Jules
-gates pass. Copilot provides assistance and does not own decisions.
+Full roster and authority table: [AGENTS.md](AGENTS.md). Codex keeps Claude
+Code's work production-ready. Human final review, release decisions, tagging,
+and publishing remain with Bradley Potts. Codex has commit, push, and tag
+authority for its own scope of work — validate changes, then stage, commit,
+and push.
 
 ## Operating Principles
 
-1. Defer to `CLAUDE.md` for repository-specific development authority.
-2. Preserve the package boundary: routing only, zero runtime dependencies, browser APIs only.
-3. Keep changes conservative, focused, production-safe, and easy to review.
-4. Do not broaden architecture or introduce new product scope.
-5. Do not weaken Claude Code's lead developer role or expand Jules beyond small automated maintenance.
-6. Do not create commits, pushes, tags, merges, packages, or releases unless Bradley explicitly asks.
+1. Preserve the package boundary: routing only, zero runtime dependencies, browser APIs only.
+2. Keep changes conservative, focused, production-safe, and easy to review.
+3. Do not broaden architecture or introduce new product scope.
+4. Commit and push within Codex's own scope of work; do not merge PRs,
+   publish packages, or cut releases unless Bradley explicitly asks.
 
 ## Entry Point
 
 At the start of any Codex session:
 
-1. Read `AGENTS.md` for shared repository boundaries.
-2. Read `CLAUDE.md` for development authority and project rules.
-3. Read this file for Codex-specific procedures.
-4. Check `CHANGELOG.md [Unreleased]` for pending work and release classification.
+1. Read `CLAUDE.md` for development authority and project rules.
+2. Read this file for Codex-specific procedures.
+3. Check `CHANGELOG.md [Unreleased]` for pending work and release classification.
 
 ---
 
@@ -70,10 +66,9 @@ Audit sequence:
 
 1. `README.md` — must accurately describe all public API types and behavior.
 2. `CHANGELOG.md` — must follow Keep a Changelog format with version links at the bottom.
-3. `AGENTS.md` — must accurately describe the agent roster, roles, and authority split.
-4. `CLAUDE.md`, `CODEX.md`, `JULES.md`, `COPILOT.md` — must stay internally consistent and
-   agree on the authority hierarchy.
-5. `ROADMAP.md` — completed phases marked, active phase current.
+3. `CLAUDE.md`, `CODEX.md`, `JULES.md`, `COPILOT.md` — must stay internally consistent and
+   agree with `AGENTS.md`'s authority hierarchy.
+4. `ROADMAP.md` — completed phases marked, active phase current.
 
 Do not expand documentation into application state, adapter behavior, or framework-specific
 concerns. This package owns routing only.
@@ -193,8 +188,9 @@ Codex may inspect git status and diffs freely. Codex must not reset, discard, or
 changes it did not make. Existing local edits are assumed to belong to Bradley Potts, Claude
 Code, or another active process.
 
-Codex does not commit by default. Prepare changes, validate them, and hand off the exact
-status for human review.
+Codex validates changes, then stages, commits, and pushes them within its own
+scope of work. Codex does not publish or merge PRs; those stay gated per
+"Role" above.
 
 ---
 

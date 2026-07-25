@@ -7,9 +7,8 @@ Google Jules is the scheduled maintenance agent for
 that keeps the router package healthy without taking over implementation or
 release ownership.
 
-Claude Code remains the lead implementation agent. Codex owns documentation,
-release readiness, production stabilization, repo hygiene, and config
-standardization. Bradley Potts remains the final release and merge authority.
+Full roster and authority table: [AGENTS.md](AGENTS.md). Bradley Potts
+remains the final release and merge authority.
 
 ## Allowed Maintenance
 
