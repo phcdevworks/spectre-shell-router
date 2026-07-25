@@ -125,10 +125,12 @@ This gives Codex and Bradley a clean, reviewable summary to work from.
 
 ## Publishing
 
-Codex prepares releases and changelog updates. Before handoff, Codex runs the
-release-readiness checklist in `CODEX.md` — verify CI, README/API sync, CHANGELOG format,
-semver, and no unexpected runtime dependencies. `prepublishOnly` runs `npm run check`; never
-publish or tag without human approval and a passing full check. Versioning follows semver.
+Codex prepares and cuts releases: version bump, changelog versioning, tag,
+and GitHub Release — see the release-readiness checklist in `CODEX.md`
+(verify CI, README/API sync, CHANGELOG format, semver, and no unexpected
+runtime dependencies). `prepublishOnly` runs `npm run check`. `npm publish`
+stays with Bradley Potts regardless of who prepares the release. Versioning
+follows semver.
 
 ## What This Package Does Not Own
 

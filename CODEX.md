@@ -6,18 +6,19 @@ Codex is the release, documentation, production stabilization, repo hygiene, ref
 and configuration standardization agent for `@phcdevworks/spectre-shell-router`.
 
 Full roster and authority table: [AGENTS.md](AGENTS.md). Codex keeps Claude
-Code's work production-ready. Human final review, release decisions, tagging,
-and publishing remain with Bradley Potts. Codex has commit, push, and tag
-authority for its own scope of work — validate changes, then stage, commit,
-and push.
+Code's work production-ready. Codex has commit, push, and tag authority for
+its own scope of work — validate changes, then stage, commit, tag, and push,
+including cutting the release itself (see "Release Review Checklist"
+below). `npm publish` remains a separate, manual step owned by Bradley
+Potts.
 
 ## Operating Principles
 
 1. Preserve the package boundary: routing only, zero runtime dependencies, browser APIs only.
 2. Keep changes conservative, focused, production-safe, and easy to review.
 3. Do not broaden architecture or introduce new product scope.
-4. Commit and push within Codex's own scope of work; do not merge PRs,
-   publish packages, or cut releases unless Bradley explicitly asks.
+4. Commit, tag, and cut releases within Codex's own scope of work; do not
+   merge PRs or run `npm publish` unless Bradley explicitly asks.
 
 ## Entry Point
 
@@ -111,7 +112,7 @@ the validation status and any unresolved release risk in the summary.
 
 ## Release Review Checklist
 
-Use this checklist before every release handoff to Bradley Potts.
+Use this checklist before cutting every release (tag + GitHub Release).
 
 ### Pre-Release Validation
 
@@ -131,14 +132,32 @@ Use this checklist before every release handoff to Bradley Potts.
 - [ ] `CHANGELOG.md` follows Keep a Changelog format.
 - [ ] `CHANGELOG.md [Unreleased]` has entries for all changes since the last release.
 - [ ] All changed items are described with enough detail for consumers to understand the impact.
-- [ ] `package.json` version is bumped to the intended release version.
-- [ ] `[Unreleased]` entries are moved to a new versioned section with a date.
-- [ ] Compare links at the bottom of `CHANGELOG.md` are updated.
+
+### Release Mechanics
+
+1. `package.json` version is bumped to the intended release version.
+2. `[Unreleased]` entries are moved to a new versioned section:
+   `## [<version>] - <YYYY-MM-DD>`, with a release title line in the format
+   `**Release Title:** Phase <N> - <short title>`, where `Phase <N>` is the
+   active phase name from this repo's own `ROADMAP.md` and `<short title>`
+   is a concise summary of what shipped. If the release spans no single
+   ROADMAP phase, state that explicitly instead of inventing one.
+3. Compare links at the bottom of `CHANGELOG.md` are updated.
+4. Stage and commit the version bump and changelog update.
+5. Create the git tag: `git tag v<version>` (matching `package.json`
+   exactly), then push the commit and tag.
+6. Publish the GitHub Release from that tag: `gh release create v<version>
+   --title "v<version>: Phase <N> - <short title>" --notes-file` (extract the
+   new version's changelog section, or `--notes` inline for a short release).
+7. `npm publish` is **not** run by Codex — that stays with Bradley Potts.
 
 ### Handoff
 
-- [ ] All changes are staged but not committed.
-- [ ] A clear summary of what changed, the semver impact, and any blockers is prepared for Bradley Potts.
+- [ ] The commit, tag, and GitHub Release are complete (or, if blocked,
+      exactly which step failed and why).
+- [ ] A clear summary of what changed, the semver impact, and any unresolved
+      risk is prepared for Bradley Potts, including the npm publish step
+      still pending his action.
 
 ---
 
