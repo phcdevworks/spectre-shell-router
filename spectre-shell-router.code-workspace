@@ -29,6 +29,9 @@
     "editor.insertSpaces": true,
     "editor.detectIndentation": true,
     "editor.trimAutoWhitespace": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    },
     "files.trimTrailingWhitespace": true,
     "files.insertFinalNewline": true,
     "files.eol": "\n",
@@ -111,6 +114,11 @@
       {
         "label": "format",
         "command": "npm run format",
+        "type": "shell"
+      },
+      {
+        "label": "check",
+        "command": "npm run check",
         "type": "shell"
       }
     ]
