@@ -54,7 +54,7 @@ Part of the [PHCDevworks Spectre shell ecosystem](https://github.com/phcdevworks
 [Contributing](CONTRIBUTING.md) | [Changelog](CHANGELOG.md) |
 [Roadmap](ROADMAP.md) | [Security Policy](SECURITY.md)
 
-## When to use this package
+## When To Use This Package
 
 - You need a framework-agnostic client-side router with zero runtime dependencies
 - You want `:param` URL matching, query string access, and lazy page loading via dynamic `import()`
@@ -62,7 +62,7 @@ Part of the [PHCDevworks Spectre shell ecosystem](https://github.com/phcdevworks
 - You need history or hash-based routing with optional navigation guards and scroll restoration
 - You are building on top of a Spectre shell or a similar minimal shell pattern
 
-## When not to use this package
+## When Not To Use This Package
 
 - You need a framework-integrated router (React Router, Vue Router, TanStack Router, etc.)
 - You need server-side rendering or file-based routing
@@ -89,7 +89,7 @@ Part of the [PHCDevworks Spectre shell ecosystem](https://github.com/phcdevworks
 
 - Node.js `^22.12.0 || >=24.0.0`
 
-## Install
+## Installation
 
 ```bash
 npm install @phcdevworks/spectre-shell-router
@@ -398,6 +398,23 @@ guidance in [CLAUDE.md](./CLAUDE.md), [CODEX.md](./CODEX.md),
 | Tests fail in CI but pass locally  | Node version mismatch                                               | CI runs Node 22 and 24; match your local version                 |
 | `dist/` is missing after clone     | Build output is gitignored                                          | Run `npm run build`                                              |
 | Link clicks are not intercepted    | Link is cross-origin, has `target`, `download`, or `rel="external"` | Expected behavior — only same-domain plain links are intercepted |
+
+## AI And Automation Boundaries
+
+Claude Code (`claude-sonnet-4-6`) is the primary development agent for this
+repository. Codex handles releases, including cutting tagged releases and
+GitHub Releases, and production stabilization. Jules handles small automated
+fixes and dependency updates. GitHub Copilot provides development support.
+
+All AI agents with repository access (Claude Code, Codex, Copilot, Jules)
+have commit, push, and tag authority in this repository. Publishing to npm
+remains Bradley Potts's sole authority. See [AGENTS.md](AGENTS.md) for the
+full commit-policy and release-authority grant.
+
+**Protected from automated change:** the routing-only scope (no application
+bootstrapping, reactive state, persistence, layouts, or design tokens added
+locally). See [AGENTS.md](AGENTS.md) for full agent governance and boundary
+rules.
 
 ## Contributing
 
