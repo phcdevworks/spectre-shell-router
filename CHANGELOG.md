@@ -4,6 +4,17 @@ All notable changes to this project will be documented here. The format follows 
 
 ## [Unreleased]
 
+### Added
+
+- Added nested routes through `Route.routes`, including relative child paths, index routes,
+  merged ancestor parameters, named child route URL generation, persistent parent layouts,
+  and deepest-first lifecycle cleanup.
+
+### Changed
+
+- Refreshed development dependencies and simplified roadmap and TODO tracking around remaining
+  production-readiness work.
+
 ## [1.3.0] - 2026-07-21
 
 Release Title: Phase 4 - TypeScript 7 Compatibility

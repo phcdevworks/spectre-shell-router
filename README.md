@@ -84,6 +84,8 @@ Part of the [PHCDevworks Spectre shell ecosystem](https://github.com/phcdevworks
 - `router.subscribe()` for reactive route state at the app layer.
 - `errorRoute` and `onError` for deterministic error handling instead of a silently cleared outlet.
 - `router.back()`, `router.forward()`, and `router.replace()` navigation history helpers.
+- Nested routing — a `routes` array on a `Route` renders child pages into a parent-declared
+  `[data-router-outlet]` element, with the parent layout kept mounted across child navigations.
 
 ## Requirements
 
@@ -142,6 +144,7 @@ type Route = {
   name?: string // optional; enables router.href() lookup
   meta?: Record<string, unknown> // optional; available on RouteContext.meta
   loader: () => Promise<PageModule>
+  routes?: Route[] // optional; nested child routes, paths relative to this route
 }
 
 type NavigationContext = {
@@ -238,6 +241,64 @@ const router = new Router(routes, root, {
   },
 })
 ```
+
+### Nested routing
+
+A route can declare a `routes` array of child routes. Child `path` values are **relative** to
+the parent — `''` matches the parent's own path (an index route), a plain segment like
+`'profile'` matches `<parent>/profile`, and `:param` segments work the same as top-level routes.
+
+The parent's page module renders a persistent layout and marks its mount point for children
+with a `data-router-outlet` attribute on an element inside `ctx.root`. The router finds that
+element after the parent renders and mounts the matching child page into it.
+
+```ts
+const routes: Route[] = [
+  {
+    path: '/app',
+    loader: async () => ({
+      render({ root }) {
+        root.innerHTML = `
+          <nav>...</nav>
+          <main data-router-outlet></main>
+        `
+      },
+    }),
+    routes: [
+      {
+        path: '', // index route: /app
+        loader: async () => ({
+          render({ root }) {
+            root.textContent = 'Dashboard'
+          },
+        }),
+      },
+      {
+        path: 'profile', // /app/profile
+        loader: async () => ({
+          render({ root }) {
+            root.textContent = 'Profile'
+          },
+        }),
+      },
+    ],
+  },
+]
+```
+
+Params from every level in the chain are merged into `ctx.params` for the matched child, and
+`name` / `router.href()` work the same for nested routes — the generated path is the parent's
+path joined with the child's.
+
+Navigating between sibling children (`/app/profile` → `/app` in the example above) reuses the
+already-rendered parent — its `render`/`destroy` hooks are not called again, so layout state
+(scroll position inside the layout, open menus, etc.) survives the navigation. Only the matched
+leaf page's `render`/`destroy` runs on every navigation, same as the non-nested case. Navigating
+to a route outside the parent's subtree destroys the whole chain, deepest first.
+
+If a route with children renders without a `[data-router-outlet]` element, the router treats it
+as a navigation error: `onError` fires and, if configured, `errorRoute` handles it — the same
+path used when a loader throws.
 
 ### Ecosystem integration patterns
 

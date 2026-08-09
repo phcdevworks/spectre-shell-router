@@ -14,214 +14,48 @@ signals, state, styling, or rendering beyond clearing the route outlet.
 | `@phcdevworks/spectre-ui`            | Token-backed CSS recipes and component styling       |
 | `@phcdevworks/spectre-ui-astro`      | Astro component layer built on spectre-ui            |
 
-The router is the navigation backbone. Phase 3 is about making it genuinely connectable to
-these packages — exposing enough surface that signals can observe route state, components can
-react to loading, and apps can manage metadata without building workarounds.
+This document tracks what's next. For what already shipped and why, see
+[CHANGELOG.md](CHANGELOG.md) (release-by-release detail) and git history — this file does not
+restate delivered work.
 
 ---
 
-## 1. Phase 1 — Foundation — Delivered
+## Delivered Phases
 
-All foundation work is complete as of v1.0.0.
-
-### What is in place
-
-- Router class with hardened navigation behavior and monotonic `currentNavId` race-condition
-  guard.
-- Path matching with `:param` segment extraction and `URLSearchParams` query parsing.
-- Browser History API integration (`pushState` / `popstate`).
-- Page lifecycle enforcement — `destroy()` always runs before the next `render()`.
-- Same-domain `<a>` link interception; modified clicks (ctrl, meta, shift, alt) and external
-  links pass through.
-- TypeScript strict mode throughout `src/index.ts`. Zero runtime dependencies.
-- Vitest test suite across three files: `router.test.ts`, `reliability.test.ts`,
-  `stress.test.ts`.
-- CI pipeline running `npm run check` (typecheck + lint + build + test) on Node 22 and 24
-  for every push and pull request.
-- NPM publishing setup with `prepublishOnly` gate.
-- Multi-agent documentation: `AGENTS.md`, `CLAUDE.md`, `CODEX.md`, `JULES.md`, `COPILOT.md`.
+| Phase   | Summary                                                                                                                                                                                                                                                  | Shipped in  |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| 1       | Foundation — Router class, `currentNavId` race-condition guard, `:param`/query matching, History API integration, lifecycle enforcement, link interception, TypeScript strict mode, Vitest suite, CI, npm publishing, multi-agent docs                   | 1.0.0       |
+| 2       | Routing contract — hash mode, `beforeNavigate` guards, scroll restoration, named routes + `router.href()`, stable `RouterOptions`                                                                                                                        | 1.0.0–1.1.0 |
+| 3       | Ecosystem integration — `router.subscribe()`, `onNavigationStart`/`onNavigationEnd`, per-route `meta`, `afterNavigate`, full README API docs for the signals/loading/title patterns                                                                      | 1.1.0       |
+| 4 P0/P1 | Production readiness — `errorRoute` + `onError` for deterministic error handling, `router.back()`/`forward()`/`replace()` history helpers                                                                                                                | 1.2.0       |
+| 4 P2    | Nested routing — `Route.routes?: Route[]` with `[data-router-outlet]` mounting, cross-level param merging, ancestor-layout persistence across sibling navigations; implemented 2026-08-10 after a vendor confirmed a concrete layout + child-outlet need | Unreleased  |
 
 ### What will not change
 
 - `src/index.ts` remains the single source of truth. Zero runtime dependencies is a hard
   constraint — browser APIs only.
 - The `npm run check` gate is the release standard. All steps must pass before handoff.
-- `destroy()` must always run before `render()`. This invariant is non-negotiable.
+- `destroy()` must always run before the next `render()` at every level of a route chain. This
+  invariant is non-negotiable.
 - This package does not own application state, reactive primitives, styling, or SSR.
 
 ---
 
-## 2. Phase 2 — Routing Contract — Delivered
+## What's Next
 
-All Phase 2 work is complete.
+No active phase is currently open. Phase 4 P2 (nested routing) is implemented and tested;
+the remaining step is a CHANGELOG entry and version bump, owned by Codex per the release
+checklist in `CODEX.md`.
 
-### What was delivered
-
-- Hash-based routing mode (`mode: 'hash'`) — paths stored after `#/`, `router.href()` returns
-  hash-prefixed URLs.
-- Route guards via `beforeNavigate` — async, cancellable, redirect-capable. Navigation reverts
-  if `next()` is never called.
-- Scroll position restoration for push navigation and browser back/forward.
-- Named routes with `router.href(name, params?)` for safe path generation. Throws on unknown
-  name or missing required `:param` segment.
-- Constructor options interface `RouterOptions` as a stable public contract.
-
----
-
-## 3. Phase 3 — Ecosystem Integration (Complete)
-
-The foundation is stable. Phase 3 focuses on making the router connectable to
-`spectre-shell-signals`, `spectre-ui`, and application-level concerns like metadata and
-analytics.
-
-### P0: Signals Bridge
-
-#### Navigation subscription API
-
-Expose router state reactively without the router owning a signal primitive.
-
-- Add `router.subscribe(callback)` — fires with the current `RouteContext` after each
-  completed navigation, returns an unsubscribe function.
-- Zero new runtime dependencies.
-- `spectre-shell-signals` can wrap this in a `signal()` at the app layer, keeping the router
-  itself dependency-free while enabling full reactivity.
-
-#### Navigating state hooks
-
-Enable loading indicators and `navigating$` signal support in `spectre-ui`.
-
-- Add optional `onNavigationStart` and `onNavigationEnd` callbacks to the constructor options.
-- Used at the app layer to drive `navigating$` signals and loading indicators in `spectre-ui`
-  components.
-
----
-
-### P1: Application Primitives
-
-#### Per-route metadata
-
-Support document title management, analytics tagging, and route-level guard data.
-
-- Add optional `meta` object to route definitions. Typed but open-ended — apps define their
-  own metadata shape.
-- `RouteContext` exposes `meta` so page modules and app code can read it at render time.
-
-#### `afterNavigate` hook
-
-Complete the navigation lifecycle surface for a11y, analytics, and side effects.
-
-- Add optional `afterNavigate(context)` to constructor options.
-- Fires after render completes; complements `beforeNavigate`.
-- Enables a11y focus management, analytics events, and post-navigation side effects.
-
----
-
-### P2: Controlled Expansion
-
-#### Nested routing
-
-Design-only until a concrete application need is proven. Evaluate alongside
-`spectre-ui-astro` layout patterns before committing to an API.
-
----
-
-### P3: API Documentation — Complete
-
-These APIs shipped in v1.1.0 and are now documented in the README with copy-able
-examples.
-
-**Unblocked:**
-
-- `spectre-shell-router` Phase 4 P0/P1 (error routes, history helpers) — delivered, see below
-- `spectre-init` Phase 6 (lifecycle, title, loading state, plugin templates)
-- `spectre-shell` P2.5 release (can ship once templates have stable examples)
-
-#### `meta` + `afterNavigate` — document title and a11y pattern
-
-Add a README example showing:
-
-- A route definition with `meta: { title: string }`.
-- An `afterNavigate(context)` handler that reads `context.meta?.title` and
-  sets `document.title`.
-- A note on a11y focus management as a secondary use case.
-
-#### `onNavigationStart` / `onNavigationEnd` — loading state pattern
-
-Add a README example showing:
-
-- Both callbacks toggling a boolean.
-- A note that these drive a `navigating` signal at the app layer via
-  `spectre-shell-signals`.
-
-#### `router.subscribe()` — signals bridge pattern
-
-Add a README example showing:
-
-- Wrapping `router.subscribe()` in a `signal()` from `spectre-shell-signals`
-  to expose a reactive `currentRoute` at the app layer.
-- This is the canonical pattern for reactive route state — one example is
-  enough; the goal is a copy-able reference.
-
----
-
-## 4. Phase 4 — Production Readiness
-
-Phase 4 closes remaining gaps that surface in real production applications: explicit
-error handling, navigation history helpers, and nested outlet support (promoted from
-Phase 3 P2 when a concrete need is confirmed). P0 and P1 shipped in the `1.2.0` release
-(2026-07-07); README/CHANGELOG documentation is complete.
-
-### P0: Error Routes — Delivered
-
-Provide deterministic, user-visible error handling instead of silent root-clearing.
-
-- `errorRoute` option on `RouterOptions`. When a loader throws or no route matches, the
-  router navigates to `errorRoute` (via `replace()`) rather than silently clearing the
-  outlet. Throws at construction time if `errorRoute` does not match an existing route path.
-- `onError(error, context)` callback for apps that want to handle errors programmatically
-  without a redirect. Fires regardless of whether `errorRoute` is configured.
-- Covered in `reliability.test.ts` and `router.test.ts`.
-
----
-
-### P1: Navigation History Helpers — Delivered
-
-Expose History API navigation as first-class router methods.
-
-- `router.back()` and `router.forward()` wrap `history.back()` and `history.forward()`.
-- `router.replace(path)` navigates to `path` without adding a new history entry
-  (`history.replaceState`), with the same race-condition guard as `navigate()`.
-
----
-
-### P2: Nested Routing
-
-Support child routes rendered inside parent outlet elements.
-
-- Nested route definitions with a child `routes` array on parent route entries.
-- Parent page modules declare an inner outlet element; child routes render into it.
-- Implement only when a concrete `spectre-ui-astro` layout pattern confirms the API shape.
-
----
-
-## Recommended Execution Order
-
-1. ~~Navigation subscription API~~ ✓
-2. ~~Navigating state hooks~~ ✓
-3. ~~Per-route metadata~~ ✓
-4. ~~`afterNavigate` hook~~ ✓
-5. ~~Phase 3 P3 API docs~~ ✓
-6. ~~Error routes~~ ✓ — Phase 4 P0
-7. ~~Navigation history helpers~~ ✓ — Phase 4 P1
-8. ~~Release prep~~ ✓ — published as `1.2.0` (2026-07-07)
-9. **Nested routing** ← only open item — only when a concrete app need is confirmed; Phase 4 P2
+New routing surface beyond what's shipped opens on demand, when a downstream consumer or
+vendor surfaces a concrete need — see [TODO.md](TODO.md).
 
 ---
 
 ## Explicitly Out of Scope
 
 - Application state management — owned by `spectre-shell-signals`
-- Rendering logic or DOM helpers beyond clearing the route outlet
+- Rendering logic or DOM helpers beyond clearing/mounting route outlets
 - Framework-specific adapters (React, Vue, etc.)
 - Styling or token definitions — owned by `spectre-tokens` / `spectre-ui`
 - SSR / server-side routing

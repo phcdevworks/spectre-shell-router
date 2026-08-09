@@ -16,6 +16,7 @@ export type Route = {
   name?: string
   meta?: Record<string, unknown>
   loader: () => Promise<PageModule>
+  routes?: Route[]
 }
 
 export type NavigationContext = {
@@ -39,13 +40,29 @@ export type RouterOptions = {
 
 export type Unsubscribe = () => void
 
+type MatchedLevel = {
+  route: Route
+  params: Record<string, string>
+}
+
+type ChainEntry = MatchedLevel & {
+  page: PageModule
+  outlet: HTMLElement
+}
+
+function paramsEqual(a: Record<string, string>, b: Record<string, string>): boolean {
+  const aKeys = Object.keys(a)
+  if (aKeys.length !== Object.keys(b).length) return false
+  return aKeys.every((key) => a[key] === b[key])
+}
+
 export class Router {
   private routes: Route[]
   private rootEl: HTMLElement | null
   private options: RouterOptions
   private mode: 'history' | 'hash'
   private scrollRestoration: boolean
-  private currentPage: PageModule | null = null
+  private currentChain: ChainEntry[] = []
   private handleNavigationBound: () => void
   private handleHashChangeBound: () => void
   private handleLinkClickBound: (e: MouseEvent) => void
@@ -61,13 +78,8 @@ export class Router {
     this.mode = options.mode ?? 'history'
     this.scrollRestoration = options.scrollRestoration !== false
 
-    for (const route of routes) {
-      if (route.name) this.nameIndex.set(route.name, route.path)
-    }
-    if (
-      options.errorRoute !== undefined &&
-      !routes.some((route) => route.path === options.errorRoute)
-    ) {
+    const allPaths = this.indexRoutes(routes, '')
+    if (options.errorRoute !== undefined && !allPaths.includes(options.errorRoute)) {
       throw new Error(`errorRoute "${options.errorRoute}" does not match any route path.`)
     }
     this.handleNavigationBound = () => { void this.handleNavigation('pop') }
@@ -139,7 +151,7 @@ export class Router {
   }
 
   public destroy() {
-    this.destroyCurrentPage()
+    this.destroyChain(0)
     window.removeEventListener('popstate', this.handleNavigationBound)
     if (this.mode === 'hash') {
       window.removeEventListener('hashchange', this.handleHashChangeBound)
@@ -207,15 +219,18 @@ export class Router {
     }
   }
 
-  private destroyCurrentPage() {
-    if (this.currentPage?.destroy) {
-      try {
-        this.currentPage.destroy()
-      } catch {
-        // a broken destroy hook must not block the next route from rendering
+  private destroyChain(fromIndex: number) {
+    for (let i = this.currentChain.length - 1; i >= fromIndex; i--) {
+      const entry = this.currentChain[i]
+      if (entry.page.destroy) {
+        try {
+          entry.page.destroy()
+        } catch {
+          // a broken destroy hook must not block the next route from rendering
+        }
       }
     }
-    this.currentPage = null
+    this.currentChain.length = fromIndex
   }
 
   private async handleNavigation(source: 'push' | 'pop') {
@@ -266,9 +281,60 @@ export class Router {
       }
     }
 
-    for (const route of this.routes) {
-      const params = this.matchRoute(route.path, path)
-      if (!params) continue
+    const segments = path.split('/').filter(Boolean)
+    const chain = this.matchChain(this.routes, segments)
+
+    if (chain) {
+      await this.renderChain(navId, chain, path, query, navContext, source)
+      return
+    }
+
+    if (this.options.errorRoute !== undefined && path !== this.options.errorRoute) {
+      this.options.onError?.(new Error(`No route matches "${path}".`), navContext)
+      this.replace(this.options.errorRoute)
+      return
+    }
+
+    this.destroyChain(0)
+    this.rootEl.innerHTML = ''
+    this.currentPath = path
+  }
+
+  private async renderChain(
+    navId: number,
+    chain: MatchedLevel[],
+    path: string,
+    query: URLSearchParams,
+    navContext: NavigationContext,
+    source: 'push' | 'pop',
+  ) {
+    if (!this.rootEl) return
+
+    let divergeAt = 0
+    while (
+      divergeAt < chain.length - 1 &&
+      divergeAt < this.currentChain.length &&
+      this.currentChain[divergeAt].route === chain[divergeAt].route &&
+      paramsEqual(this.currentChain[divergeAt].params, chain[divergeAt].params)
+    ) {
+      divergeAt++
+    }
+
+    this.destroyChain(divergeAt)
+
+    let mountRoot: HTMLElement =
+      divergeAt === 0 ? this.rootEl : this.currentChain[divergeAt - 1].outlet
+    mountRoot.innerHTML = ''
+
+    let mergedParams: Record<string, string> = {}
+    for (let i = 0; i < divergeAt; i++) {
+      mergedParams = { ...mergedParams, ...this.currentChain[i].params }
+    }
+
+    for (let i = divergeAt; i < chain.length; i++) {
+      const { route, params } = chain[i]
+      mergedParams = { ...mergedParams, ...params }
+      const isLeaf = i === chain.length - 1
 
       let page: PageModule
       try {
@@ -279,7 +345,7 @@ export class Router {
         if (this.options.errorRoute !== undefined && path !== this.options.errorRoute) {
           this.replace(this.options.errorRoute)
         } else {
-          this.destroyCurrentPage()
+          this.destroyChain(0)
           this.rootEl.innerHTML = ''
         }
         return
@@ -287,50 +353,78 @@ export class Router {
 
       if (navId !== this.currentNavId || !this.rootEl) return
 
-      this.destroyCurrentPage()
-      this.rootEl.innerHTML = ''
-      this.currentPage = page
-      this.currentPath = path
-
       const context: RouteContext = {
         path,
-        params,
+        params: mergedParams,
         query,
-        root: this.rootEl,
+        root: mountRoot,
         meta: route.meta,
       }
 
       page.render(context)
-      this.notifySubscribers(context)
-      this.options.afterNavigate?.(context)
 
-      if (this.scrollRestoration) {
-        if (source === 'pop') {
-          const savedY = (history.state as Record<string, unknown>)?.scrollY
-          window.scrollTo(0, typeof savedY === 'number' ? savedY : 0)
-        } else {
-          window.scrollTo(0, 0)
+      let outlet = mountRoot
+      if (!isLeaf) {
+        const found = mountRoot.querySelector<HTMLElement>('[data-router-outlet]')
+        if (!found) {
+          const error = new Error(
+            `Route "${route.path}" has child routes but its rendered output has no ` +
+              '[data-router-outlet] element for them to mount into.',
+          )
+          this.options.onError?.(error, navContext)
+          if (this.options.errorRoute !== undefined && path !== this.options.errorRoute) {
+            this.replace(this.options.errorRoute)
+          } else {
+            this.destroyChain(0)
+            this.rootEl.innerHTML = ''
+          }
+          return
         }
+        outlet = found
       }
 
-      return
+      this.currentChain.push({ route, params, page, outlet })
+      mountRoot = outlet
+
+      if (isLeaf) {
+        this.currentPath = path
+        this.notifySubscribers(context)
+        this.options.afterNavigate?.(context)
+      }
     }
 
-    if (this.options.errorRoute !== undefined && path !== this.options.errorRoute) {
-      this.options.onError?.(new Error(`No route matches "${path}".`), navContext)
-      this.replace(this.options.errorRoute)
-      return
+    if (this.scrollRestoration) {
+      if (source === 'pop') {
+        const savedY = (history.state as Record<string, unknown>)?.scrollY
+        window.scrollTo(0, typeof savedY === 'number' ? savedY : 0)
+      } else {
+        window.scrollTo(0, 0)
+      }
     }
-
-    this.destroyCurrentPage()
-    this.rootEl.innerHTML = ''
-    this.currentPath = path
   }
 
-  private matchRoute(routePath: string, urlPath: string): Record<string, string> | null {
-    const routeParts = routePath.split('/').filter(Boolean)
-    const urlParts = urlPath.split('/').filter(Boolean)
+  private indexRoutes(routes: Route[], prefix: string): string[] {
+    const paths: string[] = []
+    for (const route of routes) {
+      const full = this.joinPath(prefix, route.path)
+      paths.push(full)
+      if (route.name) this.nameIndex.set(route.name, full)
+      if (route.routes && route.routes.length > 0) {
+        paths.push(...this.indexRoutes(route.routes, full))
+      }
+    }
+    return paths
+  }
 
+  private joinPath(prefix: string, path: string): string {
+    if (prefix === '') return path
+    if (path === '' || path === '/') return prefix
+    const left = prefix.endsWith('/') ? prefix.slice(0, -1) : prefix
+    const right = path.startsWith('/') ? path.slice(1) : path
+    return `${left}/${right}`
+  }
+
+  private matchSegments(routeParts: string[], urlParts: string[]): Record<string, string> | null {
     if (routeParts.length !== urlParts.length) return null
 
     const params: Record<string, string> = {}
@@ -347,5 +441,26 @@ export class Router {
     }
 
     return params
+  }
+
+  private matchChain(routes: Route[], segments: string[]): MatchedLevel[] | null {
+    for (const route of routes) {
+      const routeParts = route.path.split('/').filter(Boolean)
+      const children = route.routes
+
+      if (children && children.length > 0) {
+        if (segments.length < routeParts.length) continue
+        const params = this.matchSegments(routeParts, segments.slice(0, routeParts.length))
+        if (!params) continue
+        const childChain = this.matchChain(children, segments.slice(routeParts.length))
+        if (!childChain) continue
+        return [{ route, params }, ...childChain]
+      }
+
+      const params = this.matchSegments(routeParts, segments)
+      if (!params) continue
+      return [{ route, params }]
+    }
+    return null
   }
 }

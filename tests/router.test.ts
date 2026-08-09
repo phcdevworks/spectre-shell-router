@@ -875,4 +875,191 @@ describe("spectre-shell-router", () => {
       forward.mockRestore()
     })
   })
+
+  describe("nested routing", () => {
+    it("renders a parent layout and its matching child into the [data-router-outlet]", async () => {
+      const { Router } = await import("../src/index")
+      const parentRender = vi.fn((ctx) => {
+        ctx.root.innerHTML = '<header>layout</header><main data-router-outlet></main>'
+      })
+      const childRender = vi.fn()
+      const routes = [
+        {
+          path: "/app",
+          loader: async () => ({ render: parentRender }),
+          routes: [{ path: "profile", loader: async () => ({ render: childRender }) }],
+        },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/app/profile")
+
+      const router = new Router(routes, root)
+      await tick()
+
+      expect(parentRender).toHaveBeenCalledOnce()
+      expect(childRender).toHaveBeenCalledOnce()
+      const childCtx = childRender.mock.calls.at(-1)?.[0]
+      expect(childCtx?.root.hasAttribute("data-router-outlet")).toBe(true)
+      router.destroy()
+    })
+
+    it("matches an empty child path as the index route", async () => {
+      const { Router } = await import("../src/index")
+      const parentRender = vi.fn((ctx) => {
+        ctx.root.innerHTML = '<main data-router-outlet></main>'
+      })
+      const indexRender = vi.fn()
+      const routes = [
+        {
+          path: "/app",
+          loader: async () => ({ render: parentRender }),
+          routes: [{ path: "", loader: async () => ({ render: indexRender }) }],
+        },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/app")
+
+      const router = new Router(routes, root)
+      await tick()
+
+      expect(parentRender).toHaveBeenCalledOnce()
+      expect(indexRender).toHaveBeenCalledOnce()
+      router.destroy()
+    })
+
+    it("merges ancestor and child params into the child's context", async () => {
+      const { Router } = await import("../src/index")
+      const parentRender = vi.fn((ctx) => {
+        ctx.root.innerHTML = '<main data-router-outlet></main>'
+      })
+      const childRender = vi.fn()
+      const routes = [
+        {
+          path: "/orgs/:orgId",
+          loader: async () => ({ render: parentRender }),
+          routes: [{ path: "members/:memberId", loader: async () => ({ render: childRender }) }],
+        },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/orgs/42/members/7")
+
+      const router = new Router(routes, root)
+      await tick()
+
+      const childCtx = childRender.mock.calls.at(-1)?.[0]
+      expect(childCtx?.params).toEqual({ orgId: "42", memberId: "7" })
+      router.destroy()
+    })
+
+    it("keeps the parent layout mounted (not re-rendered) when navigating between sibling children", async () => {
+      const { Router } = await import("../src/index")
+      const parentDestroy = vi.fn()
+      const parentRender = vi.fn((ctx) => {
+        ctx.root.innerHTML = '<main data-router-outlet></main>'
+      })
+      const childADestroy = vi.fn()
+      const childBRender = vi.fn()
+      const routes = [
+        {
+          path: "/app",
+          loader: async () => ({ render: parentRender, destroy: parentDestroy }),
+          routes: [
+            { path: "a", loader: async () => ({ render: vi.fn(), destroy: childADestroy }) },
+            { path: "b", loader: async () => ({ render: childBRender }) },
+          ],
+        },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/app/a")
+
+      const router = new Router(routes, root)
+      await tick()
+      expect(parentRender).toHaveBeenCalledOnce()
+
+      router.navigate("/app/b")
+      await tick()
+
+      expect(parentRender).toHaveBeenCalledOnce()
+      expect(parentDestroy).not.toHaveBeenCalled()
+      expect(childADestroy).toHaveBeenCalledOnce()
+      expect(childBRender).toHaveBeenCalledOnce()
+      router.destroy()
+    })
+
+    it("destroys the whole chain when navigating away from the parent entirely", async () => {
+      const { Router } = await import("../src/index")
+      const parentDestroy = vi.fn()
+      const parentRender = vi.fn((ctx) => {
+        ctx.root.innerHTML = '<main data-router-outlet></main>'
+      })
+      const otherRender = vi.fn()
+      const routes = [
+        {
+          path: "/app",
+          loader: async () => ({ render: parentRender, destroy: parentDestroy }),
+          routes: [{ path: "a", loader: async () => ({ render: vi.fn() }) }],
+        },
+        { path: "/other", loader: async () => ({ render: otherRender }) },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/app/a")
+
+      const router = new Router(routes, root)
+      await tick()
+
+      router.navigate("/other")
+      await tick()
+
+      expect(parentDestroy).toHaveBeenCalledOnce()
+      expect(otherRender).toHaveBeenCalledOnce()
+      router.destroy()
+    })
+
+    it("reports onError and clears the outlet when a parent renders without a [data-router-outlet]", async () => {
+      const { Router } = await import("../src/index")
+      const onError = vi.fn()
+      const childRender = vi.fn()
+      const routes = [
+        {
+          path: "/app",
+          loader: async () => ({ render: vi.fn() }),
+          routes: [{ path: "a", loader: async () => ({ render: childRender }) }],
+        },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/app/a")
+
+      const router = new Router(routes, root, { onError })
+      await tick()
+
+      expect(onError).toHaveBeenCalledOnce()
+      expect(childRender).not.toHaveBeenCalled()
+      router.destroy()
+    })
+
+    it("supports named routes for nested children via router.href()", async () => {
+      const { Router } = await import("../src/index")
+      const routes = [
+        {
+          path: "/app",
+          loader: async () => ({
+            render: (ctx: { root: HTMLElement }) => {
+              ctx.root.innerHTML = '<main data-router-outlet></main>'
+            },
+          }),
+          routes: [
+            { path: "profile", name: "profile", loader: async () => ({ render: vi.fn() }) },
+          ],
+        },
+      ]
+      const root = document.createElement("div")
+      window.history.replaceState({}, "", "/app")
+
+      const router = new Router(routes, root)
+      await tick()
+
+      expect(router.href("profile")).toBe("/app/profile")
+      router.destroy()
+    })
+  })
 })
