@@ -138,17 +138,16 @@ Use this checklist before cutting every release (tag + GitHub Release).
 1. `package.json` version is bumped to the intended release version.
 2. `[Unreleased]` entries are moved to a new versioned section:
    `## [<version>] - <YYYY-MM-DD>`, with a release title line in the format
-   `**Release Title:** Phase <N> - <short title>`, where `Phase <N>` is the
-   active phase name from this repo's own `ROADMAP.md` and `<short title>`
-   is a concise summary of what shipped. If the release spans no single
-   ROADMAP phase, state that explicitly instead of inventing one.
+   `**Release Title:** <short title>`, where `<short title>` is a concise
+   summary of what shipped. Do not include the version or roadmap phase in
+   the release title.
 3. Compare links at the bottom of `CHANGELOG.md` are updated.
 4. Stage and commit the version bump and changelog update.
 5. Create the git tag: `git tag v<version>` (matching `package.json`
    exactly), then push the commit and tag.
-6. Publish the GitHub Release from that tag: `gh release create v<version>
-   --title "v<version>: Phase <N> - <short title>" --notes-file` (extract the
-   new version's changelog section, or `--notes` inline for a short release).
+6. Publish the GitHub Release from that tag with
+   `gh release create v<version> --title "<short title>" --notes-file`. Extract
+   the new version's changelog section, or use `--notes` inline for a short release.
 7. `npm publish` is **not** run by Codex — that stays with Bradley Potts.
 
 ### Handoff

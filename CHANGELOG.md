@@ -6,7 +6,7 @@ All notable changes to this project will be documented here. The format follows 
 
 ## [1.4.0] - 2026-08-10
 
-**Release Title:** Phase 4 - Nested Routing
+**Release Title:** Nested Routing
 
 Contract change type: additive
 
@@ -23,7 +23,7 @@ Contract change type: additive
 
 ## [1.3.0] - 2026-07-21
 
-Release Title: Phase 4 - TypeScript 7 Compatibility
+Release Title: TypeScript 7 Compatibility
 
 Contract change type: additive
 
@@ -39,7 +39,7 @@ Contract change type: additive
 
 ## [1.2.0] - 2026-07-07
 
-Release Title: Phase 4 - Production Readiness and Ecosystem Manifest
+Release Title: Production Readiness and Ecosystem Manifest
 
 Contract change type: additive
 
@@ -71,7 +71,7 @@ Contract change type: additive
 
 ## [1.1.0] - 2026-06-04
 
-Release Title: Phase 2 - Router Options and Navigation Reliability
+Release Title: Router Options and Navigation Reliability
 
 Contract change type: additive
 
@@ -99,7 +99,7 @@ Contract change type: additive
 
 ## [1.0.0] - 2026-04-25
 
-Release Title: Phase 1 - Stable Router Release and Navigation Polish
+Release Title: Stable Router Release and Navigation Polish
 
 ### Added
 
@@ -116,7 +116,7 @@ Release Title: Phase 1 - Stable Router Release and Navigation Polish
 
 ## [0.0.2] - 2026-04-13
 
-Release Title: Phase 1 - Router Class Refactor and Navigation Hardening
+Release Title: Router Class Refactor and Navigation Hardening
 
 ### Added
 
@@ -134,7 +134,7 @@ Release Title: Phase 1 - Router Class Refactor and Navigation Hardening
 
 ## [0.0.1] - 2026-02-05
 
-Release Title: Phase 1 - Initial Router Foundation
+Release Title: Initial Router Foundation
 
 ### Added
 
