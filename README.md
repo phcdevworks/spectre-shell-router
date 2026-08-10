@@ -12,12 +12,12 @@ it) and `spectre-init` (which scaffolds new apps against it).
 
 ## Repository Snapshot
 
-| Field | Value |
-|-------|-------|
-| Project team | `project-shell` |
-| Repository role | Spectre client-side router |
-| Package/artifact | `@phcdevworks/spectre-shell-router` |
-| Current version/status | 1.3.0 |
+| Field                  | Value                               |
+| ---------------------- | ----------------------------------- |
+| Project team           | `project-shell`                     |
+| Repository role        | Spectre client-side router          |
+| Package/artifact       | `@phcdevworks/spectre-shell-router` |
+| Current version/status | 1.4.0                               |
 
 ## Standard Workflow
 
@@ -30,17 +30,17 @@ it) and `spectre-init` (which scaffolds new apps against it).
 
 ## Documentation Map
 
-| Guide | Path |
-|-------|------|
-| Agent rules | [AGENTS.md](AGENTS.md) |
-| Claude Code | [CLAUDE.md](CLAUDE.md) |
-| Codex | [CODEX.md](CODEX.md) |
-| Copilot | [COPILOT.md](COPILOT.md) |
-| Jules | [JULES.md](JULES.md) |
-| Roadmap | [ROADMAP.md](ROADMAP.md) |
-| Todo | [TODO.md](TODO.md) |
-| Changelog | [CHANGELOG.md](CHANGELOG.md) |
-| Security | [SECURITY.md](SECURITY.md) |
+| Guide       | Path                         |
+| ----------- | ---------------------------- |
+| Agent rules | [AGENTS.md](AGENTS.md)       |
+| Claude Code | [CLAUDE.md](CLAUDE.md)       |
+| Codex       | [CODEX.md](CODEX.md)         |
+| Copilot     | [COPILOT.md](COPILOT.md)     |
+| Jules       | [JULES.md](JULES.md)         |
+| Roadmap     | [ROADMAP.md](ROADMAP.md)     |
+| Todo        | [TODO.md](TODO.md)           |
+| Changelog   | [CHANGELOG.md](CHANGELOG.md) |
+| Security    | [SECURITY.md](SECURITY.md)   |
 
 [![npm version](https://img.shields.io/npm/v/@phcdevworks/spectre-shell-router.svg)](https://www.npmjs.com/package/@phcdevworks/spectre-shell-router)
 [![CI](https://img.shields.io/github/actions/workflow/status/phcdevworks/spectre-shell-router/ci.yml?branch=main&label=CI)](https://github.com/phcdevworks/spectre-shell-router/actions/workflows/ci.yml)
@@ -383,10 +383,21 @@ const unsubscribe = router.subscribe((context) => {
 
 ```ts
 const routes: Route[] = [
-  { path: '/', loader: async () => ({ render({ root }) { root.textContent = 'Home' } }) },
+  {
+    path: '/',
+    loader: async () => ({
+      render({ root }) {
+        root.textContent = 'Home'
+      },
+    }),
+  },
   {
     path: '/error',
-    loader: async () => ({ render({ root }) { root.textContent = 'Something went wrong.' } }),
+    loader: async () => ({
+      render({ root }) {
+        root.textContent = 'Something went wrong.'
+      },
+    }),
   },
 ]
 
@@ -408,8 +419,8 @@ silently clearing the outlet. `onError` fires first regardless of whether
 
 ```ts
 router.replace('/login') // navigate without adding a history entry
-router.back()            // wraps history.back()
-router.forward()         // wraps history.forward()
+router.back() // wraps history.back()
+router.forward() // wraps history.forward()
 ```
 
 ### Behavior

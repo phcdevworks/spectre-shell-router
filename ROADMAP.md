@@ -22,13 +22,13 @@ restate delivered work.
 
 ## Delivered Phases
 
-| Phase   | Summary                                                                                                                                                                                                                                                  | Shipped in  |
-| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| 1       | Foundation — Router class, `currentNavId` race-condition guard, `:param`/query matching, History API integration, lifecycle enforcement, link interception, TypeScript strict mode, Vitest suite, CI, npm publishing, multi-agent docs                   | 1.0.0       |
-| 2       | Routing contract — hash mode, `beforeNavigate` guards, scroll restoration, named routes + `router.href()`, stable `RouterOptions`                                                                                                                        | 1.0.0–1.1.0 |
-| 3       | Ecosystem integration — `router.subscribe()`, `onNavigationStart`/`onNavigationEnd`, per-route `meta`, `afterNavigate`, full README API docs for the signals/loading/title patterns                                                                      | 1.1.0       |
-| 4 P0/P1 | Production readiness — `errorRoute` + `onError` for deterministic error handling, `router.back()`/`forward()`/`replace()` history helpers                                                                                                                | 1.2.0       |
-| 4 P2    | Nested routing — `Route.routes?: Route[]` with `[data-router-outlet]` mounting, cross-level param merging, ancestor-layout persistence across sibling navigations; implemented 2026-08-10 after a vendor confirmed a concrete layout + child-outlet need | Unreleased  |
+| Phase   | Summary                                                                                                                                                                                                                                | Shipped in  |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| 1       | Foundation — Router class, `currentNavId` race-condition guard, `:param`/query matching, History API integration, lifecycle enforcement, link interception, TypeScript strict mode, Vitest suite, CI, npm publishing, multi-agent docs | 1.0.0       |
+| 2       | Routing contract — hash mode, `beforeNavigate` guards, scroll restoration, named routes + `router.href()`, stable `RouterOptions`                                                                                                      | 1.0.0–1.1.0 |
+| 3       | Ecosystem integration — `router.subscribe()`, `onNavigationStart`/`onNavigationEnd`, per-route `meta`, `afterNavigate`, full README API docs for the signals/loading/title patterns                                                    | 1.1.0       |
+| 4 P0/P1 | Production readiness — `errorRoute` + `onError` for deterministic error handling, `router.back()`/`forward()`/`replace()` history helpers                                                                                              | 1.2.0       |
+| 4 P2    | Nested routing — `Route.routes?: Route[]` with `[data-router-outlet]` mounting, cross-level param merging, ancestor-layout persistence across sibling navigations                                                                      | 1.4.0       |
 
 ### What will not change
 
@@ -43,9 +43,7 @@ restate delivered work.
 
 ## What's Next
 
-No active phase is currently open. Phase 4 P2 (nested routing) is implemented and tested;
-the remaining step is a CHANGELOG entry and version bump, owned by Codex per the release
-checklist in `CODEX.md`.
+No active phase is currently open. Phase 4 is complete.
 
 New routing surface beyond what's shipped opens on demand, when a downstream consumer or
 vendor surfaces a concrete need — see [TODO.md](TODO.md).
