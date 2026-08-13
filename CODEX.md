@@ -12,6 +12,11 @@ including cutting the release itself (see "Release Review Checklist"
 below). `npm publish` remains a separate, manual step owned by Bradley
 Potts.
 
+Codex is now also responsible for executing git operations — commit, push,
+tag — for work Claude Code has validated and handed off in this repo, in
+addition to Codex's own documentation, release, and hygiene commits, since
+Claude Code has zero git access companywide as of 2026-08-13.
+
 ## Operating Principles
 
 1. Preserve the package boundary: routing only, zero runtime dependencies, browser APIs only.
