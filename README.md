@@ -298,7 +298,8 @@ to a route outside the parent's subtree destroys the whole chain, deepest first.
 
 If a route with children renders without a `[data-router-outlet]` element, the router treats it
 as a navigation error: `onError` fires and, if configured, `errorRoute` handles it — the same
-path used when a loader throws.
+path used when a loader throws. The rendered parent is cleaned up through its `destroy()`
+hook when the failed chain is removed.
 
 ### Ecosystem integration patterns
 
@@ -409,7 +410,7 @@ const router = new Router(routes, root, {
 })
 ```
 
-When a `loader` throws or no route matches, the router navigates to `errorRoute`
+When a `loader` throws, path decoding fails, or no route matches, the router navigates to `errorRoute`
 (via `replace()`, so the failing URL is not pushed onto history) instead of
 silently clearing the outlet. `onError` fires first regardless of whether
 `errorRoute` is configured, so apps can log or report errors without a redirect.
@@ -429,11 +430,13 @@ router.forward() // wraps history.forward()
 - If a `loader` throws: `onError` fires (if configured), then the router
   navigates to `errorRoute` if configured and the failing path is not already
   `errorRoute`; otherwise the root is cleared and the navigation is abandoned.
+- If a path contains malformed percent encoding: `onError` receives the decoding error, then
+  `errorRoute` handles it if configured; otherwise the current page is destroyed and the root is cleared.
 - If a faster navigation supersedes a pending one, the stale result is discarded (race-safe via monotonic counter).
 - If no route matches: `onError` fires (if configured), then the router
   navigates to `errorRoute` if configured and the unmatched path is not already
   `errorRoute`; otherwise the root is cleared and `destroy()` is called on the current page.
-- If `beforeNavigate` does not call `next()`, navigation is cancelled and the URL reverts to the current route.
+- If `beforeNavigate` does not call `next()`, navigation is cancelled and the full URL reverts to the current route, preserving its query string and fragment in both history and hash modes.
 - If `beforeNavigate` calls `next('/path')`, the router redirects to that path.
 - Same-domain `<a>` clicks are intercepted automatically; modified clicks (ctrl, meta, shift, alt) and external links pass through.
 - In hash mode, router paths are stored after `#/` and `router.href()` returns hash-prefixed URLs.

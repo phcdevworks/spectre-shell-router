@@ -4,6 +4,17 @@ All notable changes to this project will be documented here. The format follows 
 
 ## [Unreleased]
 
+Contract change type: semantic change
+
+### Fixed
+
+- Handle malformed path encoding through `onError` and the configured error route instead of
+  producing an unhandled rejection.
+- Clean up rendered parent pages when a required nested routing outlet is missing.
+- Preserve the full previous URL, including query strings and fragments, when a navigation
+  guard cancels navigation in history or hash mode.
+- Invoke `onError` for unmatched routes even when no error route is configured.
+
 ## [1.4.0] - 2026-08-10
 
 **Release Title:** Nested Routing

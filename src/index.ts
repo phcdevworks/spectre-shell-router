@@ -68,6 +68,7 @@ export class Router {
   private handleLinkClickBound: (e: MouseEvent) => void
   private currentNavId = 0
   private currentPath: string | null = null
+  private currentUrl: string | null = null
   private nameIndex: Map<string, string> = new Map()
   private subscribers: Set<(context: RouteContext) => void> = new Set()
 
@@ -238,11 +239,12 @@ export class Router {
     const navId = ++this.currentNavId
     const path = this.getCurrentPath()
     const query = this.getCurrentQuery()
+    const url = window.location.href
     const navContext: NavigationContext = { from: this.currentPath, to: path }
 
     this.options.onNavigationStart?.(navContext)
     try {
-      await this.runNavigation(navId, source, path, query, navContext)
+      await this.runNavigation(navId, source, path, query, navContext, url)
     } finally {
       this.options.onNavigationEnd?.(navContext)
     }
@@ -254,6 +256,7 @@ export class Router {
     path: string,
     query: URLSearchParams,
     navContext: NavigationContext,
+    url: string,
   ) {
     if (!this.rootEl) return
 
@@ -269,8 +272,8 @@ export class Router {
       if (navId !== this.currentNavId || !this.rootEl) return
 
       if (!allowed) {
-        if (this.currentPath !== null) {
-          history.replaceState({}, '', this.mode === 'hash' ? `#${this.currentPath}` : this.currentPath)
+        if (this.currentUrl !== null) {
+          history.replaceState({}, '', this.currentUrl)
         }
         return
       }
@@ -282,15 +285,29 @@ export class Router {
     }
 
     const segments = path.split('/').filter(Boolean)
-    const chain = this.matchChain(this.routes, segments)
-
-    if (chain) {
-      await this.renderChain(navId, chain, path, query, navContext, source)
+    let chain: MatchedLevel[] | null
+    try {
+      chain = this.matchChain(this.routes, segments)
+    } catch (error) {
+      this.options.onError?.(error, navContext)
+      if (navId !== this.currentNavId || !this.rootEl) return
+      if (this.options.errorRoute !== undefined && path !== this.options.errorRoute) {
+        this.replace(this.options.errorRoute)
+      } else {
+        this.destroyChain(0)
+        this.rootEl.innerHTML = ''
+      }
       return
     }
 
+    if (chain) {
+      await this.renderChain(navId, chain, path, query, navContext, source, url)
+      return
+    }
+
+    this.options.onError?.(new Error(`No route matches "${path}".`), navContext)
+    if (navId !== this.currentNavId || !this.rootEl) return
     if (this.options.errorRoute !== undefined && path !== this.options.errorRoute) {
-      this.options.onError?.(new Error(`No route matches "${path}".`), navContext)
       this.replace(this.options.errorRoute)
       return
     }
@@ -298,6 +315,7 @@ export class Router {
     this.destroyChain(0)
     this.rootEl.innerHTML = ''
     this.currentPath = path
+    this.currentUrl = url
   }
 
   private async renderChain(
@@ -307,6 +325,7 @@ export class Router {
     query: URLSearchParams,
     navContext: NavigationContext,
     source: 'push' | 'pop',
+    url: string,
   ) {
     if (!this.rootEl) return
 
@@ -363,6 +382,8 @@ export class Router {
 
       page.render(context)
 
+      const entry: ChainEntry = { route, params, page, outlet: mountRoot }
+      this.currentChain.push(entry)
       let outlet = mountRoot
       if (!isLeaf) {
         const found = mountRoot.querySelector<HTMLElement>('[data-router-outlet]')
@@ -383,11 +404,12 @@ export class Router {
         outlet = found
       }
 
-      this.currentChain.push({ route, params, page, outlet })
+      entry.outlet = outlet
       mountRoot = outlet
 
       if (isLeaf) {
         this.currentPath = path
+        this.currentUrl = url
         this.notifySubscribers(context)
         this.options.afterNavigate?.(context)
       }
