@@ -4,6 +4,10 @@ All notable changes to this project will be documented here. The format follows 
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-09-05
+
+**Release Title:** Navigation Error and Cleanup Fixes
+
 Contract change type: semantic change
 
 ### Fixed
@@ -152,7 +156,8 @@ Release Title: Initial Router Foundation
 - **Initial Release**: Minimal, framework-agnostic client-side router for Spectre-based applications.
 - **Features**: Includes string-based path matching, dynamic parameter extraction, and native History API integration.
 
-[unreleased]: https://github.com/phcdevworks/spectre-shell-router/compare/1.4.0...HEAD
+[unreleased]: https://github.com/phcdevworks/spectre-shell-router/compare/v1.4.1...HEAD
+[1.4.1]: https://github.com/phcdevworks/spectre-shell-router/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/phcdevworks/spectre-shell-router/compare/1.3.0...1.4.0
 [1.3.0]: https://github.com/phcdevworks/spectre-shell-router/compare/1.2.0...1.3.0
 [1.2.0]: https://github.com/phcdevworks/spectre-shell-router/compare/1.1.0...1.2.0

@@ -1,6 +1,6 @@
 {
   "name": "@phcdevworks/spectre-shell-router",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "@phcdevworks/spectre-shell-router is the client-side router package of the Spectre system. It maps URL paths to lazy page modules, renders into a root element, and keeps navigation behavior framework-agnostic for Spectre-based applications.",
   "keywords": [
     "phcdevworks",
