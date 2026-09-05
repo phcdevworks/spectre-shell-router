@@ -143,7 +143,7 @@ type Route = {
   path: string
   name?: string // optional; enables router.href() lookup
   meta?: Record<string, unknown> // optional; available on RouteContext.meta
-  loader: () => Promise<PageModule>
+  loader: (signal: AbortSignal) => Promise<PageModule>
   routes?: Route[] // optional; nested child routes, paths relative to this route
 }
 
@@ -154,6 +154,7 @@ type NavigationContext = {
 
 type RouterOptions = {
   mode?: 'history' | 'hash'
+  basePath?: string // optional; deploy under a URL prefix, e.g. '/portal'
   scrollRestoration?: boolean
   errorRoute?: string
   beforeNavigate?: (
@@ -241,6 +242,56 @@ const router = new Router(routes, root, {
   },
 })
 ```
+
+### Deploying under a base path
+
+Pass `basePath` when an app is served under a URL prefix, such as behind a reverse proxy at
+`/portal/`:
+
+```ts
+const router = new Router(routes, root, { basePath: '/portal' })
+```
+
+Routes are declared exactly as if the app were served from `/` — `basePath` is stripped before
+matching and re-applied by `navigate()`, `replace()`, `href()`, and link interception:
+
+```ts
+// window.location.pathname === '/portal/users/42'
+// matches the '/users/:id' route with params.id === '42'
+
+router.navigate('/users/7')  // -> pushes '/portal/users/7'
+router.href('user', { id: '7' })  // -> '/portal/users/7'
+```
+
+Clicks on `<a>` links whose `href` falls outside `basePath` are left alone (not intercepted), so
+links to sibling apps hosted outside the prefix behave as normal browser navigations. `basePath`
+only applies in `history` mode; in `hash` mode the routable path lives entirely in the URL hash
+and is unaffected by the page's own base path.
+
+### Cancellable loaders
+
+`Route.loader` receives an `AbortSignal` as its first argument. When a navigation is superseded
+by another one before its loader resolves, the router aborts that signal — use it to cancel
+in-flight `fetch()` calls or otherwise bail out of expensive work that's no longer needed:
+
+```ts
+const routes: Route[] = [
+  {
+    path: '/report/:id',
+    loader: async (signal) => {
+      const data = await fetch('/api/reports', { signal }).then((r) => r.json())
+      return {
+        render({ root }) {
+          root.textContent = data.title
+        },
+      }
+    },
+  },
+]
+```
+
+A loader that ignores the signal still works — cancellation is opt-in. The signal is also
+aborted on `router.destroy()`.
 
 ### Nested routing
 

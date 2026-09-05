@@ -199,6 +199,67 @@ describe("Router Reliability Tests", () => {
     router.destroy()
   })
 
+  it("aborts the in-flight loader's signal when navigation is superseded", async () => {
+    const { Router } = await import("../src/index")
+    const abortedFlags: boolean[] = []
+
+    const routes = [
+      {
+        path: "/",
+        loader: async () => ({ render: () => {} })
+      },
+      {
+        path: "/slow",
+        loader: async (signal: AbortSignal) => {
+          await tick()
+          abortedFlags.push(signal.aborted)
+          return { render: (ctx: RouteContext) => { ctx.root.innerHTML = "Slow" } }
+        }
+      },
+      {
+        path: "/fast",
+        loader: async () => ({ render: (ctx: RouteContext) => { ctx.root.innerHTML = "Fast" } })
+      }
+    ]
+
+    const root = document.createElement("div")
+    const router = new Router(routes, root)
+    await tick()
+
+    router.navigate("/slow")
+    router.navigate("/fast")
+    await tick()
+    await tick()
+
+    expect(abortedFlags).toEqual([true])
+    expect(root.innerHTML).toBe("Fast")
+
+    router.destroy()
+  })
+
+  it("aborts the current controller on destroy()", async () => {
+    const { Router } = await import("../src/index")
+    let capturedSignal: AbortSignal | undefined
+
+    const routes = [
+      {
+        path: "/",
+        loader: async (signal: AbortSignal) => {
+          capturedSignal = signal
+          return { render: () => {} }
+        }
+      }
+    ]
+
+    const root = document.createElement("div")
+    const router = new Router(routes, root)
+    await tick()
+
+    expect(capturedSignal?.aborted).toBe(false)
+    router.destroy()
+    expect(capturedSignal?.aborted).toBe(true)
+  })
+
   it("throws in the constructor when errorRoute does not match any route path", async () => {
     const { Router } = await import("../src/index")
     const routes = [{ path: "/", loader: async () => ({ render: () => {} }) }]

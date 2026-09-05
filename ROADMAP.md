@@ -29,6 +29,7 @@ restate delivered work.
 | 3       | Ecosystem integration — `router.subscribe()`, `onNavigationStart`/`onNavigationEnd`, per-route `meta`, `afterNavigate`, full README API docs for the signals/loading/title patterns                                                    | 1.1.0       |
 | 4 P0/P1 | Production readiness — `errorRoute` + `onError` for deterministic error handling, `router.back()`/`forward()`/`replace()` history helpers                                                                                              | 1.2.0       |
 | 4 P2    | Nested routing — `Route.routes?: Route[]` with `[data-router-outlet]` mounting, cross-level param merging, ancestor-layout persistence across sibling navigations                                                                      | 1.4.0       |
+| 5       | Deployment and performance — `RouterOptions.basePath` for URL-prefix deployment, `AbortSignal`-based cancellable loaders | Unreleased  |
 
 ### What will not change
 
@@ -43,7 +44,7 @@ restate delivered work.
 
 ## What's Next
 
-No active phase is currently open. Phase 4 is complete.
+No active phase is currently open. Phase 5 is complete.
 
 New routing surface beyond what's shipped opens on demand, when a downstream consumer or
 vendor surfaces a concrete need — see [TODO.md](TODO.md).

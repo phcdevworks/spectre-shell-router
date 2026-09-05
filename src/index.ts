@@ -15,7 +15,7 @@ export type Route = {
   path: string
   name?: string
   meta?: Record<string, unknown>
-  loader: () => Promise<PageModule>
+  loader: (signal: AbortSignal) => Promise<PageModule>
   routes?: Route[]
 }
 
@@ -26,6 +26,7 @@ export type NavigationContext = {
 
 export type RouterOptions = {
   mode?: 'history' | 'hash'
+  basePath?: string
   scrollRestoration?: boolean
   errorRoute?: string
   beforeNavigate?: (
@@ -61,12 +62,14 @@ export class Router {
   private rootEl: HTMLElement | null
   private options: RouterOptions
   private mode: 'history' | 'hash'
+  private basePath: string
   private scrollRestoration: boolean
   private currentChain: ChainEntry[] = []
   private handleNavigationBound: () => void
   private handleHashChangeBound: () => void
   private handleLinkClickBound: (e: MouseEvent) => void
   private currentNavId = 0
+  private currentAbortController: AbortController | null = null
   private currentPath: string | null = null
   private currentUrl: string | null = null
   private nameIndex: Map<string, string> = new Map()
@@ -77,6 +80,7 @@ export class Router {
     this.rootEl = root
     this.options = options
     this.mode = options.mode ?? 'history'
+    this.basePath = this.normalizeBasePath(options.basePath)
     this.scrollRestoration = options.scrollRestoration !== false
 
     const allPaths = this.indexRoutes(routes, '')
@@ -103,7 +107,7 @@ export class Router {
     if (this.scrollRestoration) {
       history.replaceState({ ...history.state, scrollY: window.scrollY }, '')
     }
-    history.pushState({}, '', this.mode === 'hash' ? `#${path}` : path)
+    history.pushState({}, '', this.mode === 'hash' ? `#${path}` : this.withBasePath(path))
     void this.handleNavigation('push')
   }
 
@@ -114,7 +118,7 @@ export class Router {
     if (this.scrollRestoration) {
       history.replaceState({ ...history.state, scrollY: window.scrollY }, '')
     }
-    history.replaceState({}, '', this.mode === 'hash' ? `#${path}` : path)
+    history.replaceState({}, '', this.mode === 'hash' ? `#${path}` : this.withBasePath(path))
     void this.handleNavigation('push')
   }
 
@@ -148,10 +152,11 @@ export class Router {
         return encodeURIComponent(value)
       })
       .join('/')
-    return this.mode === 'hash' ? `#${path}` : path
+    return this.mode === 'hash' ? `#${path}` : this.withBasePath(path)
   }
 
   public destroy() {
+    this.currentAbortController?.abort()
     this.destroyChain(0)
     window.removeEventListener('popstate', this.handleNavigationBound)
     if (this.mode === 'hash') {
@@ -161,12 +166,30 @@ export class Router {
     this.rootEl = null
   }
 
+  private normalizeBasePath(basePath: string | undefined): string {
+    if (!basePath || basePath === '/') return ''
+    const withLeadingSlash = basePath.startsWith('/') ? basePath : `/${basePath}`
+    return withLeadingSlash.replace(/\/+$/, '')
+  }
+
+  private withBasePath(path: string): string {
+    if (!this.basePath) return path
+    return this.joinPath(this.basePath, path)
+  }
+
+  private stripBasePath(pathname: string): string {
+    if (!this.basePath) return pathname
+    if (pathname === this.basePath) return '/'
+    if (pathname.startsWith(`${this.basePath}/`)) return pathname.slice(this.basePath.length)
+    return pathname
+  }
+
   private getCurrentPath(): string {
     if (this.mode === 'hash') {
       const hash = window.location.hash
       return (hash.startsWith('#/') ? hash.slice(1) : '/').split('?')[0] || '/'
     }
-    return window.location.pathname
+    return this.stripBasePath(window.location.pathname)
   }
 
   private getCurrentQuery(): URLSearchParams {
@@ -210,8 +233,16 @@ export class Router {
       return
     }
 
+    if (
+      this.basePath &&
+      url.pathname !== this.basePath &&
+      !url.pathname.startsWith(`${this.basePath}/`)
+    ) {
+      return
+    }
+
     e.preventDefault()
-    this.navigate(url.pathname + url.search + url.hash)
+    this.navigate(this.stripBasePath(url.pathname) + url.search + url.hash)
   }
 
   private notifySubscribers(context: RouteContext) {
@@ -236,6 +267,9 @@ export class Router {
 
   private async handleNavigation(source: 'push' | 'pop') {
     if (!this.rootEl) return
+    this.currentAbortController?.abort()
+    const abortController = new AbortController()
+    this.currentAbortController = abortController
     const navId = ++this.currentNavId
     const path = this.getCurrentPath()
     const query = this.getCurrentQuery()
@@ -244,7 +278,7 @@ export class Router {
 
     this.options.onNavigationStart?.(navContext)
     try {
-      await this.runNavigation(navId, source, path, query, navContext, url)
+      await this.runNavigation(navId, source, path, query, navContext, url, abortController.signal)
     } finally {
       this.options.onNavigationEnd?.(navContext)
     }
@@ -257,6 +291,7 @@ export class Router {
     query: URLSearchParams,
     navContext: NavigationContext,
     url: string,
+    signal: AbortSignal,
   ) {
     if (!this.rootEl) return
 
@@ -301,7 +336,7 @@ export class Router {
     }
 
     if (chain) {
-      await this.renderChain(navId, chain, path, query, navContext, source, url)
+      await this.renderChain(navId, chain, path, query, navContext, source, url, signal)
       return
     }
 
@@ -326,6 +361,7 @@ export class Router {
     navContext: NavigationContext,
     source: 'push' | 'pop',
     url: string,
+    signal: AbortSignal,
   ) {
     if (!this.rootEl) return
 
@@ -357,7 +393,7 @@ export class Router {
 
       let page: PageModule
       try {
-        page = await route.loader()
+        page = await route.loader(signal)
       } catch (error) {
         if (navId !== this.currentNavId || !this.rootEl) return
         this.options.onError?.(error, navContext)

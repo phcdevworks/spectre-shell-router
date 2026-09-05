@@ -4,6 +4,21 @@ All notable changes to this project will be documented here. The format follows 
 
 ## [Unreleased]
 
+Contract change type: additive
+
+### Added
+
+- Added `RouterOptions.basePath` for deploying an app under a URL prefix (e.g. `/portal`) —
+  stripped before route matching and re-applied by `navigate()`, `replace()`, `href()`, and
+  link interception.
+- `Route.loader` now receives an `AbortSignal`, aborted when a navigation is superseded by
+  another before the loader resolves (or on `router.destroy()`), so expensive in-flight work
+  (e.g. `fetch()`) can be cancelled. Existing loaders that ignore the argument are unaffected.
+
+### Changed
+
+- Updated development tooling to ESLint 10.10 and Vitest 5.0.
+
 ## [1.4.1] - 2026-09-05
 
 **Release Title:** Navigation Error and Cleanup Fixes
