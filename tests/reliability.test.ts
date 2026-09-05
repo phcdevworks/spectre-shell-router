@@ -1,3 +1,4 @@
+import type { RouteContext } from "../src/index"
 import { describe, expect, it, vi, beforeEach } from "vitest"
 
 const tick = () => new Promise((resolve) => setTimeout(resolve, 0))
@@ -18,7 +19,7 @@ describe("Router Reliability Tests", () => {
       },
       {
         path: "/",
-        loader: async () => ({ render: (ctx) => { ctx.root.innerHTML = "Home" } })
+        loader: async () => ({ render: (ctx: RouteContext) => { ctx.root.innerHTML = "Home" } })
       }
     ]
 
@@ -43,14 +44,14 @@ describe("Router Reliability Tests", () => {
       {
         path: "/",
         loader: async () => ({
-          render: (ctx) => { ctx.root.innerHTML = "Home" },
+          render: (ctx: RouteContext) => { ctx.root.innerHTML = "Home" },
           destroy: () => { throw new Error("Destroy failed") }
         })
       },
       {
         path: "/next",
         loader: async () => ({
-          render: (ctx) => { ctx.root.innerHTML = "Next" }
+          render: (ctx: RouteContext) => { ctx.root.innerHTML = "Next" }
         })
       }
     ]
@@ -126,11 +127,11 @@ describe("Router Reliability Tests", () => {
       },
       {
         path: "/error",
-        loader: async () => ({ render: (ctx) => { ctx.root.innerHTML = "Error" } })
+        loader: async () => ({ render: (ctx: RouteContext) => { ctx.root.innerHTML = "Error" } })
       },
       {
         path: "/",
-        loader: async () => ({ render: (ctx) => { ctx.root.innerHTML = "Home" } })
+        loader: async () => ({ render: (ctx: RouteContext) => { ctx.root.innerHTML = "Home" } })
       }
     ]
 
@@ -155,11 +156,11 @@ describe("Router Reliability Tests", () => {
     const routes = [
       {
         path: "/error",
-        loader: async () => ({ render: (ctx) => { ctx.root.innerHTML = "Error" } })
+        loader: async () => ({ render: (ctx: RouteContext) => { ctx.root.innerHTML = "Error" } })
       },
       {
         path: "/",
-        loader: async () => ({ render: (ctx) => { ctx.root.innerHTML = "Home" } })
+        loader: async () => ({ render: (ctx: RouteContext) => { ctx.root.innerHTML = "Home" } })
       }
     ]
 

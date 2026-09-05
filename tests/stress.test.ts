@@ -1,3 +1,4 @@
+import type { RouteContext } from "../src/index"
 import { describe, expect, it, vi, beforeEach } from "vitest"
 
 const tick = () => new Promise((resolve) => setTimeout(resolve, 0))
@@ -57,7 +58,7 @@ describe("Router Stress Test Suite", () => {
         path: "/:id",
         loader: async () => {
           await new Promise(r => setTimeout(r, Math.random() * 20))
-          return { render: (ctx) => renderCount(ctx.params.id) }
+          return { render: (ctx: RouteContext) => renderCount(ctx.params.id) }
         }
       }
     ]

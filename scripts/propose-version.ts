@@ -2,6 +2,7 @@
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { proposeVersion } from './release-version.ts'
 
 type ChangeClassification = 'additive' | 'semantic change' | 'breaking'
 
@@ -55,28 +56,8 @@ if (
 
 const pkg = parsed as PackageJsonVersion
 const current = pkg.version
-const [majorStr, minorStr, patchStr] = current.split('.')
-const major = Number.parseInt(majorStr, 10)
-const minor = Number.parseInt(minorStr, 10)
-const patch = Number.parseInt(patchStr, 10)
-
-if ([major, minor, patch].some(Number.isNaN)) {
-  throw new Error(`Invalid package.json version: ${current}`)
-}
-
-let proposed: string
-let bumpType: 'major' | 'minor' | 'patch'
-
-if (classification === 'breaking') {
-  proposed = `${major + 1}.0.0`
-  bumpType = 'major'
-} else if (classification === 'additive' || classification === 'semantic change') {
-  proposed = `${major}.${minor + 1}.0`
-  bumpType = 'minor'
-} else {
-  proposed = `${major}.${minor}.${patch + 1}`
-  bumpType = 'patch'
-}
+const releaseImpact = unreleasedSection.match(/^Release impact:\s*(.+)$/im)?.[1].trim()
+const { proposed, bumpType } = proposeVersion(current, classification, releaseImpact)
 
 console.log(`Current version : ${current}`)
 console.log(`Classification  : ${classification}`)

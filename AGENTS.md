@@ -246,7 +246,7 @@ for Spectre applications. It maps URL paths to lazy page modules and enforces th
 2. **Lifecycle enforcement** — `destroy()` must always run before the next `render()`
 3. **Zero dependencies** — standard browser APIs only
 4. **Async loaders** — dynamic `import()` pattern for page loading
-5. **Native History API** — `pushState` / `popstate`; no hash routing by default (hash mode is a planned opt-in)
+5. **Native History API** — `pushState` / `popstate`; no hash routing by default (hash mode is opt-in)
 6. **Race-condition safe** — `currentNavId` monotonic counter guards stale renders
 7. **Scripts are TypeScript** — all `scripts/` tooling is `.ts`, run via
    `node --experimental-strip-types`; never add a new `.js`/`.mjs` script.
@@ -266,7 +266,9 @@ All of typecheck, lint, build, tests, and `check:ecosystem` must pass.
 1. Make the smallest focused change that solves the stated problem
 2. Run `npm run check` — all green before handing off
 3. Update `CHANGELOG.md` and `README.md` when public behavior changes
-4. Leave commits, merges, tags, publishing, and releases for Bradley's approval
+4. Git-authorized agents commit and push directly to `main`; Codex cuts releases
+   under the standing authority above. Claude Code hands off validated work.
+   npm publishing stays with Bradley Potts; other branches and PRs require his explicit exception.
 
 ## Ecosystem Manifest
 

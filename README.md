@@ -24,7 +24,7 @@ it) and `spectre-init` (which scaffolds new apps against it).
 1. Read [AGENTS.md](AGENTS.md), then the agent-specific guide for the task.
 2. Check [TODO.md](TODO.md) and [ROADMAP.md](ROADMAP.md) for current scope.
 3. Make the smallest repo-local change that satisfies the task.
-4. Run `npm run check` when validation is required or practical.
+4. Run `npm run check` before marking any change complete.
 5. Update docs and [CHANGELOG.md](CHANGELOG.md) only when behavior, public
    contracts, or release-relevant metadata changed.
 
@@ -66,7 +66,7 @@ Part of the [PHCDevworks Spectre shell ecosystem](https://github.com/phcdevworks
 
 - You need a framework-integrated router (React Router, Vue Router, TanStack Router, etc.)
 - You need server-side rendering or file-based routing
-- You need application state management, persistent layouts, or design tokens
+- You need application state management or design tokens
 
 ## Capabilities
 
@@ -443,7 +443,7 @@ router.forward() // wraps history.forward()
 
 ## Boundaries
 
-This package owns client-side routing only. It does not own application bootstrapping, reactive state, persistence, layouts, design tokens, or server routing.
+This package owns client-side routing only. It does not own application bootstrapping, reactive state, persistence, layout markup, design tokens, or server routing.
 
 ## Development
 
@@ -454,11 +454,11 @@ npm run check
 
 Useful scripts:
 
-- `npm run typecheck` validates TypeScript without emitting files.
+- `npm run typecheck` validates source, tests, scripts, and TypeScript configuration files without emitting files.
 - `npm run lint` runs ESLint.
 - `npm test -- --run` runs the Vitest suite once.
 - `npm run build` emits declarations and JavaScript to `dist`.
-- `npm run check` runs the full verification gate (typecheck + lint + build + test + check:ecosystem).
+- `npm run check` runs the full verification gate (typecheck + lint + build + test + check:version-sync + check:ecosystem).
 
 AI-agent coordination starts in [AGENTS.md](./AGENTS.md), with companion
 guidance in [CLAUDE.md](./CLAUDE.md), [CODEX.md](./CODEX.md),
@@ -481,19 +481,20 @@ repository. Codex handles releases, including cutting tagged releases and
 GitHub Releases, and production stabilization. Jules handles small automated
 fixes and dependency updates. GitHub Copilot provides development support.
 
-All AI agents with repository access (Claude Code, Codex, Copilot, Jules)
-have commit, push, and tag authority in this repository. Publishing to npm
+Codex, Copilot, and Jules have commit, push, and tag authority and work directly
+on `main`. Claude Code has no git access and hands validated changes to Codex
+or Bradley Potts. Pull requests require an explicit exception from Bradley Potts. Publishing to npm
 remains Bradley Potts's sole authority. See [AGENTS.md](AGENTS.md) for the
 full commit-policy and release-authority grant.
 
 **Protected from automated change:** the routing-only scope (no application
-bootstrapping, reactive state, persistence, layouts, or design tokens added
+bootstrapping, reactive state, persistence, layout markup, or design tokens added
 locally). See [AGENTS.md](AGENTS.md) for full agent governance and boundary
 rules.
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md). The gate is `npm run check` — all of typecheck, lint, build, tests, and `check:ecosystem` must pass before opening a pull request.
+See [CONTRIBUTING.md](./CONTRIBUTING.md). The gate is `npm run check` — all of typecheck, lint, build, tests, and `check:ecosystem` must pass before a change is complete.
 
 ## Release Notes
 

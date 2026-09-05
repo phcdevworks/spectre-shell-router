@@ -155,10 +155,16 @@ describe("spectre-shell-router", () => {
       ctrlKey: true
     })
 
+    let preventedByRouter = true
+    window.addEventListener("click", (click) => {
+      preventedByRouter = click.defaultPrevented
+      // Observe the router first, then prevent jsdom's unsupported document navigation.
+      click.preventDefault()
+    }, { once: true })
     link.dispatchEvent(event)
     await tick()
 
-    expect(event.defaultPrevented).toBe(false)
+    expect(preventedByRouter).toBe(false)
     expect(window.location.pathname).toBe("/")
     expect(render).not.toHaveBeenCalled()
 

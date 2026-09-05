@@ -45,7 +45,7 @@ Run and interpret the full validation gate before any release handoff.
 npm run check
 ```
 
-`npm run check` runs: typecheck → lint → build → test → check:ecosystem. All steps must pass clean.
+`npm run check` runs: typecheck → lint → build → test → check:version-sync → check:ecosystem. All steps must pass clean.
 
 When a gate fails, Codex must:
 
@@ -147,7 +147,9 @@ Use this checklist before cutting every release (tag + GitHub Release).
    summary of what shipped. Do not include the version or roadmap phase in
    the release title. Confirm a
    `Contract change type: <additive|semantic change|breaking>`
-   classification line is present and accurate for the release.
+   classification line is present and accurate for the release. For a patch
+   bugfix, add `Release impact: patch` so `release:propose` selects the patch
+   increment; see `CONTRIBUTING.md` for supported combinations.
 3. Compare links at the bottom of `CHANGELOG.md` are updated.
 4. Stage and commit the version bump and changelog update.
 5. Create the git tag: `git tag v<version>` (matching `package.json`

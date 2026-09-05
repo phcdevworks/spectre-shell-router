@@ -41,14 +41,14 @@ Codex now executes all git operations for this repo; see
 
 When work is ready, Claude Code runs `npm run check`, then stops short of any
 git command and hands off to Codex (or Bradley Potts) with a summary of
-files changed and validation performed. Publishing packages and creating
-releases remain with Bradley Potts.
+files changed and validation performed. Codex cuts releases under the standing authority in `AGENTS.md`; npm publishing
+remains with Bradley Potts.
 
 ## Pull Request Creation
 
-Claude Code prepares changes and hands off the branch/diff to Codex (or
-Bradley Potts) to commit, tag, and open a PR where the repository's workflow
-calls for one — Claude Code does not create commits, tags, or PRs directly.
+Claude Code hands validated changes to Codex (or Bradley Potts) for commit
+and push directly to `main`. Other branches and pull requests require an
+explicit exception from Bradley Potts. Claude Code never executes git.
 
 ---
 
@@ -80,7 +80,7 @@ Key scripts:
 
 ```bash
 npm run check          # Full verification: typecheck + lint + build + test + check:ecosystem
-npm run typecheck      # tsc --noEmit only
+npm run typecheck      # Source, tests, scripts, and TypeScript configs
 npm run lint           # ESLint
 npm run lint:fix       # ESLint with auto-fix
 npm run build          # tsc emit to dist/
@@ -174,7 +174,6 @@ explicitly out of scope:
 
 ## Roadmap
 
-See `ROADMAP.md`. Phases 1-3 are complete. Phase 4 (Production Readiness) is the active
-phase — priorities: error routes (P0, `errorRoute` option and `onError` callback), navigation
-history helpers (P1, `router.back()` / `router.forward()` / `router.replace()`), and nested
-routing (P2, evaluation-only until a concrete need is confirmed).
+See `ROADMAP.md`. Phases 1 through 4 are complete, including error routes,
+navigation history helpers, and nested routing. No active phase is open;
+new routing surface is driven by concrete downstream needs.
