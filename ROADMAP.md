@@ -29,7 +29,7 @@ restate delivered work.
 | 3       | Ecosystem integration — `router.subscribe()`, `onNavigationStart`/`onNavigationEnd`, per-route `meta`, `afterNavigate`, full README API docs for the signals/loading/title patterns                                                    | 1.1.0       |
 | 4 P0/P1 | Production readiness — `errorRoute` + `onError` for deterministic error handling, `router.back()`/`forward()`/`replace()` history helpers                                                                                              | 1.2.0       |
 | 4 P2    | Nested routing — `Route.routes?: Route[]` with `[data-router-outlet]` mounting, cross-level param merging, ancestor-layout persistence across sibling navigations                                                                      | 1.4.0       |
-| 5       | Deployment and performance — `RouterOptions.basePath` for URL-prefix deployment, `AbortSignal`-based cancellable loaders | Unreleased  |
+| 5       | Deployment and performance — `RouterOptions.basePath` for URL-prefix deployment, `AbortSignal`-based cancellable loaders | 1.5.0       |
 
 ### What will not change
 
