@@ -3,22 +3,22 @@ import { proposeVersion } from '../scripts/release-version'
 
 describe('release version proposals', () => {
   it('allows explicit patch releases for bug fixes', () => {
-    expect(proposeVersion('1.4.1', 'semantic change', 'patch')).toEqual({
-      proposed: '1.4.2', bumpType: 'patch',
+    expect(proposeVersion('2.3.4', 'semantic change', 'patch')).toEqual({
+      proposed: '2.3.5', bumpType: 'patch',
     })
   })
   it.each(['additive', 'semantic change'] as const)('preserves the minor default for %s', (kind) => {
-    expect(proposeVersion('1.4.1', kind).proposed).toBe('1.5.0')
+    expect(proposeVersion('2.3.4', kind).proposed).toBe('2.4.0')
   })
   it('defaults breaking changes to major', () => {
-    expect(proposeVersion('1.4.1', 'breaking').proposed).toBe('2.0.0')
+    expect(proposeVersion('2.3.4', 'breaking').proposed).toBe('3.0.0')
   })
   it('rejects undersized releases and invalid impact values', () => {
-    expect(() => proposeVersion('1.4.1', 'breaking', 'minor')).toThrow()
-    expect(() => proposeVersion('1.4.1', 'additive', 'patch')).toThrow()
-    expect(() => proposeVersion('1.4.1', 'semantic change', 'typo')).toThrow()
+    expect(() => proposeVersion('2.3.4', 'breaking', 'minor')).toThrow()
+    expect(() => proposeVersion('2.3.4', 'additive', 'patch')).toThrow()
+    expect(() => proposeVersion('2.3.4', 'semantic change', 'typo')).toThrow()
   })
-  it.each(['1.4', '1.4.1oops', '01.4.1'])('rejects invalid version %s', (version) => {
+  it.each(['2.3', '2.3.4oops', '02.3.4'])('rejects invalid version %s', (version) => {
     expect(() => proposeVersion(version, 'semantic change', 'patch')).toThrow()
   })
 })
