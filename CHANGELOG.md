@@ -4,6 +4,11 @@ All notable changes to this project will be documented here. The format follows 
 
 ## [Unreleased]
 
+### Changed
+
+- Standardized the package summary against the approved PHCDevworks product
+  description.
+
 ## [1.5.0] - 2026-09-06
 
 **Release Title:** Routing Reliability, Base Paths, and Cancellable Loaders
