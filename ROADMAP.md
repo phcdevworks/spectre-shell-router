@@ -46,8 +46,8 @@ restate delivered work.
 
 No active phase is currently open. Phase 5 is complete.
 
-New routing surface beyond what's shipped opens on demand, when a downstream consumer or
-vendor surfaces a concrete need — see [TODO.md](TODO.md).
+New routing surface can be planned proactively, without waiting for a
+downstream request — see [TODO.md](TODO.md).
 
 ---
 

@@ -1,6 +1,6 @@
 {
   "name": "@phcdevworks/spectre-shell-router",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "@phcdevworks/spectre-shell-router is the navigation layer of the Spectre application shell. It provides predictable routing and route-state behavior for modular Spectre applications.",
   "keywords": [
     "phcdevworks",
@@ -17,7 +17,7 @@
   "author": "PHCDevworks",
   "license": "MIT",
   "type": "module",
-  "packageManager": "npm@12.0.2",
+  "packageManager": "npm@12.2.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -69,15 +69,15 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@phcdevworks/spectre-manifest": "^1.2.0",
-    "@types/node": "^26.6.2",
+    "@types/node": "^26.6.5",
     "@typescript/native": "npm:typescript@^7.0.2",
-    "eslint": "^10.11.0",
-    "globals": "^17.12.0",
+    "eslint": "^10.12.0",
+    "globals": "^17.13.0",
     "jiti": "^2.7.0",
-    "jsdom": "^30.0.1",
-    "prettier": "^3.9.8",
+    "jsdom": "^30.1.2",
+    "prettier": "^3.9.10",
     "typescript": "npm:@typescript/typescript6@^6.0.2",
-    "typescript-eslint": "^8.70.0",
-    "vitest": "^5.0.1"
+    "typescript-eslint": "^8.71.1",
+    "vitest": "^5.0.3"
   }
 }

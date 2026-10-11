@@ -87,7 +87,12 @@ export class Router {
     if (options.errorRoute !== undefined && !allPaths.includes(options.errorRoute)) {
       throw new Error(`errorRoute "${options.errorRoute}" does not match any route path.`)
     }
-    this.handleNavigationBound = () => { void this.handleNavigation('pop') }
+    this.handleNavigationBound = () => {
+      // Browsers fire popstate for in-page fragment links (e.g. #section); those are not routes.
+      const hash = window.location.hash
+      if (this.mode === 'hash' && hash && !hash.startsWith('#/')) return
+      void this.handleNavigation('pop')
+    }
     this.handleHashChangeBound = this.handleHashChange.bind(this)
     this.handleLinkClickBound = this.handleLinkClick.bind(this)
 

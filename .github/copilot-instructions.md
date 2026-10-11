@@ -39,4 +39,5 @@ roster and authority table: [AGENTS.md](../AGENTS.md).
 - Route behavior, architecture, public API contract, and test strategy direction are Claude Code-owned
 - Documentation, releases, stabilization, repo hygiene, and config standardization are Codex-owned
 - Mechanical dependency/config micro-updates are Jules/Dependabot-owned and scoped by `JULES.md`
+- xAI Grok (including Grok Bot) works under these same instructions; see `GROK.md` for its git authority.
 - Copilot output is advisory and should align with the owning agent decisions

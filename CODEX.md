@@ -72,7 +72,7 @@ Audit sequence:
 
 1. `README.md` — must accurately describe all public API types and behavior.
 2. `CHANGELOG.md` — must follow Keep a Changelog format with version links at the bottom.
-3. `CLAUDE.md`, `CODEX.md`, `JULES.md`, `COPILOT.md` — must stay internally consistent and
+3. `CLAUDE.md`, `CODEX.md`, `JULES.md`, `GROK.md`, `COPILOT.md` — must stay internally consistent and
    agree with `AGENTS.md`'s authority hierarchy.
 4. `ROADMAP.md` — completed phases marked, active phase current.
 

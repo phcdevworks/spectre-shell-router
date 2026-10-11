@@ -41,7 +41,7 @@ Codex now executes all git operations for this repo; see
 
 When work is ready, Claude Code runs `npm run check`, then stops short of any
 git command and hands off to Codex (or Bradley Potts) with a summary of
-files changed and validation performed. Codex cuts releases under the standing authority in `AGENTS.md`; npm publishing
+files changed and validation performed. Codex cuts a release only when Bradley Potts says to get this repo ready for release; npm publishing
 remains with Bradley Potts.
 
 ## Pull Request Creation
@@ -176,4 +176,4 @@ explicitly out of scope:
 
 See `ROADMAP.md`. Phases 1 through 4 are complete, including error routes,
 navigation history helpers, and nested routing. No active phase is open;
-new routing surface is driven by concrete downstream needs.
+new routing surface is planned proactively, not only on downstream request.
