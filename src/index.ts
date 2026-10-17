@@ -22,6 +22,13 @@ export type Route = {
 export type NavigationContext = {
   from: string | null
   to: string
+  params: Record<string, string>
+  query: URLSearchParams
+  meta?: Record<string, unknown>
+}
+
+export type NavigateOptions = {
+  state?: Record<string, unknown>
 }
 
 export type RouterOptions = {
@@ -31,7 +38,7 @@ export type RouterOptions = {
   errorRoute?: string
   beforeNavigate?: (
     context: NavigationContext,
-    next: (redirect?: string) => void,
+    next: (redirect?: string) => void
   ) => void | Promise<void>
   onNavigationStart?: (context: NavigationContext) => void
   onNavigationEnd?: (context: NavigationContext) => void
@@ -40,6 +47,16 @@ export type RouterOptions = {
 }
 
 export type Unsubscribe = () => void
+
+type ParamKeys<P extends string> = P extends `${infer Head}/${infer Tail}`
+  ? ParamKeys<Head> | ParamKeys<Tail>
+  : P extends `:${infer Name}`
+    ? Name
+    : P extends '*'
+      ? '*'
+      : never
+
+export type RouteParams<P extends string> = { [K in ParamKeys<P>]: string }
 
 type MatchedLevel = {
   route: Route
@@ -51,10 +68,19 @@ type ChainEntry = MatchedLevel & {
   outlet: HTMLElement
 }
 
+type MatchResult = { ok: true; chain: MatchedLevel[] | null } | { ok: false; error: unknown }
+
+const MAX_REDIRECTS = 10
+
 function paramsEqual(a: Record<string, string>, b: Record<string, string>): boolean {
   const aKeys = Object.keys(a)
   if (aKeys.length !== Object.keys(b).length) return false
   return aKeys.every((key) => a[key] === b[key])
+}
+
+function mergeMeta(chain: MatchedLevel[]): Record<string, unknown> | undefined {
+  const metas = chain.flatMap(({ route }) => (route.meta ? [route.meta] : []))
+  return metas.length > 0 ? Object.assign({}, ...metas) : undefined
 }
 
 export class Router {
@@ -70,9 +96,13 @@ export class Router {
   private handleLinkClickBound: (e: MouseEvent) => void
   private currentNavId = 0
   private currentAbortController: AbortController | null = null
+  private preloadAbortController = new AbortController()
   private currentPath: string | null = null
   private currentUrl: string | null = null
+  private currentContext: RouteContext | null = null
+  private redirectCount = 0
   private nameIndex: Map<string, string> = new Map()
+  private segmentCache: WeakMap<Route, string[]> = new WeakMap()
   private subscribers: Set<(context: RouteContext) => void> = new Set()
 
   constructor(routes: Route[], root: HTMLElement, options: RouterOptions = {}) {
@@ -105,33 +135,31 @@ export class Router {
     void this.handleNavigation('push')
   }
 
-  public navigate(path: string) {
-    if (!this.rootEl) {
-      throw new Error('Router has been destroyed or not initialized.')
-    }
-    if (this.scrollRestoration) {
-      history.replaceState({ ...history.state, scrollY: window.scrollY }, '')
-    }
-    history.pushState({}, '', this.mode === 'hash' ? `#${path}` : this.withBasePath(path))
+  public get current(): RouteContext | null {
+    return this.currentContext
+  }
+
+  public navigate(path: string, options: NavigateOptions = {}) {
+    this.assertActive()
+    this.saveScrollPosition()
+    history.pushState(options.state ?? {}, '', this.toUrl(path))
     void this.handleNavigation('push')
   }
 
-  public replace(path: string) {
-    if (!this.rootEl) {
-      throw new Error('Router has been destroyed or not initialized.')
-    }
-    if (this.scrollRestoration) {
-      history.replaceState({ ...history.state, scrollY: window.scrollY }, '')
-    }
-    history.replaceState({}, '', this.mode === 'hash' ? `#${path}` : this.withBasePath(path))
+  public replace(path: string, options: NavigateOptions = {}) {
+    this.assertActive()
+    this.saveScrollPosition()
+    history.replaceState(options.state ?? {}, '', this.toUrl(path))
     void this.handleNavigation('push')
   }
 
   public back() {
+    this.assertActive()
     history.back()
   }
 
   public forward() {
+    this.assertActive()
     history.forward()
   }
 
@@ -150,25 +178,64 @@ export class Router {
     const path = pattern
       .split('/')
       .map((segment) => {
-        if (!segment.startsWith(':')) return segment
-        const key = segment.slice(1)
+        if (segment !== '*' && !segment.startsWith(':')) return segment
+        const key = segment === '*' ? '*' : segment.slice(1)
         const value = params?.[key]
         if (value === undefined) throw new Error(`Missing param "${key}" for route "${name}".`)
-        return encodeURIComponent(value)
+        return segment === '*'
+          ? value.split('/').filter(Boolean).map(encodeURIComponent).join('/')
+          : encodeURIComponent(value)
       })
       .join('/')
-    return this.mode === 'hash' ? `#${path}` : this.withBasePath(path)
+    const normalized = path.length > 1 ? path.replace(/\/+$/, '') : path
+    return this.toUrl(normalized)
+  }
+
+  public async preload(path: string): Promise<void> {
+    this.assertActive()
+    const pathname = path.split(/[?#]/)[0] || '/'
+    let chain: MatchedLevel[] | null
+    try {
+      chain = this.matchChain(this.routes, pathname.split('/').filter(Boolean))
+    } catch {
+      return
+    }
+    if (!chain) return
+    const signal = this.preloadAbortController.signal
+    try {
+      await Promise.all(chain.map(({ route }) => route.loader(signal)))
+    } catch {
+      // preloading is a hint; the real navigation reports loader failures through onError
+    }
   }
 
   public destroy() {
     this.currentAbortController?.abort()
+    this.preloadAbortController.abort()
     this.destroyChain(0)
     window.removeEventListener('popstate', this.handleNavigationBound)
     if (this.mode === 'hash') {
       window.removeEventListener('hashchange', this.handleHashChangeBound)
     }
     document.removeEventListener('click', this.handleLinkClickBound)
+    this.currentContext = null
     this.rootEl = null
+  }
+
+  private assertActive() {
+    if (!this.rootEl) {
+      throw new Error('Router has been destroyed or not initialized.')
+    }
+  }
+
+  private saveScrollPosition() {
+    if (this.scrollRestoration) {
+      history.replaceState({ ...history.state, scrollY: window.scrollY }, '')
+    }
+  }
+
+  private toUrl(path: string): string {
+    return this.mode === 'hash' ? `#${path}` : this.withBasePath(path)
   }
 
   private normalizeBasePath(basePath: string | undefined): string {
@@ -217,7 +284,10 @@ export class Router {
       return
     }
 
-    const link = (e.target as HTMLElement).closest('a')
+    // composedPath() reaches anchors inside shadow roots, where e.target is retargeted to the host.
+    const link = e
+      .composedPath()
+      .find((node): node is HTMLAnchorElement => node instanceof HTMLAnchorElement)
     if (
       !link ||
       link.target ||
@@ -270,6 +340,26 @@ export class Router {
     this.currentChain.length = fromIndex
   }
 
+  private clearRoot() {
+    this.destroyChain(0)
+    this.currentContext = null
+    if (this.rootEl) this.rootEl.innerHTML = ''
+  }
+
+  private revertUrl() {
+    if (this.currentUrl !== null) {
+      history.replaceState({}, '', this.currentUrl)
+    }
+  }
+
+  private recover(path: string) {
+    if (this.options.errorRoute !== undefined && path !== this.options.errorRoute) {
+      this.replace(this.options.errorRoute)
+    } else {
+      this.clearRoot()
+    }
+  }
+
   private async handleNavigation(source: 'push' | 'pop') {
     if (!this.rootEl) return
     this.currentAbortController?.abort()
@@ -279,11 +369,25 @@ export class Router {
     const path = this.getCurrentPath()
     const query = this.getCurrentQuery()
     const url = window.location.href
-    const navContext: NavigationContext = { from: this.currentPath, to: path }
+
+    let match: MatchResult
+    try {
+      match = { ok: true, chain: this.matchChain(this.routes, path.split('/').filter(Boolean)) }
+    } catch (error) {
+      match = { ok: false, error }
+    }
+    const chain = match.ok ? match.chain : null
+    const navContext: NavigationContext = {
+      from: this.currentPath,
+      to: path,
+      params: chain ? Object.assign({}, ...chain.map((level) => level.params)) : {},
+      query,
+      meta: chain ? mergeMeta(chain) : undefined,
+    }
 
     this.options.onNavigationStart?.(navContext)
     try {
-      await this.runNavigation(navId, source, path, query, navContext, url, abortController.signal)
+      await this.runNavigation(navId, source, match, navContext, url, abortController.signal)
     } finally {
       this.options.onNavigationEnd?.(navContext)
     }
@@ -292,13 +396,13 @@ export class Router {
   private async runNavigation(
     navId: number,
     source: 'push' | 'pop',
-    path: string,
-    query: URLSearchParams,
+    match: MatchResult,
     navContext: NavigationContext,
     url: string,
-    signal: AbortSignal,
+    signal: AbortSignal
   ) {
     if (!this.rootEl) return
+    const path = navContext.to
 
     if (this.options.beforeNavigate) {
       let allowed = false
@@ -312,36 +416,37 @@ export class Router {
       if (navId !== this.currentNavId || !this.rootEl) return
 
       if (!allowed) {
-        if (this.currentUrl !== null) {
-          history.replaceState({}, '', this.currentUrl)
-        }
+        this.redirectCount = 0
+        this.revertUrl()
         return
       }
 
       if (redirectTo !== undefined) {
+        if (this.redirectCount >= MAX_REDIRECTS) {
+          this.redirectCount = 0
+          this.options.onError?.(
+            new Error(`Redirect limit of ${MAX_REDIRECTS} exceeded navigating to "${path}".`),
+            navContext
+          )
+          this.revertUrl()
+          return
+        }
+        this.redirectCount++
         this.navigate(redirectTo)
         return
       }
     }
+    this.redirectCount = 0
 
-    const segments = path.split('/').filter(Boolean)
-    let chain: MatchedLevel[] | null
-    try {
-      chain = this.matchChain(this.routes, segments)
-    } catch (error) {
-      this.options.onError?.(error, navContext)
+    if (!match.ok) {
+      this.options.onError?.(match.error, navContext)
       if (navId !== this.currentNavId || !this.rootEl) return
-      if (this.options.errorRoute !== undefined && path !== this.options.errorRoute) {
-        this.replace(this.options.errorRoute)
-      } else {
-        this.destroyChain(0)
-        this.rootEl.innerHTML = ''
-      }
+      this.recover(path)
       return
     }
 
-    if (chain) {
-      await this.renderChain(navId, chain, path, query, navContext, source, url, signal)
+    if (match.chain) {
+      await this.renderChain(navId, match.chain, navContext, source, url, signal)
       return
     }
 
@@ -352,8 +457,7 @@ export class Router {
       return
     }
 
-    this.destroyChain(0)
-    this.rootEl.innerHTML = ''
+    this.clearRoot()
     this.currentPath = path
     this.currentUrl = url
   }
@@ -361,14 +465,13 @@ export class Router {
   private async renderChain(
     navId: number,
     chain: MatchedLevel[],
-    path: string,
-    query: URLSearchParams,
     navContext: NavigationContext,
     source: 'push' | 'pop',
     url: string,
-    signal: AbortSignal,
+    signal: AbortSignal
   ) {
     if (!this.rootEl) return
+    const { to: path, query } = navContext
 
     let divergeAt = 0
     while (
@@ -402,12 +505,7 @@ export class Router {
       } catch (error) {
         if (navId !== this.currentNavId || !this.rootEl) return
         this.options.onError?.(error, navContext)
-        if (this.options.errorRoute !== undefined && path !== this.options.errorRoute) {
-          this.replace(this.options.errorRoute)
-        } else {
-          this.destroyChain(0)
-          this.rootEl.innerHTML = ''
-        }
+        this.recover(path)
         return
       }
 
@@ -431,15 +529,10 @@ export class Router {
         if (!found) {
           const error = new Error(
             `Route "${route.path}" has child routes but its rendered output has no ` +
-              '[data-router-outlet] element for them to mount into.',
+              '[data-router-outlet] element for them to mount into.'
           )
           this.options.onError?.(error, navContext)
-          if (this.options.errorRoute !== undefined && path !== this.options.errorRoute) {
-            this.replace(this.options.errorRoute)
-          } else {
-            this.destroyChain(0)
-            this.rootEl.innerHTML = ''
-          }
+          this.recover(path)
           return
         }
         outlet = found
@@ -451,6 +544,7 @@ export class Router {
       if (isLeaf) {
         this.currentPath = path
         this.currentUrl = url
+        this.currentContext = context
         this.notifySubscribers(context)
         this.options.afterNavigate?.(context)
       }
@@ -460,16 +554,42 @@ export class Router {
       if (source === 'pop') {
         const savedY = (history.state as Record<string, unknown>)?.scrollY
         window.scrollTo(0, typeof savedY === 'number' ? savedY : 0)
-      } else {
+      } else if (!this.scrollToFragment()) {
         window.scrollTo(0, 0)
       }
     }
+  }
+
+  private scrollToFragment(): boolean {
+    if (this.mode === 'hash') return false
+    const id = window.location.hash.slice(1)
+    if (!id) return false
+    let target: HTMLElement | null
+    try {
+      target = document.getElementById(id) ?? document.getElementById(decodeURIComponent(id))
+    } catch {
+      return false
+    }
+    if (!target) return false
+    target.scrollIntoView()
+    return true
   }
 
   private indexRoutes(routes: Route[], prefix: string): string[] {
     const paths: string[] = []
     for (const route of routes) {
       const full = this.joinPath(prefix, route.path)
+      const segments = route.path.split('/').filter(Boolean)
+      const wildcardAt = segments.indexOf('*')
+      if (
+        wildcardAt !== -1 &&
+        (wildcardAt !== segments.length - 1 || (route.routes && route.routes.length > 0))
+      ) {
+        throw new Error(
+          `Route "${full}": "*" is only allowed as the final segment of a route without child routes.`
+        )
+      }
+      this.segmentCache.set(route, segments)
       paths.push(full)
       if (route.name) this.nameIndex.set(route.name, full)
       if (route.routes && route.routes.length > 0) {
@@ -477,6 +597,15 @@ export class Router {
       }
     }
     return paths
+  }
+
+  private routeSegments(route: Route): string[] {
+    let segments = this.segmentCache.get(route)
+    if (!segments) {
+      segments = route.path.split('/').filter(Boolean)
+      this.segmentCache.set(route, segments)
+    }
+    return segments
   }
 
   private joinPath(prefix: string, path: string): string {
@@ -488,11 +617,13 @@ export class Router {
   }
 
   private matchSegments(routeParts: string[], urlParts: string[]): Record<string, string> | null {
-    if (routeParts.length !== urlParts.length) return null
+    const wildcard = routeParts[routeParts.length - 1] === '*'
+    const fixed = wildcard ? routeParts.length - 1 : routeParts.length
+    if (wildcard ? urlParts.length < fixed : urlParts.length !== fixed) return null
 
     const params: Record<string, string> = {}
 
-    for (let i = 0; i < routeParts.length; i++) {
+    for (let i = 0; i < fixed; i++) {
       const routePart = routeParts[i]
       const urlPart = decodeURIComponent(urlParts[i])
 
@@ -503,12 +634,16 @@ export class Router {
       }
     }
 
+    if (wildcard) {
+      params['*'] = urlParts.slice(fixed).map(decodeURIComponent).join('/')
+    }
+
     return params
   }
 
   private matchChain(routes: Route[], segments: string[]): MatchedLevel[] | null {
     for (const route of routes) {
-      const routeParts = route.path.split('/').filter(Boolean)
+      const routeParts = this.routeSegments(route)
       const children = route.routes
 
       if (children && children.length > 0) {

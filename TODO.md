@@ -1,6 +1,6 @@
 # Spectre Shell Router — Execution Todo
 
-No active work is currently open in this package. Phases 1 through 4 are
+No active work is currently open in this package. Phases 1 through 6 are
 complete — see [ROADMAP.md](ROADMAP.md) for the full delivery history and
 [CHANGELOG.md](CHANGELOG.md) for release-by-release detail.
 

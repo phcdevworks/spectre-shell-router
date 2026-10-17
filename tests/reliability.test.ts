@@ -144,7 +144,7 @@ describe("Router Reliability Tests", () => {
 
     expect(root.innerHTML).toBe("Error")
     expect(onError).toHaveBeenCalledTimes(1)
-    expect(onError.mock.calls[0][1]).toEqual({ from: "/", to: "/fail" })
+    expect(onError.mock.calls[0][1]).toEqual(expect.objectContaining({ from: "/", to: "/fail" }))
 
     router.destroy()
   })

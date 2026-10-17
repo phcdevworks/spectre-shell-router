@@ -678,8 +678,8 @@ describe("spectre-shell-router", () => {
       const router = new Router(routes, root, { onNavigationStart, onNavigationEnd })
       await tick()
 
-      expect(onNavigationStart).toHaveBeenCalledWith({ from: null, to: "/" })
-      expect(onNavigationEnd).toHaveBeenCalledWith({ from: null, to: "/" })
+      expect(onNavigationStart).toHaveBeenCalledWith(expect.objectContaining({ from: null, to: "/" }))
+      expect(onNavigationEnd).toHaveBeenCalledWith(expect.objectContaining({ from: null, to: "/" }))
 
       onNavigationStart.mockClear()
       onNavigationEnd.mockClear()
@@ -687,8 +687,8 @@ describe("spectre-shell-router", () => {
       router.navigate("/next")
       await tick()
 
-      expect(onNavigationStart).toHaveBeenCalledWith({ from: "/", to: "/next" })
-      expect(onNavigationEnd).toHaveBeenCalledWith({ from: "/", to: "/next" })
+      expect(onNavigationStart).toHaveBeenCalledWith(expect.objectContaining({ from: "/", to: "/next" }))
+      expect(onNavigationEnd).toHaveBeenCalledWith(expect.objectContaining({ from: "/", to: "/next" }))
       router.destroy()
     })
 

@@ -32,9 +32,9 @@ describe('navigation regressions', () => {
     await tick()
     router.navigate('/items/%')
     await tick()
-    expect(onError).toHaveBeenCalledExactlyOnceWith(expect.any(URIError), {
+    expect(onError).toHaveBeenCalledExactlyOnceWith(expect.any(URIError), expect.objectContaining({
       from: '/', to: '/items/%',
-    })
+    }))
     expect(loader).not.toHaveBeenCalled()
     expect(root.textContent).toBe(errorRoute ? 'Error' : '')
     router.navigate('/')
@@ -90,7 +90,7 @@ describe('navigation regressions', () => {
     await tick()
     router.navigate('/missing')
     await tick()
-    expect(onError).toHaveBeenCalledExactlyOnceWith(expect.any(Error), { from: '/', to: '/missing' })
+    expect(onError).toHaveBeenCalledExactlyOnceWith(expect.any(Error), expect.objectContaining({ from: '/', to: '/missing' }))
     expect(root.textContent).toBe('')
     expect(destroy).toHaveBeenCalledTimes(1)
   })

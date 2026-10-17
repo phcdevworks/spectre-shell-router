@@ -4,6 +4,49 @@ All notable changes to this project will be documented here. The format follows 
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-10-17
+
+**Release Title:** Guard-Aware Navigation and Catch-All Routing
+
+Contract change type: additive
+
+### Added
+
+- `NavigationContext` now carries `params`, `query`, and `meta` (shallow-merged across a nested
+  route chain, child keys winning). Routes are matched before `beforeNavigate` runs, so guards
+  can act on route metadata such as `meta.requiresAuth`.
+- Catch-all route segments: a trailing `*` matches the rest of the path (zero or more segments)
+  into `params['*']`. `path: '*'` serves an in-place 404 without changing the URL, and
+  `router.href()` accepts a `'*'` param. A `*` anywhere but the final segment, or on a route
+  with child routes, throws at construction.
+- `router.current` — read-only getter for the most recently rendered `RouteContext`; `null`
+  before the first render, after an unmatched or failed navigation, and after `destroy()`.
+- `router.preload(path)` — best-effort warm-up that runs every loader in the matched chain
+  without rendering. Unmatched paths and loader failures resolve silently; the signal passed to
+  preloading loaders is aborted on `destroy()`.
+- `navigate(path, { state })` and `replace(path, { state })` attach caller state to the history
+  entry (new exported `NavigateOptions` type).
+- `RouteParams<'/users/:id'>` — exported type-only helper that infers param keys from a path
+  string, including `'*'`. No runtime cost.
+
+### Changed
+
+- Updated development tooling, including the ecosystem manifest validator, ESLint, TypeScript
+  ESLint, Vitest, jsdom, and transitive packages.
+- Push navigations to a URL with a fragment (e.g. `/guide#install`) scroll the matching element
+  into view instead of scrolling to the top, when `scrollRestoration` is enabled in history mode.
+- `back()` and `forward()` now throw after `destroy()`, matching `navigate()` and `replace()`.
+- Route path patterns are split once at construction instead of on every navigation.
+
+### Fixed
+
+- Link interception now resolves the clicked `<a>` through `event.composedPath()`, so links
+  rendered inside shadow roots (e.g. Spectre web components) are routed instead of triggering a
+  full page load.
+- A `beforeNavigate` guard that keeps redirecting is stopped after 10 consecutive redirects:
+  `onError` receives a "Redirect limit" error and the URL reverts to the current route, instead
+  of looping forever.
+
 ## [1.5.1] - 2026-10-12
 
 **Release Title:** Hash Fragment Navigation Fix
@@ -191,7 +234,8 @@ Release Title: Initial Router Foundation
 - **Initial Release**: Minimal, framework-agnostic client-side router for Spectre-based applications.
 - **Features**: Includes string-based path matching, dynamic parameter extraction, and native History API integration.
 
-[unreleased]: https://github.com/phcdevworks/spectre-shell-router/compare/v1.5.1...HEAD
+[unreleased]: https://github.com/phcdevworks/spectre-shell-router/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/phcdevworks/spectre-shell-router/compare/v1.5.1...v1.6.0
 [1.5.1]: https://github.com/phcdevworks/spectre-shell-router/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/phcdevworks/spectre-shell-router/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/phcdevworks/spectre-shell-router/compare/1.3.0...1.4.0

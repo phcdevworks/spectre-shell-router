@@ -16,7 +16,7 @@ it) and `spectre-init` (which scaffolds new apps against it).
 | Project team           | `project-shell`                     |
 | Repository role        | Spectre client-side router          |
 | Package/artifact       | `@phcdevworks/spectre-shell-router` |
-| Current version/status | 1.5.1                               |
+| Current version/status | 1.6.0                               |
 
 ## Standard Workflow
 
@@ -70,11 +70,12 @@ Part of the [PHCDevworks Spectre shell ecosystem](https://github.com/phcdevworks
 
 ## Capabilities
 
-- Route matching with `:param` path segments.
+- Route matching with `:param` and trailing catch-all `*` path segments.
 - Lazy page loading through route `loader` functions.
 - Browser History API integration for programmatic navigation and link interception.
 - Optional hash-based routing mode.
 - Route guards with cancellation and redirect support.
+- Guard context with matched params, query values, and merged route metadata.
 - Scroll restoration for push and browser back/forward navigation.
 - Query string access through `URLSearchParams`.
 - Page cleanup through optional `destroy` hooks.
@@ -86,6 +87,8 @@ Part of the [PHCDevworks Spectre shell ecosystem](https://github.com/phcdevworks
 - `router.back()`, `router.forward()`, and `router.replace()` navigation history helpers.
 - Nested routing — a `routes` array on a `Route` renders child pages into a parent-declared
   `[data-router-outlet]` element, with the parent layout kept mounted across child navigations.
+- Best-effort route preloading through `router.preload()` and current route access through
+  `router.current`.
 
 ## Requirements
 
@@ -150,6 +153,13 @@ type Route = {
 type NavigationContext = {
   from: string | null
   to: string
+  params: Record<string, string>
+  query: URLSearchParams
+  meta?: Record<string, unknown> // merged across a nested route chain; child keys win
+}
+
+type NavigateOptions = {
+  state?: Record<string, unknown>
 }
 
 type RouterOptions = {
@@ -183,6 +193,9 @@ type RouteContext = {
 type Unsubscribe = () => void
 ```
 
+The exported generic `RouteParams<Path>` maps every inferred `:param` and `*` key in a literal
+route pattern to `string`.
+
 ### Router class
 
 ```ts
@@ -190,10 +203,10 @@ class Router {
   constructor(routes: Route[], root: HTMLElement, options?: RouterOptions)
 
   // Push a new path onto history and navigate to it.
-  navigate(path: string): void
+  navigate(path: string, options?: NavigateOptions): void
 
   // Navigate to path without adding a new history entry (uses replaceState).
-  replace(path: string): void
+  replace(path: string, options?: NavigateOptions): void
 
   // Thin wrappers around history.back() / history.forward().
   back(): void
@@ -202,6 +215,12 @@ class Router {
   // Build a path string from a named route and optional params.
   // Throws if the name is unknown or a required :param segment has no matching key.
   href(name: string, params?: Record<string, string>): string
+
+  // Best-effort warm-up for all loaders in a matched route chain.
+  preload(path: string): Promise<void>
+
+  // The most recently rendered leaf RouteContext, or null when none is rendered.
+  readonly current: RouteContext | null
 
   // Subscribe to completed navigations. Fires with the current RouteContext
   // after every render. Returns an unsubscribe function.
@@ -226,6 +245,27 @@ router.href('home')              // '/'
 router.href('user', { id: '42' })  // '/users/42'
 ```
 
+Catch-all routes use `*` only as the final segment and capture zero or more remaining path
+segments in `params['*']`. Put a catch-all after more specific sibling routes because routes are
+matched in declaration order:
+
+```ts
+const routes: Route[] = [
+  { path: '/docs/start', loader: loadStart },
+  { name: 'docs', path: '/docs/*', loader: loadDocs },
+  { path: '*', loader: loadNotFound },
+]
+
+router.href('docs', { '*': 'guides/installation' }) // '/docs/guides/installation'
+```
+
+`RouteParams<Path>` can derive the required parameter object for a literal route pattern:
+
+```ts
+type UserPostParams = RouteParams<'/users/:id/posts/:postId'>
+// { id: string; postId: string }
+```
+
 **Router options examples:**
 
 ```ts
@@ -243,6 +283,28 @@ const router = new Router(routes, root, {
 })
 ```
 
+`NavigationContext` passed to guards and navigation hooks includes the matched `params`, parsed
+`query`, and route `meta`. For nested routes, metadata is shallow-merged from parent to child,
+with child keys winning. Redirect chains are limited to 10 redirects; exceeding the limit calls
+`onError` and restores the last rendered URL.
+
+### Preloading and current route state
+
+Use `preload()` as a best-effort hint before navigation. It loads every module in the matched
+route chain without rendering, changing history, or reporting failures through `onError`:
+
+```ts
+await router.preload('/docs/getting-started')
+
+const current = router.current
+if (current) {
+  console.log(current.path, current.params)
+}
+```
+
+`router.current` is `null` before the first successful render, after an unmatched or failed
+navigation, and after `destroy()`.
+
 ### Deploying under a base path
 
 Pass `basePath` when an app is served under a URL prefix, such as behind a reverse proxy at
@@ -259,8 +321,8 @@ matching and re-applied by `navigate()`, `replace()`, `href()`, and link interce
 // window.location.pathname === '/portal/users/42'
 // matches the '/users/:id' route with params.id === '42'
 
-router.navigate('/users/7')  // -> pushes '/portal/users/7'
-router.href('user', { id: '7' })  // -> '/portal/users/7'
+router.navigate('/users/7') // -> pushes '/portal/users/7'
+router.href('user', { id: '7' }) // -> '/portal/users/7'
 ```
 
 Clicks on `<a>` links whose `href` falls outside `basePath` are left alone (not intercepted), so
@@ -471,9 +533,14 @@ silently clearing the outlet. `onError` fires first regardless of whether
 
 ```ts
 router.replace('/login') // navigate without adding a history entry
+router.navigate('/checkout', { state: { source: 'cart' } })
+router.replace('/login', { state: { returnTo: '/checkout' } })
 router.back() // wraps history.back()
 router.forward() // wraps history.forward()
 ```
+
+The optional `state` object is attached to the resulting History API entry. These methods, plus
+`preload()`, `back()`, and `forward()`, throw after `destroy()`.
 
 ### Behavior
 
@@ -489,7 +556,12 @@ router.forward() // wraps history.forward()
   `errorRoute`; otherwise the root is cleared and `destroy()` is called on the current page.
 - If `beforeNavigate` does not call `next()`, navigation is cancelled and the full URL reverts to the current route, preserving its query string and fragment in both history and hash modes.
 - If `beforeNavigate` calls `next('/path')`, the router redirects to that path.
-- Same-domain `<a>` clicks are intercepted automatically; modified clicks (ctrl, meta, shift, alt) and external links pass through.
+- If a guard redirects more than 10 consecutive times, `onError` receives a redirect-limit error
+  and the URL reverts to the current route.
+- Same-domain `<a>` clicks, including anchors inside shadow roots, are intercepted automatically;
+  modified clicks (ctrl, meta, shift, alt) and external links pass through.
+- In history mode, push navigation to a URL fragment scrolls the matching element into view when
+  scroll restoration is enabled; if no matching element exists, the page scrolls to the top.
 - In hash mode, router paths are stored after `#/` and `router.href()` returns hash-prefixed URLs.
 
 ## Boundaries

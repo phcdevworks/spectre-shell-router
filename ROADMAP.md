@@ -22,14 +22,15 @@ restate delivered work.
 
 ## Delivered Phases
 
-| Phase   | Summary                                                                                                                                                                                                                                | Shipped in  |
-| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| 1       | Foundation — Router class, `currentNavId` race-condition guard, `:param`/query matching, History API integration, lifecycle enforcement, link interception, TypeScript strict mode, Vitest suite, CI, npm publishing, multi-agent docs | 1.0.0       |
-| 2       | Routing contract — hash mode, `beforeNavigate` guards, scroll restoration, named routes + `router.href()`, stable `RouterOptions`                                                                                                      | 1.0.0–1.1.0 |
-| 3       | Ecosystem integration — `router.subscribe()`, `onNavigationStart`/`onNavigationEnd`, per-route `meta`, `afterNavigate`, full README API docs for the signals/loading/title patterns                                                    | 1.1.0       |
-| 4 P0/P1 | Production readiness — `errorRoute` + `onError` for deterministic error handling, `router.back()`/`forward()`/`replace()` history helpers                                                                                              | 1.2.0       |
-| 4 P2    | Nested routing — `Route.routes?: Route[]` with `[data-router-outlet]` mounting, cross-level param merging, ancestor-layout persistence across sibling navigations                                                                      | 1.4.0       |
-| 5       | Deployment and performance — `RouterOptions.basePath` for URL-prefix deployment, `AbortSignal`-based cancellable loaders | 1.5.0       |
+| Phase   | Summary                                                                                                                                                                                                                                                                                 | Shipped in  |
+| ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| 1       | Foundation — Router class, `currentNavId` race-condition guard, `:param`/query matching, History API integration, lifecycle enforcement, link interception, TypeScript strict mode, Vitest suite, CI, npm publishing, multi-agent docs                                                  | 1.0.0       |
+| 2       | Routing contract — hash mode, `beforeNavigate` guards, scroll restoration, named routes + `router.href()`, stable `RouterOptions`                                                                                                                                                       | 1.0.0–1.1.0 |
+| 3       | Ecosystem integration — `router.subscribe()`, `onNavigationStart`/`onNavigationEnd`, per-route `meta`, `afterNavigate`, full README API docs for the signals/loading/title patterns                                                                                                     | 1.1.0       |
+| 4 P0/P1 | Production readiness — `errorRoute` + `onError` for deterministic error handling, `router.back()`/`forward()`/`replace()` history helpers                                                                                                                                               | 1.2.0       |
+| 4 P2    | Nested routing — `Route.routes?: Route[]` with `[data-router-outlet]` mounting, cross-level param merging, ancestor-layout persistence across sibling navigations                                                                                                                       | 1.4.0       |
+| 5       | Deployment and performance — `RouterOptions.basePath` for URL-prefix deployment, `AbortSignal`-based cancellable loaders                                                                                                                                                                | 1.5.0       |
+| 6       | Lean performance — guard-aware `NavigationContext` (`params`/`query`/`meta`), shadow DOM link interception, redirect loop cap, catch-all `*` segments, fragment scrolling, `router.current`, `router.preload()`, `RouteParams<>` type, history `state` option, pre-split route patterns | 1.6.0       |
 
 ### What will not change
 
@@ -44,7 +45,7 @@ restate delivered work.
 
 ## What's Next
 
-No active phase is currently open. Phase 5 is complete.
+No active phase is currently open. Phase 6 shipped in 1.6.0.
 
 New routing surface can be planned proactively, without waiting for a
 downstream request — see [TODO.md](TODO.md).
