@@ -92,7 +92,8 @@ Part of the [PHCDevworks Spectre shell ecosystem](https://github.com/phcdevworks
 
 ## Requirements
 
-- Node.js `^22.12.0 || >=24.0.0`
+- Package consumers: Node.js `^22.12.0 || >=24.0.0`
+- Repository development and validation: Node.js `^22.22.2 || >=24.15.0`
 
 ## Installation
 

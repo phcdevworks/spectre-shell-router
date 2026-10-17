@@ -32,7 +32,8 @@ Contract change type: additive
 ### Changed
 
 - Updated development tooling, including the ecosystem manifest validator, ESLint, TypeScript
-  ESLint, Vitest, jsdom, and transitive packages.
+  ESLint, Vitest, jsdom, and transitive packages, and aligned the CI validation matrix with the
+  toolchain's Node.js requirements. The published package's Node.js engine range is unchanged.
 - Push navigations to a URL with a fragment (e.g. `/guide#install`) scroll the matching element
   into view instead of scrolling to the top, when `scrollRestoration` is enabled in history mode.
 - `back()` and `forward()` now throw after `destroy()`, matching `navigate()` and `replace()`.
