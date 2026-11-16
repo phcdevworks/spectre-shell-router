@@ -38,7 +38,11 @@ jobs:
           cache-dependency-path: package-lock.json
 
       - name: Use pinned npm version
-        run: npm install -g "$(node -p "require('./package.json').packageManager")"
+        # Install into a separate prefix: upgrading the bundled npm in place
+        # can break mid-install (npm 10 deletes its own modules while running).
+        run: |
+          npm install -g --prefix "$RUNNER_TEMP/npm" "$(node -p "require('./package.json').packageManager")"
+          echo "$RUNNER_TEMP/npm/bin" >> "$GITHUB_PATH"
 
       - name: Install dependencies
         run: npm ci
