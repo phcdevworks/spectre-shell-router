@@ -23,23 +23,25 @@ jobs:
       fail-fast: false
       matrix:
         node-version:
-          - 22.22.2
-          - 24.15.0
+          - 22.x
+          - 24.x
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
           cache-dependency-path: package-lock.json
 
-      - name: Use pinned npm version
-        # Install into a separate prefix: upgrading the bundled npm in place
-        # can break mid-install (npm 10 deletes its own modules while running).
+      # The lockfile is written by the npm pinned in package.json
+      # "packageManager"; npm 10 (bundled with Node 22) rejects it. Install
+      # into a separate prefix: upgrading the bundled npm in place can break
+      # mid-install.
+      - name: Install pinned npm
         run: |
           npm install -g --prefix "$RUNNER_TEMP/npm" "$(node -p "require('./package.json').packageManager")"
           echo "$RUNNER_TEMP/npm/bin" >> "$GITHUB_PATH"
